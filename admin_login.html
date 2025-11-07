@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Sign In/Sign Up | MNU Events</title>
+
+  <!-- CSS (relative) -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" type="image/x-icon" href="images/redlogo.png" />
+
+  <!-- Icons/fonts -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- Switch back to Students -->
+  <a id="studentSwitch" class="role-switch" href="login.html" title="Back to Students">Students</a>
+
+  <header class="header container">
+    <div class="left-section"></div>
+    <div class="logo">
+      <a href="index.html"><img src="images/logo.png" alt="MNU Events" /></a>
+    </div>
+  </header>
+
+  <div class="login-container">
+    <!-- LOGIN (ADMIN) -->
+    <div class="login-form" id="loginForm">
+      <h2>Welcome Back</h2>
+      <h4><span style="opacity:.85;font-weight:600;text-align: center;">(Admin Mode)</span></h4>
+
+      <div class="form-message-container">
+        <span>Please enter your organizer credentials to sign in</span>
+      </div>
+
+      <form class="form-text">
+        <input type="email" placeholder="official@kazguu.kz" />
+        <input type="password" placeholder="Enter your password" />
+        <a href="organizer.html"><button type="button">Sign In</button></a>
+        <a href="#">Forgot Your Password?</a>
+      </form>
+
+      <p>Don't have an account?
+        <a href="#" id="showSignup" data-action="show-signup">Sign Up</a>
+      </p>
+    </div>
+
+    <!-- SIGNUP (ADMIN) -->
+    <div class="signup-form hidden" id="signupForm">
+      <h2>Create Account</h2>
+      <h4><span style="opacity:.85;font-weight:600;text-align: center;">(Admin Mode)</span></h4>
+
+      <div class="form-message-container">
+        <span>Register your club's official account</span>
+      </div>
+
+      <form>
+        <input type="text" placeholder="Club name" />
+        <input type="email" placeholder="official@kazguu.kz" />
+        <input type="password" placeholder="Create password" />
+        <input type="password" placeholder="Confirm password" />
+        <!-- при нажатии просто вернёмся на логин -->
+        <button type="button" data-action="do-signup">Sign Up</button>
+      </form>
+
+      <p>Already have an account?
+        <a href="#" id="showLogin" data-action="show-login">Sign In</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- External script (optional) -->
+  <script src="js/script.js" defer></script>
+
+  <!-- Inline fallback + поведение "Sign Up -> Login" -->
+  <script>
+    (function () {
+      if (!document.querySelector('style[data-hidden-helper]')) {
+        const s = document.createElement('style');
+        s.setAttribute('data-hidden-helper', '1');
+        s.textContent = '.hidden{display:none !important;}';
+        document.head.appendChild(s);
+      }
+
+      const loginForm  = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+
+      if (loginForm && signupForm) {
+        loginForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+      }
+
+      document.addEventListener('click', function (e) {
+        const showSignup = e.target.closest('[data-action="show-signup"]');
+        const showLogin  = e.target.closest('[data-action="show-login"]');
+        const doSignup   = e.target.closest('[data-action="do-signup"]');
+
+        if (showSignup) {
+          e.preventDefault();
+          loginForm?.classList.add('hidden');
+          signupForm?.classList.remove('hidden');
+        }
+        if (showLogin) {
+          e.preventDefault();
+          signupForm?.classList.add('hidden');
+          loginForm?.classList.remove('hidden');
+        }
+        // при клике на кнопку Sign Up (в форме регистрации) — возвращаемся на логин
+        if (doSignup) {
+          e.preventDefault();
+          signupForm?.classList.add('hidden');
+          loginForm?.classList.remove('hidden');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

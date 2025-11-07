@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Events</title>
+
+  <!-- Favicon + Fonts + Icons -->
+  <link rel="icon" href="images/redlogo.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/events.css"/>
+</head>
+
+<body class="ev-body">
+  <!-- HEADER: сразу чёрный фиксированный -->
+  <header class="header header-black visible" id="pageHeader">
+    <div class="header-inner">
+      <!-- Left: Language -->
+      <div class="left-section lang-wrap">
+        <button type="button" class="icon-arw" id="langBtn">
+          ENG <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </button>
+        <div class="dropdown-menu" id="langMenu">
+          <button class="active" data-lang="ENG">ENG</button>
+          <button data-lang="РУС">РУС</button>
+          <button data-lang="ҚАЗ">ҚАЗ</button>
+        </div>
+      </div>
+
+      <!-- Center: Logo -->
+      <div class="logo">
+        <a href="index.html"><img src="images/logo.png" alt="MNU Events"></a>
+      </div>
+
+      <!-- Right: Nav -->
+      <nav>
+        <ul>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="#">Clubs</a></li>
+          <li><a href="login.html">Log In</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="ev-container">
+
+    <!-- SEARCH (простой, на всю ширину контейнера) -->
+    <div class="ev-search ev-search--header" id="evSearchBox">
+      <i class="fa-solid fa-magnifying-glass ev-search__icon" aria-hidden="true"></i>
+      <input id="evSearch" class="ev-search__input" type="search"
+             placeholder="Search events, venues, clubs" aria-label="Search"/>
+    </div>
+
+    <!-- CATEGORIES -->
+    <section id="evChips" class="ev-chips" aria-label="Event categories"></section>
+
+    <!-- GRID -->
+    <section id="evGrid" class="ev-grid" aria-live="polite"></section>
+
+    <p id="evEmpty" class="ev-empty" hidden>No events found</p>
+
+    <!-- …твой существующий контент списка… -->
+
+<!-- Modal -->
+<div id="evModal" class="ev-modal" hidden>
+  <div class="ev-modal__backdrop" data-close=""></div>
+
+  <article class="ev-modal__content" role="dialog" aria-modal="true" aria-labelledby="evMdTitle">
+    <button class="ev-modal__close" type="button" data-close="" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <img id="evMdHero" class="ev-md__hero" alt="Event cover"/>
+
+    <!-- Вся прокручиваемая часть карточки -->
+    <div class="ev-md__scroll">
+      <div class="ev-md__body">
+        <div class="ev-md__top">
+          <h2 id="evMdTitle" class="ev-md__title"></h2>
+
+          <!-- ОСТАВЛЯЕМ только CSI-пилюлю -->
+          <div id="evMdCsi" class="csi-pills"></div>
+        </div>
+
+        <p id="evMdDesc" class="ev-md__desc"></p>
+
+        <ul class="ev-md__meta" id="evMdMeta"></ul>
+      </div>
+
+      <!-- Единственная нижняя кнопка -->
+      <div class="ev-md__footer">
+        <button id="evMdJoin" class="ev-join" type="button">Join</button>
+      </div>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  <!-- Lang dropdown (hover) -->
+  <script>
+    (function wireLang(){
+      const btn  = document.getElementById('langBtn');
+      const menu = document.getElementById('langMenu');
+      if (!btn || !menu) return;
+
+      let t;
+      const wrap = btn.closest('.lang-wrap');
+      const open  = () => { clearTimeout(t); menu.style.display = 'flex'; };
+      const close = () => { t = setTimeout(() => menu.style.display = 'none', 150); };
+
+      wrap.addEventListener('mouseenter', open);
+      wrap.addEventListener('mouseleave', close);
+
+      menu.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-lang]');
+        if (!b) return;menu.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        btn.innerHTML = `${b.dataset.lang} <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>`;
+      });
+
+      menu.style.display = 'none';
+    })();
+  </script>
+
+  <!-- Data + Page logic -->
+  <script src="js/events.data.js"></script>
+  <script src="js/events.js"></script>
+  <script>
+    // инициализация страницы (фильтры/карточки и т.д.)
+    window.EventsPage && window.EventsPage();
+  </script>
+</body>
+</html>

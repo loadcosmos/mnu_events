@@ -1,0 +1,149 @@
+:root{
+  --brand-red: #b80000;
+  --brand-dark: #111;
+  --muted: #666;
+  --bg: #fff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: Inter, Poppins, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background:var(--bg);
+  color:var(--brand-dark);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.5;
+}
+
+/* container helper */
+.container{ width:92%; max-width:1200px; margin:0 auto; }
+
+/* Header (matches your requested start) */
+.header.container{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 0;
+  background:var(--bg);
+  position:sticky;
+  top:0;
+  z-index:1500;
+  border-bottom:2px solid rgba(0,0,0,0.06);
+  backdrop-filter: blur(4px);
+}
+
+/* left */
+.left-section{ position:relative; }
+.icon-arw{
+  background:transparent;border:0;font-weight:700;cursor:pointer;color:var(--brand-dark);
+  font-size:15px;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;
+}
+.dropdown-menu{ position:absolute; top:42px; left:0; min-width:120px; background:#fff; border-radius:10px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08); overflow:hidden; border:1px solid rgba(0,0,0,0.06); }
+.dropdown-menu button{ display:block; width:100%; padding:10px 14px; border:0; background:transparent; text-align:left; cursor:pointer; font-weight:600; }
+.dropdown-menu button:hover, .dropdown-menu button.active{ background:var(--brand-red); color:#fff; }
+
+/* logo */
+.logo img{ height:48px; }
+
+/* nav */
+nav ul{ display:flex; gap:18px; align-items:center; margin:0; padding:0; list-style:none; }
+nav a{ color:var(--brand-dark); text-decoration:none; font-weight:600; padding:8px 6px; }
+nav a:hover, nav a.active{ color:var(--brand-red); }
+
+/* header right + wishlist */
+.header-right{ display:flex; align-items:center; gap:12px; }
+.wishlist-btn{ background:transparent;border:0;cursor:pointer;font-size:16px; display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px; }
+.wishlist-btn:hover{ background: rgba(184,0,0,0.04); }
+
+/* HERO & Categories */
+.hero{ padding:36px 0 6px; }
+.hero-inner{ display:flex; flex-direction:column; align-items:center; gap:8px; margin-top:6px; }
+.hero-title{ font-size:28px; font-weight:800; color:var(--brand-dark); text-align:center; }
+.hero-sub{ color:var(--muted); max-width:820px; text-align:center; }
+
+/* categories */
+.categories{ display:flex; gap:18px; justify-content:center; margin:20px 0 26px; flex-wrap:wrap; }
+.cat-btn{
+  width:320px; height:150px; border-radius:14px; overflow:hidden; position:relative; cursor:pointer;
+  display:flex; align-items:flex-end; padding:16px; color:#fff; background-size:cover; background-position:center;
+  transition:transform .28s ease, box-shadow .28s ease; box-shadow:0 10px 30px rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.04);
+}
+.cat-btn .label{ font-weight:800; font-size:18px; text-shadow:0 6px 18px rgba(0,0,0,0.35); }
+.cat-btn::before{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 20%, rgba(0,0,0,0.45) 100%); }
+.cat-btn:hover{ transform:translateY(-6px) scale(1.02); box-shadow:0 18px 40px rgba(184,0,0,0.12); }
+.cat-btn.active{ outline:3px solid rgba(184,0,0,0.12); transform:translateY(-2px) scale(1.01); }
+
+/* clubs grid */
+.clubs-section{ padding:28px 0 80px; }
+.clubs-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+  gap:18px;
+  align-items:start;
+}
+
+/* club card (split) */
+.club-card{
+  display:flex; gap:0; border-radius:12px; overflow:hidden; border:1px solid rgba(0,0,0,0.04);
+  box-shadow:0 10px 24px rgba(0,0,0,0.06); transition: transform .32s ease, opacity .32s ease;
+  opacity:0; transform:translateY(12px); background:#fff;
+}
+.club-card.visible{ opacity:1; transform:translateY(0); }
+.club-left{ width:40%; min-width:180px; max-width:280px; overflow:hidden; }
+.club-left img{ width:100%; height:100%; object-fit:cover; display:block; aspect-ratio:4/3; }
+.club-right{ padding:16px 18px; display:flex; flex-direction:column; flex:1; }
+.club-right h3{ margin:0 0 8px; color:var(--brand-red); font-size:18px; }
+.club-right p{ margin:0; color:#444; flex:1; font-size:14px; }
+.club-actions{ display:flex; gap:10px; margin-top:12px; align-items:center; }
+.btn-join{ background:var(--brand-red); color:#fff; border:0; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; }
+.btn-wish{ background:transparent; border:1px solid rgba(0,0,0,0.08); padding:9px 12px; border-radius:10px; cursor:pointer; }
+.club-card:hover{ transform:translateY(-6px); }
+
+/* bottom drawer modal (slide up) */
+.drawer-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:flex-end; justify-content:center; z-index:2200; animation:fadeIn .18s ease; }
+.drawer{
+  width:100%; max-width:1100px; border-radius:12px 12px 0 0; background:#fff; box-shadow:0 -20px 60px rgba(0,0,0,0.35);
+  display:grid; grid-template-columns: 1fr 420px; max-height:80vh; overflow:auto; transform:translateY(100%); animation: slideUp .36s cubic-bezier(.2,.9,.25,1) forwards;
+}
+@media(max-width:900px){ .drawer{ grid-template-columns: 1fr; } }
+.drawer-left{ padding:22px; background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.02)); }
+.drawer-right{ padding:20px; background:rgba(255,255,255,0.02); display:flex; flex-direction:column; gap:12px; }
+.drawer .club-photo{ width:100%; height:320px; object-fit:cover; border-radius:8px; }
+
+/* drawer content */
+.drawer .title{ font-size:22px; font-weight:800; color:var(--brand-dark); margin:0 0 8px; }
+.drawer p{ color:#333; line-height:1.6; }
+
+/* drawer actions */
+.drawer-actions{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.drawer-actions button{ padding:10px 14px; border-radius:10px; border:0; cursor:pointer; font-weight:700; }
+.join-btn{ background:var(--brand-red); color:#fff; }
+.wish-btn{ background:#fff; border:1px solid rgba(0,0,0,0.08); }
+.close-drawer{ position:absolute; right:14px; top:10px; background:transparent; border:0; font-size:20px; cursor:pointer; }
+
+/* wishlist popup (mini) */
+.wishlist-modal{ position:fixed; right:20px; top:70px; width:360px; max-height:70vh; overflow:auto; background:#fff; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.2); z-index:2100; padding:12px; }
+.wishlist-modal h4{ margin:6px 0 12px; color:var(--brand-dark); }
+.wish-item{ display:flex; gap:10px; align-items:center; padding:8px; border-radius:8px; border-bottom:1px solid rgba(0,0,0,0.04); }
+.wish-item img{ width:64px; height:64px; object-fit:cover; border-radius:8px; }
+.wish-item .meta{ flex:1; }
+.wish-item .meta h5{ margin:0 0 4px; color:var(--brand-dark); font-size:15px; }
+.wish-item .meta p{ margin:0; font-size:13px; color:var(--muted); }
+.wish-item button{ background:transparent;border:1px solid rgba(0,0,0,0.08); padding:6px 8px;border-radius:8px; cursor:pointer; }
+
+/* helpers & animations */
+.hint{ color:var(--muted); font-size:13px; margin-top:8px; }
+@keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+@keyframes slideUp{ from{ transform:translateY(100%);} to{ transform:translateY(0%);} }
+
+@media(max-width:1100px){ .clubs-grid{ grid-template-columns: 1fr; } }
+@media(max-width:720px){
+  .cat-btn{ width:92%; height:140px; }
+  .categories{ gap:12px; }
+  .hero-title{ font-size:22px; }
+  .club-card{ flex-direction:column; }
+  .club-left{ width:100%; height:200px; }
+  .club-right{ padding:14px; }
+  .wishlist-modal{ left:12px; right:12px; top:auto; bottom:20px; width:auto; max-width:calc(100% - 24px); }
+}
