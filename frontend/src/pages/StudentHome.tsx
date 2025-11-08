@@ -95,6 +95,12 @@ function StudentHome() {
     setActiveFilter(filter);
   };
 
+  const handleEventClick = (eventId: string) => {
+    // TODO: Navigate to event details page
+    console.log('Event clicked:', eventId);
+    // navigate(`/events/${eventId}`);
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -192,7 +198,12 @@ function StudentHome() {
             </div>
             <div className={styles.scrollContainer}>
               {recommendedEvents.map((event) => (
-                <div key={event.id} className={styles.eventCardHorizontal}>
+                <div
+                  key={event.id}
+                  className={styles.eventCardHorizontal}
+                  onClick={() => handleEventClick(event.id)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <img
                     src={event.imageUrl || 'https://via.placeholder.com/320x180/d62e1f/ffffff?text=MNU+Event'}
                     alt={event.title}
@@ -294,7 +305,12 @@ function StudentHome() {
           ) : (
             <div className={styles.eventsGrid}>
               {events.map((event) => (
-                <div key={event.id} className={styles.eventCard}>
+                <div
+                  key={event.id}
+                  className={styles.eventCard}
+                  onClick={() => handleEventClick(event.id)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div style={{ position: 'relative' }}>
                     <img
                       src={event.imageUrl || 'https://via.placeholder.com/400x200/d62e1f/ffffff?text=MNU+Event'}
