@@ -1,57 +1,74 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/auth.service';
-import '../styles/style.css';
+import '../styles/auth.css';
+
+type UserRole = 'student' | 'organizer';
+type AuthMode = 'signin' | 'signup';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [isSignup, setIsSignup] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
+  const [role, setRole] = useState<UserRole>('student');
+  const [mode, setMode] = useState<AuthMode>('signin');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
 
-  // Login form
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  // Sign In State
+  const [signinData, setSigninData] = useState({ email: '', password: '' });
 
-  // Signup form
+  // Sign Up State
   const [signupData, setSignupData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
     firstName: '',
     lastName: '',
+    organizationName: '',
   });
 
-  // Verification
+  // Verification State
   const [verificationCode, setVerificationCode] = useState('');
   const [pendingEmail, setPendingEmail] = useState('');
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      await authService.login(loginData);
-      navigate('/events');
+      const response = await authService.login(signinData);
+
+      // Check role match
+      if (role === 'organizer' && (response.user.role === 'ORGANIZER' || response.user.role === 'ADMIN')) {
+        navigate('/organizer');
+      } else if (role === 'student' && response.user.role === 'STUDENT') {
+        navigate('/');
+      } else {
+        setError(`This account is not registered as a ${role}`);
+        authService.logout();
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Sign in failed');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (signupData.password !== signupData.confirmPassword) {
-      setError('Passwords do not match');
+    // Validate email domain
+    if (!signupData.email.endsWith('@kazguu.kz')) {
+      setError('Registration is only available for @kazguu.kz email addresses');
       return;
     }
 
-    if (!signupData.email.endsWith('@kazguu.kz')) {
-      setError('Please use your @kazguu.kz email');
+    // Validate passwords match
+    if (signupData.password !== signupData.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
@@ -61,15 +78,15 @@ export default function Login() {
       await authService.register({
         email: signupData.email,
         password: signupData.password,
-        firstName: signupData.firstName,
-        lastName: signupData.lastName,
+        firstName: role === 'student' ? signupData.firstName : signupData.organizationName,
+        lastName: role === 'student' ? signupData.lastName : 'Organization',
       });
 
       setPendingEmail(signupData.email);
       setIsVerifying(true);
-      setError('');
+      setSuccess('Verification code sent to your email');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || 'Sign up failed');
     } finally {
       setLoading(false);
     }
@@ -85,7 +102,8 @@ export default function Login() {
         email: pendingEmail,
         code: verificationCode,
       });
-      navigate('/events');
+
+      navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Verification failed');
     } finally {
@@ -93,145 +111,295 @@ export default function Login() {
     }
   };
 
+  const resetForm = () => {
+    setError('');
+    setSuccess('');
+    setSigninData({ email: '', password: '' });
+    setSignupData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      firstName: '',
+      lastName: '',
+      organizationName: '',
+    });
+  };
+
+  const switchRole = (newRole: UserRole) => {
+    setRole(newRole);
+    resetForm();
+  };
+
+  const switchMode = (newMode: AuthMode) => {
+    setMode(newMode);
+    setError('');
+    setSuccess('');
+  };
+
   return (
-    <div>
-      <a
-        className="role-switch"
-        href="/admin-login"
-        title="Войти как админ"
-      >
-        Admin
-      </a>
+    <div className="auth-page">
+      {/* Animated Background */}
+      <div className="auth-background" />
 
-      <header className="header container">
-        <div className="left-section"></div>
-        <div className="logo">
-          <a href="/">
-            <img src="/images/logo.png" alt="MNU Events" />
-          </a>
-        </div>
-      </header>
-
-      <div className="login-container">
-        {/* Verification Form */}
-        {isVerifying && (
-          <div className="login-form">
-            <h2>Verify Email</h2>
-            <div className="form-message-container">
-              <span>Enter the 6-digit code sent to {pendingEmail}</span>
+      {/* Auth Container */}
+      <div className="auth-container">
+        {!isVerifying && (
+          <>
+            {/* Role Toggle */}
+            <div className="role-toggle-container">
+              <div className="role-toggle">
+                <button
+                  className={`role-toggle-option ${role === 'student' ? 'active' : ''}`}
+                  onClick={() => switchRole('student')}
+                >
+                  Students
+                </button>
+                <button
+                  className={`role-toggle-option ${role === 'organizer' ? 'active' : ''}`}
+                  onClick={() => switchRole('organizer')}
+                >
+                  Organizers
+                </button>
+              </div>
             </div>
-            {error && <p style={{ color: '#ff4444', textAlign: 'center' }}>{error}</p>}
-            <form className="form-text" onSubmit={handleVerify}>
-              <input
-                type="text"
-                placeholder="Enter 6-digit code"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-                maxLength={6}
-                required
-              />
-              <button type="submit" disabled={loading}>
-                {loading ? 'Verifying...' : 'Verify'}
-              </button>
-              <a href="#" onClick={() => setIsVerifying(false)}>
-                Back to login
-              </a>
-            </form>
-          </div>
-        )}
 
-        {/* Login Form */}
-        {!isSignup && !isVerifying && (
-          <div className="login-form" id="loginForm">
-            <h2>Welcome Back</h2>
-            <div className="form-message-container">
-              <span>Please enter your details to sign in</span>
+            {/* Auth Header */}
+            <div className="auth-header">
+              <h1 className="auth-title">
+                {mode === 'signin' ? 'Welcome Back' : 'Create Account'}
+              </h1>
+              {role === 'organizer' && (
+                <span className="auth-mode-label">(Admin Mode)</span>
+              )}
+              <p className="auth-subtitle">
+                {mode === 'signin' ? (
+                  role === 'student' ? (
+                    'Please enter your student details to sign in'
+                  ) : (
+                    'Please enter your organizer credentials to sign in'
+                  )
+                ) : (
+                  role === 'student' ? (
+                    'Use your university email to join the community'
+                  ) : (
+                    'Register your club or department'
+                  )
+                )}
+              </p>
             </div>
-            {error && <p style={{ color: '#ff4444', textAlign: 'center' }}>{error}</p>}
-            <form className="form-text" onSubmit={handleLogin}>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={loginData.email}
-                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                required
-              />
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={loginData.password}
-                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                required
-              />
-              <button type="submit" disabled={loading}>
-                {loading ? 'Signing In...' : 'Sign In'}
-              </button>
-              <a href="#">Forgot Your Password?</a>
-            </form>
-            <p>
-              Don't have an account?{' '}
-              <a href="#" onClick={(e) => { e.preventDefault(); setIsSignup(true); }}>
-                Sign Up
-              </a>
-            </p>
-          </div>
-        )}
 
-        {/* Signup Form */}
-        {isSignup && !isVerifying && (
-          <div className="signup-form" id="signupForm">
-            <h2>Create Account</h2>
-            <div className="form-message-container">
-              <span>Register with your @kazguu.kz account</span>
-            </div>
-            {error && <p style={{ color: '#ff4444', textAlign: 'center' }}>{error}</p>}
-            <form onSubmit={handleSignup}>
-              <input
-                type="text"
-                placeholder="First Name"
-                value={signupData.firstName}
-                onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={signupData.lastName}
-                onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
-                required
-              />
-              <input
-                type="email"
-                placeholder="user@kazguu.kz"
-                value={signupData.email}
-                onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                required
-              />
-              <input
-                type="password"
-                placeholder="Create password"
-                value={signupData.password}
-                onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                required
-              />
-              <input
-                type="password"
-                placeholder="Confirm password"
-                value={signupData.confirmPassword}
-                onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-                required
-              />
-              <button type="submit" disabled={loading}>
-                {loading ? 'Creating Account...' : 'Sign Up'}
-              </button>
-            </form>
-            <p>
-              Already have an account?{' '}
-              <a href="#" onClick={(e) => { e.preventDefault(); setIsSignup(false); setError(''); }}>
+            {/* Form Tabs */}
+            <div className="form-tabs">
+              <button
+                className={`form-tab ${mode === 'signin' ? 'active' : ''}`}
+                onClick={() => switchMode('signin')}
+              >
                 Sign In
+              </button>
+              <button
+                className={`form-tab ${mode === 'signup' ? 'active' : ''}`}
+                onClick={() => switchMode('signup')}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            {/* Error/Success Messages */}
+            {error && (
+              <div className="error-message">
+                <i className="fa-solid fa-circle-exclamation"></i>
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="success-message">
+                <i className="fa-solid fa-circle-check"></i>
+                {success}
+              </div>
+            )}
+
+            {/* Sign In Form */}
+            {mode === 'signin' && (
+              <form className="auth-form" onSubmit={handleSignIn}>
+                <div className="form-field">
+                  <i className="fa-solid fa-envelope"></i>
+                  <input
+                    type="email"
+                    className="auth-input"
+                    placeholder="Enter your email"
+                    value={signinData.email}
+                    onChange={(e) => setSigninData({ ...signinData, email: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="form-field">
+                  <i className="fa-solid fa-lock"></i>
+                  <input
+                    type="password"
+                    className="auth-input"
+                    placeholder="Enter your password"
+                    value={signinData.password}
+                    onChange={(e) => setSigninData({ ...signinData, password: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <button type="submit" className="auth-submit-btn" disabled={loading}>
+                  {loading ? 'Signing In...' : 'Sign In'}
+                </button>
+
+                <a href="#" className="auth-link forgot-password">
+                  Forgot Your Password?
+                </a>
+              </form>
+            )}
+
+            {/* Sign Up Form */}
+            {mode === 'signup' && (
+              <form className="auth-form" onSubmit={handleSignUp}>
+                {role === 'student' ? (
+                  <>
+                    <div className="form-field">
+                      <i className="fa-solid fa-user"></i>
+                      <input
+                        type="text"
+                        className="auth-input"
+                        placeholder="First Name"
+                        value={signupData.firstName}
+                        onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <i className="fa-solid fa-user"></i>
+                      <input
+                        type="text"
+                        className="auth-input"
+                        placeholder="Last Name"
+                        value={signupData.lastName}
+                        onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="form-field">
+                    <i className="fa-solid fa-building"></i>
+                    <input
+                      type="text"
+                      className="auth-input"
+                      placeholder="Organization / Club Name"
+                      value={signupData.organizationName}
+                      onChange={(e) => setSignupData({ ...signupData, organizationName: e.target.value })}
+                      required
+                    />
+                  </div>
+                )}
+
+                <div className="form-field">
+                  <i className="fa-solid fa-envelope"></i>
+                  <input
+                    type="email"
+                    className="auth-input"
+                    placeholder="user@kazguu.kz"
+                    value={signupData.email}
+                    onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                    required
+                  />
+                  <p className="validation-hint">
+                    Must use your @kazguu.kz university email
+                  </p>
+                </div>
+
+                <div className="form-field">
+                  <i className="fa-solid fa-lock"></i>
+                  <input
+                    type="password"
+                    className="auth-input"
+                    placeholder="Create password"
+                    value={signupData.password}
+                    onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="form-field">
+                  <i className="fa-solid fa-lock"></i>
+                  <input
+                    type="password"
+                    className="auth-input"
+                    placeholder="Confirm password"
+                    value={signupData.confirmPassword}
+                    onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <button type="submit" className="auth-submit-btn" disabled={loading}>
+                  {loading ? 'Creating Account...' : 'Sign Up'}
+                </button>
+              </form>
+            )}
+          </>
+        )}
+
+        {/* Email Verification Form */}
+        {isVerifying && (
+          <>
+            <div className="auth-header">
+              <h1 className="auth-title">Verify Email</h1>
+              <p className="auth-subtitle">
+                Enter the 6-digit code sent to <strong>{pendingEmail}</strong>
+              </p>
+            </div>
+
+            {error && (
+              <div className="error-message">
+                <i className="fa-solid fa-circle-exclamation"></i>
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="success-message">
+                <i className="fa-solid fa-circle-check"></i>
+                {success}
+              </div>
+            )}
+
+            <form className="auth-form" onSubmit={handleVerify}>
+              <div className="form-field">
+                <i className="fa-solid fa-shield-halved"></i>
+                <input
+                  type="text"
+                  className="auth-input"
+                  placeholder="Enter 6-digit code"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  maxLength={6}
+                  required
+                />
+              </div>
+
+              <button type="submit" className="auth-submit-btn" disabled={loading}>
+                {loading ? 'Verifying...' : 'Verify Email'}
+              </button>
+
+              <a
+                href="#"
+                className="auth-link forgot-password"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsVerifying(false);
+                  setMode('signin');
+                }}
+              >
+                Back to Sign In
               </a>
-            </p>
-          </div>
+            </form>
+          </>
         )}
       </div>
     </div>

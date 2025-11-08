@@ -3,7 +3,6 @@ import { authService } from './services/auth.service';
 
 // Pages
 import Login from './pages/Login';
-import AdminLogin from './pages/AdminLogin';
 import Events from './pages/Events';
 import Clubs from './pages/Clubs';
 import Organizer from './pages/Organizer';
@@ -31,7 +30,6 @@ function App() {
       {/* Public routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/events" element={<Events />} />
       <Route path="/clubs" element={<Clubs />} />
 
