@@ -1,41 +1,44 @@
-import { api } from './api';
-import { Registration, PaginatedResponse } from '../types';
+import api from './api';
 
-export const registrationsService = {
-  register: async (eventId: string): Promise<Registration> => {
-    const response = await api.post('/registrations', { eventId });
+export interface Registration {
+  id: string;
+  userId: string;
+  eventId: string;
+  status: string;
+  checkedIn: boolean;
+  checkedInAt?: string;
+  createdAt: string;
+  event?: {
+    id: string;
+    title: string;
+    startDate: string;
+    endDate: string;
+    location: string;
+    imageUrl?: string;
+  };
+}
+
+class RegistrationsService {
+  async register(eventId: string) {
+    const response = await api.post<Registration>(`/registrations/${eventId}`);
     return response.data;
-  },
+  }
 
-  getMyRegistrations: async (page?: number, limit?: number): Promise<PaginatedResponse<Registration>> => {
-    const response = await api.get('/registrations/my', { params: { page, limit } });
+  async cancel(eventId: string) {
+    await api.delete(`/registrations/${eventId}`);
+  }
+
+  async getMyRegistrations() {
+    const response = await api.get<Registration[]>('/registrations/my');
     return response.data;
-  },
+  }
 
-  getEventParticipants: async (
-    eventId: string,
-    page?: number,
-    limit?: number,
-    search?: string
-  ): Promise<PaginatedResponse<Registration>> => {
-    const response = await api.get(`/registrations/event/${eventId}`, {
-      params: { page, limit, search },
+  async checkIn(eventId: string, userId: string) {
+    const response = await api.post(`/registrations/${eventId}/check-in`, {
+      userId,
     });
     return response.data;
-  },
+  }
+}
 
-  cancel: async (id: string) => {
-    const response = await api.delete(`/registrations/${id}`);
-    return response.data;
-  },
-
-  checkIn: async (id: string): Promise<Registration> => {
-    const response = await api.patch(`/registrations/${id}/checkin`);
-    return response.data;
-  },
-
-  undoCheckIn: async (id: string): Promise<Registration> => {
-    const response = await api.patch(`/registrations/${id}/undo-checkin`);
-    return response.data;
-  },
-};
+export const registrationsService = new RegistrationsService();

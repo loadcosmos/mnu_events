@@ -1,39 +1,78 @@
-import { api } from './api';
-import { User, AuthResponse } from '../types';
+import api from './api';
 
-export const authService = {
-  register: async (data: {
+export interface RegisterDto {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface LoginDto {
+  email: string;
+  password: string;
+}
+
+export interface VerifyEmailDto {
+  email: string;
+  code: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  user: {
+    id: string;
     email: string;
-    password: string;
     firstName: string;
     lastName: string;
-  }) => {
-    const response = await api.post('/auth/register', data);
-    return response.data;
-  },
+    role: string;
+    emailVerified: boolean;
+  };
+}
 
-  verifyEmail: async (email: string, code: string): Promise<AuthResponse> => {
-    const response = await api.post('/auth/verify-email', { email, code });
+class AuthService {
+  async register(data: RegisterDto) {
+    const response = await api.post<{ message: string }>('/auth/register', data);
     return response.data;
-  },
+  }
 
-  resendCode: async (email: string) => {
-    const response = await api.post('/auth/resend-code', { email });
+  async verifyEmail(data: VerifyEmailDto) {
+    const response = await api.post<AuthResponse>('/auth/verify-email', data);
+    this.saveTokens(response.data);
     return response.data;
-  },
+  }
 
-  login: async (email: string, password: string): Promise<AuthResponse> => {
-    const response = await api.post('/auth/login', { email, password });
+  async login(data: LoginDto) {
+    const response = await api.post<AuthResponse>('/auth/login', data);
+    this.saveTokens(response.data);
     return response.data;
-  },
+  }
 
-  getProfile: async (): Promise<User> => {
+  async logout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+  }
+
+  async getProfile() {
     const response = await api.get('/auth/profile');
     return response.data;
-  },
+  }
 
-  logout: () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-  },
-};
+  private saveTokens(data: AuthResponse) {
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('refresh_token', data.refresh_token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+  }
+
+  getUser() {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('access_token');
+  }
+}
+
+export const authService = new AuthService();

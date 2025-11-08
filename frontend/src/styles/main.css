@@ -1,0 +1,255 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: #000; /* фон страницы */
+  color: #fff;
+}
+
+a {
+  text-decoration: none;
+  color: #fff;
+}
+
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+/* ---------- HEADER ---------- */
+/* ---------- HEADER ---------- */
+.header-transparent {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  width: 100%;
+  padding: 40px 6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  z-index: 10;
+}
+
+/* Чёрный фиксированный */
+.header-black {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 40px 4rem;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+/* Когда появляется */
+.header-black.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Внутренние стили */
+.header-inner {
+  max-width: 1165px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+header {
+    position: absolute; /* поверх hero */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    background: transparent; /* прозрачный фон */
+  }
+
+/* Левая часть */
+.left-section {
+  display: inline-block;
+  align-items: center;
+  position: relative;
+}
+
+.icon-arw {
+    background: none;
+    border: none;
+    color: #fff; /* делает текст белым */
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    display: inline-flex; /* чтобы текст и иконка были на одной линии */
+    align-items: center;
+    gap: 6px; /* 🔹 расстояние между текстом и иконкой */
+  }
+  
+  .icon-arw i {
+    color: #d62e1f; /* 🔹 делает иконку красной */
+  }
+
+.arrow {
+  color: #d62e1f;
+  font-size: 10px;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    border-radius: 6px;
+    background-color: #ffffff19;
+    border: 1px solid #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    min-width: 60px;
+    transform: translateY(-5px);
+  transition: all 0.25s ease;
+}
+
+.dropdown-menu button {
+    background: none;
+    border: none;
+    text-align: center;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.dropdown-menu button:hover {
+    background-color: #00000035;
+}
+
+.dropdown-menu button.active {
+    color: #d62e1f;
+  }
+
+/* Логотип по центру */
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.header.scrolled .logo img {
+  height: 70px;
+}
+
+.logo img {
+  height: 70px;
+  transition: height 0.3s ease;
+}
+
+/* Правая часть — навигация */
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 30px;
+}
+
+nav li a {
+  font-weight: 500;
+  transition: 0.3s;
+  
+}
+
+nav li a:hover {
+  color: #d62e1f;
+}
+
+/* ---------- Адаптив ---------- */
+@media (max-width: 768px) {
+  nav ul {
+    gap: 15px;
+  }
+
+  .logo img {
+    height: 45px;
+  }
+}
+
+
+
+.about-section {
+  position: relative;
+  text-align: center;
+  padding: 210px 60px 180px; /* добавила побольше снизу, чтобы градиент красиво тянулся */
+  color: #fff;
+  background: #d62e1f;
+  overflow: hidden;
+}
+
+/* Контент поверх градиента */
+.about-section h1,
+.about-section p {
+  position: relative;
+  z-index: 1;
+}
+
+.about-section h1 {
+  font-size: 45px;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.about-section p {
+  font-size: 1.3rem;
+  max-width: 800px;
+  margin: 0 auto 20px;
+  line-height: 1.7;
+}
+
+
+
+/* ---------- Адаптивность ---------- */
+@media (max-width: 768px) {
+  nav ul {
+    gap: 15px;
+  }
+
+  .hero .text {
+    font-size: 1rem;
+  }
+
+  .btn {
+    padding: 10px 20px;
+  }
+
+  .about-section h1 {
+    font-size: 30px;
+  }
+
+  .about-section p {
+    font-size: 1rem;
+  }
+}

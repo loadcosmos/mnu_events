@@ -1,0 +1,382 @@
+/* 🔹 Убираем стандартные отступы браузера */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden; /* на всякий случай */
+}
+
+/* 🔹 Весь контейнер */
+.organizer-wrapper {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Montserrat', sans-serif;
+  background: #ffffff;
+  margin: 0; /* чтобы ничего не смещалось */
+}
+
+/* 🔹 Левая панель */
+.sidebar {
+  position: fixed;       /* прибиваем к левому краю */
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh;         /* на всю высоту окна */
+  background: #1E1E1E;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* 🔹 Основной контент справа от панели */
+.main-section {
+  flex: 1;
+  margin-left: 240px;   /* отступ = ширине sidebar */
+  padding: 40px 50px;
+}
+
+/* Остальные стили без изменений */
+.sidebar-logo {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.sidebar-logo img {
+  width: 60px;
+}
+
+.slider-title {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.menu-btn {
+  background: transparent;
+  border: none;
+  color: #bbb;
+  font-size: 15px;
+  text-align: left;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-family: 'Montserrat';
+}
+
+.menu-btn i {
+  margin-right: 8px;
+}
+
+.menu-btn:hover,
+.menu-btn.active {
+  background: #2c2c2c;
+  color: #fff;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  text-align: center;
+}
+
+.logout-btn {
+  background: #ffffff07;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: #fff 1px solid;
+  cursor: pointer;
+  font-family: 'Montserrat';
+}
+
+.logout-btn:hover{
+    background: #ffffff07;
+  color: #d62e1f;
+  border: #d62e1f 1px solid;
+}
+
+.page-content h1 {
+  margin-bottom: 40px;
+  color: #111;
+}
+
+.edit-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  margin-right: 5px;
+}
+
+.events-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.events-table th,
+.events-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+.profile-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+}
+
+.profile-logo {
+  width: 100px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+/* ===== Profile (Account Settings) ===== */
+.profile-wrap {
+  padding: 24px 28px;
+}
+
+.profile-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.profile-card {
+  background: #fff;
+  border: 1px solid var(--ev-border, #e6e7ea);
+  border-radius: 16px;
+  box-shadow: var(--ev-shadow-soft, 0 3px 10px rgba(16,24,40,.08));
+  padding: 20px;
+  max-width: 820px;
+}
+
+.section-title {
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.avatar-box {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #eee;
+  display: grid;
+  place-items: center;
+  background: #fafafa;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  font-size: 14px;
+  color: #888;
+}
+
+.avatar-actions .link-btn {
+  margin-right: 10px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+}
+.link-btn.danger { color: #c0392b; }
+
+.info-list {
+  margin-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 220px 1fr 24px;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f5f5f6;
+}
+.info-label {
+  color: #6b7280;
+  font-size: 14px;
+}
+.info-value {
+  font-size: 16px;
+}
+.info-input, .info-textarea {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  outline: none;
+}
+.info-input:focus, .info-textarea:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148,163,184,.2);
+}
+.info-textarea {
+  resize: vertical;
+}
+.multiline { white-space: pre-wrap; }
+
+.chev {
+  text-align: right;
+  color: #cbd5e1;
+  font-size: 22px;
+  user-select: none;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.btn {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn.primary {
+  background: var(--ev-red, #d62e1f);
+  border-color: var(--ev-red, #d62e1f);
+  color: #fff;
+}
+.btn.ghost {
+  background: #fff;
+}
+.hidden { display: none !important; }
+
+/* ==== Organizer Profile overrides (paste at the end) ==== */
+
+/* 1) Карточка профиля: ширина как у форм, норм. тень и скругление */
+.profile-card {
+  width: auto;                /* переопределяем старое width:400px */
+  max-width: 820px;           /* аккуратный контейнер как у форм */
+  border: 1px solid #e6e7ea;
+  border-radius: 16px;
+  box-shadow: 0 3px 10px rgba(16,24,40,.08);
+  padding: 24px;
+}
+
+/* 2) Аватар — круглый превью, если вдруг где-то перезаписали */
+.profile-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0;
+  border: 1px solid #eee;
+}
+
+/* 3) Строки «как в макете»: сетка и разделители */
+.profile-rows { border-top: 1px solid #f0f0f0; }
+.profile-row {
+  display: grid;
+  grid-template-columns: 220px 1fr 18px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f5f5f6;
+}
+.profile-row .label {
+  color: #6b7280;
+  font-size: 14px;
+}
+.profile-row .value { font-size: 16px; }
+.profile-row .chev {
+  text-align: right;
+  color: #cbd5e1;
+  font-size: 18px;
+}
+
+/* 4) Инпуты в стиле форм добавления события */
+.profile-input,
+.profile-textarea {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  outline: none;
+}
+.profile-input:focus,
+.profile-textarea:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148,163,184,.2);
+}
+.profile-textarea { resize: vertical; }
+
+/* 5) Кнопки: красная — как основная на других страницах, серая — вторичная */
+.submit-btn {
+  background: #d62e1f;
+  color: #fff;
+  border: 1px solid #d62e1f;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.submit-btn:hover { filter: brightness(0.95); }
+
+.reset-btn, .edit-profile {
+  background: #fff;
+  color: #111;
+  border: 1px solid #e5e7eb;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.reset-btn:hover, .edit-profile:hover { background: #f8f9fb; }
+
+/* 6) Контейнер действий в конце карточки */
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}

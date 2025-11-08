@@ -1,48 +1,53 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
-import VerifyEmail from './pages/Auth/VerifyEmail';
-import Events from './pages/Events/Events';
-import EventDetails from './pages/Events/EventDetails';
-import Profile from './pages/Dashboard/Profile';
-import MyRegistrations from './pages/Dashboard/MyRegistrations';
-import Layout from './components/layout/Layout';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { authService } from './services/auth.service';
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
-  return user ? <>{children}</> : <Navigate to="/login" />;
-};
+// Pages
+import Login from './pages/Login';
+import AdminLogin from './pages/AdminLogin';
+import Events from './pages/Events';
+import Clubs from './pages/Clubs';
+import Organizer from './pages/Organizer';
+import Home from './pages/Home';
 
-function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
+// Protected route wrapper
+function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode; requiredRole?: string }) {
+  const isAuth = authService.isAuthenticated();
+  const user = authService.getUser();
 
-      <Route element={<Layout />}>
-        <Route path="/" element={<Events />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/events/:id" element={<EventDetails />} />
+  if (!isAuth) {
+    return <Navigate to="/login" replace />;
+  }
 
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/my-registrations" element={<ProtectedRoute><MyRegistrations /></ProtectedRoute>} />
-      </Route>
-    </Routes>
-  );
+  if (requiredRole && user?.role !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
 }
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-        <Toaster position="top-right" />
-      </AuthProvider>
-    </BrowserRouter>
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/admin-login" element={<AdminLogin />} />
+      <Route path="/events" element={<Events />} />
+      <Route path="/clubs" element={<Clubs />} />
+
+      {/* Protected routes */}
+      <Route
+        path="/organizer/*"
+        element={
+          <ProtectedRoute requiredRole="ORGANIZER">
+            <Organizer />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Redirect unknown routes */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
