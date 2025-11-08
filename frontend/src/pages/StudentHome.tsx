@@ -6,16 +6,20 @@ interface Event {
   id: string;
   title: string;
   description: string;
-  date: string;
+  startDate: string;
   location: string;
-  category: 'creativity' | 'service' | 'intelligence';
-  points: number;
+  category: 'ACADEMIC' | 'SPORTS' | 'CULTURAL' | 'TECH' | 'SOCIAL' | 'CAREER' | 'OTHER';
   imageUrl?: string;
-  organizer: string;
-  attendees: number;
+  creator: {
+    firstName: string;
+    lastName: string;
+  };
+  _count?: {
+    registrations: number;
+  };
 }
 
-type FilterType = 'all' | 'creativity' | 'service' | 'intelligence' | 'upcoming' | 'popular';
+type FilterType = 'all' | 'ACADEMIC' | 'SPORTS' | 'CULTURAL' | 'TECH' | 'SOCIAL' | 'CAREER' | 'upcoming';
 
 function StudentHome() {
   const navigate = useNavigate();
@@ -37,8 +41,20 @@ function StudentHome() {
         return;
       }
 
+      // Build query params
+      const params = new URLSearchParams();
+      params.append('limit', '50'); // Get more events
+
+      if (activeFilter !== 'all' && activeFilter !== 'upcoming') {
+        params.append('category', activeFilter);
+      }
+
+      if (activeFilter === 'upcoming') {
+        params.append('status', 'UPCOMING');
+      }
+
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/events?filter=${activeFilter}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/events?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -55,11 +71,12 @@ function StudentHome() {
       }
 
       const data = await response.json();
-      setEvents(data);
+      const eventsList = data.data || data; // Handle both paginated and simple response
+      setEvents(eventsList);
 
       // Set recommended events (first 5 for now)
       if (activeFilter === 'all') {
-        setRecommendedEvents(data.slice(0, 5));
+        setRecommendedEvents(eventsList.slice(0, 5));
       }
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -89,12 +106,30 @@ function StudentHome() {
   };
 
   const getCategoryLabel = (category: string) => {
-    const labels = {
-      creativity: 'Creativity',
-      service: 'Service',
-      intelligence: 'Intelligence',
+    const labels: Record<string, string> = {
+      ACADEMIC: 'Academic',
+      SPORTS: 'Sports',
+      CULTURAL: 'Cultural',
+      TECH: 'Tech',
+      SOCIAL: 'Social',
+      CAREER: 'Career',
+      OTHER: 'Other',
     };
-    return labels[category as keyof typeof labels] || category;
+    return labels[category] || category;
+  };
+
+  const getCategoryColor = (category: string) => {
+    // Map categories to CSI-like colors
+    const colors: Record<string, string> = {
+      ACADEMIC: 'intelligence', // Green
+      TECH: 'intelligence', // Green
+      SPORTS: 'creativity', // Orange
+      CULTURAL: 'creativity', // Orange
+      SOCIAL: 'service', // Blue
+      CAREER: 'service', // Blue
+      OTHER: 'service', // Blue
+    };
+    return colors[category] || 'service';
   };
 
   return (
@@ -164,22 +199,22 @@ function StudentHome() {
                     className={styles.eventImageHorizontal}
                   />
                   <div className={styles.eventCardContent}>
-                    <span className={`${styles.eventCategory} ${styles[event.category]}`}>
+                    <span className={`${styles.eventCategory} ${styles[getCategoryColor(event.category)]}`}>
                       {getCategoryLabel(event.category)}
                     </span>
                     <h3 className={styles.eventCardTitle}>{event.title}</h3>
                     <div className={styles.eventMeta}>
                       <div className={styles.eventMetaItem}>
                         <i className="fas fa-calendar"></i>
-                        <span>{formatDate(event.date)}</span>
+                        <span>{formatDate(event.startDate)}</span>
                       </div>
                       <div className={styles.eventMetaItem}>
                         <i className="fas fa-map-marker-alt"></i>
                         <span>{event.location}</span>
                       </div>
                       <div className={styles.eventMetaItem}>
-                        <i className="fas fa-star"></i>
-                        <span>{event.points} CSI Points</span>
+                        <i className="fas fa-users"></i>
+                        <span>{event._count?.registrations || 0} attending</span>
                       </div>
                     </div>
                   </div>
@@ -198,34 +233,46 @@ function StudentHome() {
             All Events
           </button>
           <button
-            className={`${styles.filterPill} ${activeFilter === 'creativity' ? styles.active : ''}`}
-            onClick={() => handleFilterChange('creativity')}
+            className={`${styles.filterPill} ${activeFilter === 'ACADEMIC' ? styles.active : ''}`}
+            onClick={() => handleFilterChange('ACADEMIC')}
           >
-            <i className="fas fa-palette"></i> Creativity
+            <i className="fas fa-book"></i> Academic
           </button>
           <button
-            className={`${styles.filterPill} ${activeFilter === 'service' ? styles.active : ''}`}
-            onClick={() => handleFilterChange('service')}
+            className={`${styles.filterPill} ${activeFilter === 'TECH' ? styles.active : ''}`}
+            onClick={() => handleFilterChange('TECH')}
           >
-            <i className="fas fa-hands-helping"></i> Service
+            <i className="fas fa-laptop-code"></i> Tech
           </button>
           <button
-            className={`${styles.filterPill} ${activeFilter === 'intelligence' ? styles.active : ''}`}
-            onClick={() => handleFilterChange('intelligence')}
+            className={`${styles.filterPill} ${activeFilter === 'SPORTS' ? styles.active : ''}`}
+            onClick={() => handleFilterChange('SPORTS')}
           >
-            <i className="fas fa-brain"></i> Intelligence
+            <i className="fas fa-futbol"></i> Sports
+          </button>
+          <button
+            className={`${styles.filterPill} ${activeFilter === 'CULTURAL' ? styles.active : ''}`}
+            onClick={() => handleFilterChange('CULTURAL')}
+          >
+            <i className="fas fa-palette"></i> Cultural
+          </button>
+          <button
+            className={`${styles.filterPill} ${activeFilter === 'SOCIAL' ? styles.active : ''}`}
+            onClick={() => handleFilterChange('SOCIAL')}
+          >
+            <i className="fas fa-users"></i> Social
+          </button>
+          <button
+            className={`${styles.filterPill} ${activeFilter === 'CAREER' ? styles.active : ''}`}
+            onClick={() => handleFilterChange('CAREER')}
+          >
+            <i className="fas fa-briefcase"></i> Career
           </button>
           <button
             className={`${styles.filterPill} ${activeFilter === 'upcoming' ? styles.active : ''}`}
             onClick={() => handleFilterChange('upcoming')}
           >
             <i className="fas fa-clock"></i> Upcoming
-          </button>
-          <button
-            className={`${styles.filterPill} ${activeFilter === 'popular' ? styles.active : ''}`}
-            onClick={() => handleFilterChange('popular')}
-          >
-            <i className="fas fa-fire"></i> Popular
           </button>
         </section>
 
@@ -255,27 +302,27 @@ function StudentHome() {
                       className={styles.eventImage}
                     />
                     <div className={styles.eventPoints}>
-                      <i className="fas fa-star"></i>
-                      {event.points}
+                      <i className="fas fa-users"></i>
+                      {event._count?.registrations || 0}
                     </div>
                   </div>
                   <div className={styles.eventCardContent}>
-                    <span className={`${styles.eventCategory} ${styles[event.category]}`}>
+                    <span className={`${styles.eventCategory} ${styles[getCategoryColor(event.category)]}`}>
                       {getCategoryLabel(event.category)}
                     </span>
                     <h3 className={styles.eventCardTitle}>{event.title}</h3>
                     <div className={styles.eventMeta}>
                       <div className={styles.eventMetaItem}>
                         <i className="fas fa-calendar"></i>
-                        <span>{formatDate(event.date)}</span>
+                        <span>{formatDate(event.startDate)}</span>
                       </div>
                       <div className={styles.eventMetaItem}>
                         <i className="fas fa-map-marker-alt"></i>
                         <span>{event.location}</span>
                       </div>
                       <div className={styles.eventMetaItem}>
-                        <i className="fas fa-users"></i>
-                        <span>{event.attendees} attending</span>
+                        <i className="fas fa-user"></i>
+                        <span>{event.creator.firstName} {event.creator.lastName}</span>
                       </div>
                     </div>
                   </div>

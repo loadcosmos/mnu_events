@@ -45,7 +45,7 @@ function OrganizerDashboard() {
 
       // Fetch stats
       const statsResponse = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/organizer/stats`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/organizer/stats`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -66,7 +66,7 @@ function OrganizerDashboard() {
 
       // Fetch events
       const eventsResponse = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/organizer/events`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/organizer/events`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
