@@ -22,7 +22,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 60 seconds
-        limit: 10, // 10 requests per TTL
+        limit: 100, // 100 requests per TTL (increased for development)
       },
     ]),
     PrismaModule,
