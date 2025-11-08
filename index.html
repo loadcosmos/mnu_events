@@ -5,35 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MNU Events</title>
     <link rel="icon" type="image/x-icon" href="/images/redlogo.png">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="/css/main.css" />
     <link rel="stylesheet" href="/css/hero.css" />
     <link rel="stylesheet" href="/css/calendar.css" />
+    <link rel="stylesheet" href="/css/events.css" />
+    <link rel="stylesheet" href="/css/organizer.css" />
 
-    <!-- React -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
 
-    <!-- Babel для JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Swiper (if needed) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-/>
-
-    <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-/>
-
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   </head>
 
   <body>
-    <!-- Корневой контейнер -->
+    <!-- Корневой контейнер для React -->
     <div id="root"></div>
 
-    <!-- JS -->
-    <script type="text/babel" src="/js/index.js"></script>
+    <!-- Vite entry point -->
+    <script type="module" src="/js/main.jsx"></script>
   </body>
 </html>

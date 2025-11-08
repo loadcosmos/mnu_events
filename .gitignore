@@ -4,6 +4,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
 # Production
 dist/
@@ -12,15 +13,24 @@ build/
 # Environment variables
 .env
 .env.local
+.env.development.local
+.env.test.local
 .env.production
+.env.production.local
 .env.*.local
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
 *~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # OS
 .DS_Store
@@ -45,3 +55,6 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# Vite
+.vite/
