@@ -1,4 +1,4 @@
-import { PrismaClient, Role, Category, EventStatus } from '@prisma/client';
+import { PrismaClient, Role, Category, EventStatus, ClubCategory } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -81,15 +81,20 @@ async function main() {
   // Create events
   const events = [];
 
+  // Используем текущий год для событий в декабре
+  // Если сейчас ноябрь 2025, события будут в декабре 2025
+  const currentYear = new Date().getFullYear();
+  const eventYear = currentYear; // Используем текущий год для событий в декабре
+
   const event1 = await prisma.event.create({
     data: {
-      title: 'Hackathon 2024',
+      title: 'Hackathon 2025',
       description:
         'Annual coding competition for students. Build innovative solutions in 24 hours! Prizes for top 3 teams.',
       category: Category.TECH,
       location: 'Main Hall, Building A',
-      startDate: new Date('2024-12-15T10:00:00'),
-      endDate: new Date('2024-12-15T18:00:00'),
+      startDate: new Date(`${eventYear}-12-15T10:00:00`),
+      endDate: new Date(`${eventYear}-12-15T18:00:00`),
       capacity: 100,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d',
@@ -100,13 +105,13 @@ async function main() {
 
   const event2 = await prisma.event.create({
     data: {
-      title: 'Career Fair 2024',
+      title: 'Career Fair 2025',
       description:
         'Meet top employers and explore career opportunities. Bring your resume and dress professionally.',
       category: Category.CAREER,
       location: 'Sports Complex',
-      startDate: new Date('2024-12-20T09:00:00'),
-      endDate: new Date('2024-12-20T17:00:00'),
+      startDate: new Date(`${eventYear}-12-20T09:00:00`),
+      endDate: new Date(`${eventYear}-12-20T17:00:00`),
       capacity: 200,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1560439514-4e9645039924',
@@ -122,8 +127,8 @@ async function main() {
         'Inter-faculty football championship. Register your team now! 7 players per team.',
       category: Category.SPORTS,
       location: 'Stadium',
-      startDate: new Date('2024-12-10T14:00:00'),
-      endDate: new Date('2024-12-10T18:00:00'),
+      startDate: new Date(`${eventYear}-12-10T14:00:00`),
+      endDate: new Date(`${eventYear}-12-10T18:00:00`),
       capacity: 50,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55',
@@ -139,8 +144,8 @@ async function main() {
         'Celebrate Kazakh culture with traditional music, dance, and food. Free entry for all students.',
       category: Category.CULTURAL,
       location: 'Concert Hall',
-      startDate: new Date('2024-12-18T18:00:00'),
-      endDate: new Date('2024-12-18T21:00:00'),
+      startDate: new Date(`${eventYear}-12-18T18:00:00`),
+      endDate: new Date(`${eventYear}-12-18T21:00:00`),
       capacity: 150,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3',
@@ -156,8 +161,8 @@ async function main() {
         'Learn the basics of AI and ML from industry experts. Hands-on coding session included.',
       category: Category.ACADEMIC,
       location: 'Room 301, Building B',
-      startDate: new Date('2024-12-12T10:00:00'),
-      endDate: new Date('2024-12-12T13:00:00'),
+      startDate: new Date(`${eventYear}-12-12T10:00:00`),
+      endDate: new Date(`${eventYear}-12-12T13:00:00`),
       capacity: 40,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780ecad995',
@@ -173,8 +178,8 @@ async function main() {
         'Meet new friends and network with fellow students. Refreshments will be provided.',
       category: Category.SOCIAL,
       location: 'Student Lounge',
-      startDate: new Date('2024-12-08T17:00:00'),
-      endDate: new Date('2024-12-08T20:00:00'),
+      startDate: new Date(`${eventYear}-12-08T17:00:00`),
+      endDate: new Date(`${eventYear}-12-08T20:00:00`),
       capacity: 80,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622',
@@ -190,8 +195,8 @@ async function main() {
         'Present your startup idea to investors. Top 3 winners receive seed funding!',
       category: Category.CAREER,
       location: 'Innovation Lab',
-      startDate: new Date('2024-12-22T13:00:00'),
-      endDate: new Date('2024-12-22T17:00:00'),
+      startDate: new Date(`${eventYear}-12-22T13:00:00`),
+      endDate: new Date(`${eventYear}-12-22T17:00:00`),
       capacity: 60,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd',
@@ -206,8 +211,8 @@ async function main() {
       description: 'University chess tournament. All skill levels welcome. Prizes for top 3 players.',
       category: Category.SPORTS,
       location: 'Library Conference Room',
-      startDate: new Date('2024-12-14T10:00:00'),
-      endDate: new Date('2024-12-14T16:00:00'),
+      startDate: new Date(`${eventYear}-12-14T10:00:00`),
+      endDate: new Date(`${eventYear}-12-14T16:00:00`),
       capacity: 30,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b',
@@ -223,8 +228,8 @@ async function main() {
         'Student photography showcase. Submit your best work and vote for your favorites!',
       category: Category.CULTURAL,
       location: 'Art Gallery',
-      startDate: new Date('2024-12-16T12:00:00'),
-      endDate: new Date('2024-12-16T18:00:00'),
+      startDate: new Date(`${eventYear}-12-16T12:00:00`),
+      endDate: new Date(`${eventYear}-12-16T18:00:00`),
       capacity: 100,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d',
@@ -240,8 +245,8 @@ async function main() {
         'Join us in giving back to the community. Various volunteer activities available.',
       category: Category.SOCIAL,
       location: 'City Community Center',
-      startDate: new Date('2024-12-09T09:00:00'),
-      endDate: new Date('2024-12-09T15:00:00'),
+      startDate: new Date(`${eventYear}-12-09T09:00:00`),
+      endDate: new Date(`${eventYear}-12-09T15:00:00`),
       capacity: 50,
       status: EventStatus.UPCOMING,
       imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a',
@@ -315,6 +320,130 @@ async function main() {
 
   console.log('✅ Registrations created');
 
+  // Clean clubs data
+  await prisma.clubMembership.deleteMany({});
+  await prisma.club.deleteMany({});
+
+  // Create clubs
+  const club1 = await prisma.club.create({
+    data: {
+      name: 'Tech Innovation Club',
+      description: 'A community for tech enthusiasts to share ideas, work on projects, and learn about the latest technologies. We organize hackathons, coding workshops, and tech talks.',
+      category: ClubCategory.TECH,
+      imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
+      organizerId: organizer.id,
+    },
+  });
+
+  const club2 = await prisma.club.create({
+    data: {
+      name: 'Debate Society',
+      description: 'Develop your public speaking and critical thinking skills. We participate in regional and national debate competitions.',
+      category: ClubCategory.ACADEMIC,
+      imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978',
+      organizerId: admin.id,
+    },
+  });
+
+  const club3 = await prisma.club.create({
+    data: {
+      name: 'Photography Club',
+      description: 'Capture moments and tell stories through photography. We organize photo walks, exhibitions, and workshops.',
+      category: ClubCategory.ARTS,
+      imageUrl: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d',
+      organizerId: organizer.id,
+    },
+  });
+
+  const club4 = await prisma.club.create({
+    data: {
+      name: 'Football Team',
+      description: 'Join our university football team! We practice regularly and compete in inter-university tournaments.',
+      category: ClubCategory.SPORTS,
+      imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55',
+      organizerId: admin.id,
+    },
+  });
+
+  const club5 = await prisma.club.create({
+    data: {
+      name: 'Volunteer Network',
+      description: 'Make a difference in your community. We organize volunteer activities, charity events, and community service projects.',
+      category: ClubCategory.SERVICE,
+      imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a',
+      organizerId: organizer.id,
+    },
+  });
+
+  const club6 = await prisma.club.create({
+    data: {
+      name: 'Cultural Exchange',
+      description: 'Celebrate diversity and learn about different cultures. We organize cultural nights, language exchange sessions, and international food festivals.',
+      category: ClubCategory.CULTURAL,
+      imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3',
+      organizerId: admin.id,
+    },
+  });
+
+  // Add members to clubs
+  await prisma.clubMembership.create({
+    data: {
+      userId: student1.id,
+      clubId: club1.id,
+      role: 'MEMBER',
+    },
+  });
+
+  await prisma.clubMembership.create({
+    data: {
+      userId: student2.id,
+      clubId: club1.id,
+      role: 'MEMBER',
+    },
+  });
+
+  await prisma.clubMembership.create({
+    data: {
+      userId: student1.id,
+      clubId: club2.id,
+      role: 'MEMBER',
+    },
+  });
+
+  await prisma.clubMembership.create({
+    data: {
+      userId: student3.id,
+      clubId: club3.id,
+      role: 'MEMBER',
+    },
+  });
+
+  await prisma.clubMembership.create({
+    data: {
+      userId: student2.id,
+      clubId: club4.id,
+      role: 'MEMBER',
+    },
+  });
+
+  await prisma.clubMembership.create({
+    data: {
+      userId: student1.id,
+      clubId: club5.id,
+      role: 'MEMBER',
+    },
+  });
+
+  await prisma.clubMembership.create({
+    data: {
+      userId: student3.id,
+      clubId: club6.id,
+      role: 'MEMBER',
+    },
+  });
+
+  console.log('✅ Clubs created');
+
   console.log(`
   ╔══════════════════════════════════════════════════════════╗
   ║                                                          ║
@@ -334,6 +463,8 @@ async function main() {
   ║   - 5 Users (1 Admin, 1 Organizer, 3 Students)           ║
   ║   - 10 Events (various categories)                       ║
   ║   - 7 Registrations (some with check-ins)                ║
+  ║   - 6 Clubs (various categories)                          ║
+  ║   - 7 Club Memberships                                   ║
   ║                                                          ║
   ╚══════════════════════════════════════════════════════════╝
   `);

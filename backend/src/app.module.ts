@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
 import { RegistrationsModule } from './registrations/registrations.module';
+import { ClubsModule } from './clubs/clubs.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -30,6 +31,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     UsersModule,
     EventsModule,
     RegistrationsModule,
+    ClubsModule,
   ],
   providers: [
     {

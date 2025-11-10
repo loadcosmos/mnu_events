@@ -8,7 +8,9 @@ import {
   Delete,
   Query,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -40,6 +42,7 @@ export class EventsController {
 
   @Get()
   @Public()
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: false, transform: true }))
   @ApiOperation({ summary: 'Get all events with filters and pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
@@ -50,12 +53,20 @@ export class EventsController {
   findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
-    @Query() filters?: FilterEventsDto,
+    @Query('category') category?: string,
+    @Query('status') status?: string,
+    @Query('search') search?: string,
   ) {
+    // Собираем фильтры вручную, исключая page и limit
+    const filters: FilterEventsDto = {};
+    if (category) filters.category = category as any;
+    if (status) filters.status = status as any;
+    if (search) filters.search = search;
+    
     return this.eventsService.findAll(
       page ? parseInt(page) : 1,
       limit ? parseInt(limit) : 10,
-      filters,
+      Object.keys(filters).length > 0 ? filters : undefined,
     );
   }
 

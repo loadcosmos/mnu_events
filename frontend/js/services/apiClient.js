@@ -1,0 +1,256 @@
+import axios from 'axios';
+import { toast } from 'sonner';
+import { retry } from '../utils/retry.js';
+
+// Базовый URL API - настройте согласно вашему бэкенду
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+// Создание axios instance
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request Interceptor - добавляет токен к каждому запросу
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Логирование запросов в dev режиме
+    if (import.meta.env.DEV) {
+      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, config.data);
+    }
+
+    return config;
+  },
+  (error) => {
+    console.error('[API Request Error]', error);
+    return Promise.reject(error);
+  }
+);
+
+// Response Interceptor - обработка ответов и ошибок
+apiClient.interceptors.response.use(
+  (response) => {
+    // Логирование успешных ответов в dev режиме
+    if (import.meta.env.DEV) {
+      console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, response.data);
+    }
+
+    return response.data;
+  },
+  async (error) => {
+    // Детальная обработка различных типов ошибок
+    if (error.response) {
+      // Сервер ответил с кодом ошибки
+      const { status, data } = error.response;
+
+      // Получаем сообщение об ошибке
+      const errorMessage = Array.isArray(data?.message)
+        ? data.message.join(', ')
+        : data?.message || 'An error occurred';
+
+      switch (status) {
+        case 401:
+          // Unauthorized - очищаем токен и перенаправляем на логин
+          console.error('[API Error] Unauthorized - redirecting to login');
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+
+          toast.error('Session expired', {
+            description: 'Please log in again',
+            duration: 3000,
+          });
+
+          // Перенаправление на страницу логина
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/admin/login') {
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 1000);
+          }
+          break;
+
+        case 403:
+          // Forbidden - недостаточно прав
+          console.error('[API Error] Forbidden - insufficient permissions');
+          toast.error('Access denied', {
+            description: 'You do not have permission to perform this action',
+            duration: 4000,
+          });
+          break;
+
+        case 404:
+          // Not Found
+          console.error('[API Error] Resource not found');
+          toast.error('Not found', {
+            description: 'The requested resource was not found',
+            duration: 4000,
+          });
+          break;
+
+        case 422:
+          // Validation Error
+          console.error('[API Error] Validation failed', data);
+          toast.error('Validation failed', {
+            description: errorMessage,
+            duration: 5000,
+          });
+          break;
+
+        case 500:
+        case 502:
+        case 503:
+          // Server Error
+          console.error('[API Error] Server error', data);
+          toast.error('Server error', {
+            description: 'Something went wrong on the server. Please try again later.',
+            duration: 5000,
+          });
+          break;
+
+        default:
+          console.error(`[API Error] ${status}`, data);
+          toast.error('Error', {
+            description: errorMessage,
+            duration: 4000,
+          });
+      }
+
+      // Создаем более удобный объект ошибки
+      const apiError = {
+        status,
+        message: data?.message || 'An error occurred',
+        errors: data?.errors || {},
+        data: data,
+      };
+
+      return Promise.reject(apiError);
+    } else if (error.request) {
+      // Запрос был отправлен, но ответа не получено
+      console.error('[API Error] No response received', error.request);
+
+      toast.error('Network error', {
+        description: 'Unable to connect to the server. Please check your internet connection.',
+        duration: 5000,
+      });
+
+      return Promise.reject({
+        status: 0,
+        message: 'Network error - no response from server',
+        errors: {},
+      });
+    } else {
+      // Ошибка при настройке запроса
+      console.error('[API Error] Request setup failed', error.message);
+
+      toast.error('Request failed', {
+        description: error.message || 'An unexpected error occurred',
+        duration: 4000,
+      });
+
+      return Promise.reject({
+        status: 0,
+        message: error.message || 'Request failed',
+        errors: {},
+      });
+    }
+  }
+);
+
+// Вспомогательные методы для удобства использования
+export const api = {
+  // GET запрос с retry
+  get: (url, config = {}) => {
+    const request = () => apiClient.get(url, config);
+    // Retry только для GET запросов и только если явно не отключен
+    if (config.retry !== false && config.retry !== undefined) {
+      return retry(request, {
+        maxRetries: config.maxRetries || 2,
+        delay: config.retryDelay || 1000,
+      });
+    }
+    // По умолчанию для GET не используем retry (чтобы избежать множественных toast)
+    return request();
+  },
+
+  // POST запрос с retry (только если явно включен)
+  post: (url, data = {}, config = {}) => {
+    const request = () => apiClient.post(url, data, config);
+    // Retry только если явно включен (для критичных операций)
+    if (config.retry === true) {
+      return retry(request, {
+        maxRetries: config.maxRetries || 2,
+        delay: config.retryDelay || 1000,
+      });
+    }
+    return request();
+  },
+
+  // PUT запрос с retry (только если явно включен)
+  put: (url, data = {}, config = {}) => {
+    const request = () => apiClient.put(url, data, config);
+    if (config.retry === true) {
+      return retry(request, {
+        maxRetries: config.maxRetries || 2,
+        delay: config.retryDelay || 1000,
+      });
+    }
+    return request();
+  },
+
+  // PATCH запрос с retry (только если явно включен)
+  patch: (url, data = {}, config = {}) => {
+    const request = () => apiClient.patch(url, data, config);
+    if (config.retry === true) {
+      return retry(request, {
+        maxRetries: config.maxRetries || 2,
+        delay: config.retryDelay || 1000,
+      });
+    }
+    return request();
+  },
+
+  // DELETE запрос с retry (только если явно включен)
+  delete: (url, config = {}) => {
+    const request = () => apiClient.delete(url, config);
+    if (config.retry === true) {
+      return retry(request, {
+        maxRetries: config.maxRetries || 2,
+        delay: config.retryDelay || 1000,
+      });
+    }
+    return request();
+  },
+
+  // Установка базового URL (полезно для тестирования)
+  setBaseURL: (url) => {
+    apiClient.defaults.baseURL = url;
+  },
+
+  // Установка токена вручную
+  setAuthToken: (token) => {
+    if (token) {
+      localStorage.setItem('authToken', token);
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      localStorage.removeItem('authToken');
+      delete apiClient.defaults.headers.common['Authorization'];
+    }
+  },
+
+  // Очистка токена
+  clearAuthToken: () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    delete apiClient.defaults.headers.common['Authorization'];
+  },
+};
+
+export default apiClient;

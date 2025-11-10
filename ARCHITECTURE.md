@@ -14,26 +14,30 @@ This document describes the frontend architecture for the MNU Events platform, f
 
 ```
 mnu_events/
-├── js/
-│   ├── services/           # API Services Layer
-│   │   ├── apiClient.js    # Centralized Axios instance with interceptors
-│   │   └── authService.js  # Authentication service
-│   ├── context/            # React Context providers
-│   │   └── AuthContext.jsx # Authentication state management
-│   ├── components/         # Reusable components
-│   │   └── ProtectedRoute.jsx # Route protection wrapper
-│   ├── pages/              # Page components
-│   │   ├── HomePage.jsx
-│   │   ├── LoginPage.jsx
-│   │   ├── EventsPage.jsx
-│   │   ├── ClubsPage.jsx
-│   │   ├── OrganizerPage.jsx (Protected)
-│   │   └── AdminLoginPage.jsx
-│   ├── App.jsx             # Main app with routing
-│   └── main.jsx            # Entry point
-├── css/                    # Stylesheets
-├── images/                 # Static assets
-└── index.html              # HTML entry point
+├── frontend/
+│   ├── js/
+│   │   ├── services/           # API Services Layer
+│   │   │   ├── apiClient.js    # Centralized Axios instance with interceptors
+│   │   │   └── authService.js  # Authentication service
+│   │   ├── context/            # React Context providers
+│   │   │   └── AuthContext.jsx # Authentication state management
+│   │   ├── components/         # Reusable components
+│   │   │   └── ProtectedRoute.jsx # Route protection wrapper
+│   │   ├── pages/              # Page components
+│   │   │   ├── HomePage.jsx
+│   │   │   ├── LoginPage.jsx
+│   │   │   ├── EventsPage.jsx
+│   │   │   ├── ClubsPage.jsx
+│   │   │   ├── OrganizerPage.jsx (Protected)
+│   │   │   └── AdminLoginPage.jsx
+│   │   ├── App.jsx             # Main app with routing
+│   │   └── main.jsx            # Entry point
+│   ├── css/                    # Stylesheets
+│   ├── images/                 # Static assets
+│   ├── svg/                    # SVG icons
+│   └── index.html              # HTML entry point
+├── vite.config.js              # Vite config (root: './frontend')
+└── package.json                # Frontend dependencies
 ```
 
 ## Core Architecture Components

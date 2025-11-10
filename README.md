@@ -71,20 +71,24 @@ mnu_events/
 │   │   └── seed.ts            # Тестовые данные
 │   └── README.md
 │
-├── js/                        # Frontend (React + Vite)
-│   ├── services/              # API Services Layer
-│   │   ├── apiClient.js       # Centralized Axios instance
-│   │   └── authService.js     # Authentication service
-│   ├── context/               # React Context
-│   │   └── AuthContext.jsx    # Auth state management
-│   ├── components/            # Компоненты
-│   │   └── ProtectedRoute.jsx # Route protection
-│   ├── pages/                 # Страницы
-│   ├── App.jsx                # Main app with routing
-│   └── main.jsx               # Entry point
-│
-├── css/                       # Оригинальные стили
-├── images/                    # Статические ресурсы
+├── frontend/                  # Frontend (React + Vite)
+│   ├── js/                    # JavaScript/JSX файлы
+│   │   ├── services/          # API Services Layer
+│   │   │   ├── apiClient.js   # Centralized Axios instance
+│   │   │   └── authService.js # Authentication service
+│   │   ├── context/           # React Context
+│   │   │   └── AuthContext.jsx # Auth state management
+│   │   ├── components/        # Компоненты
+│   │   │   └── ProtectedRoute.jsx # Route protection
+│   │   ├── pages/             # Страницы
+│   │   ├── App.jsx            # Main app with routing
+│   │   └── main.jsx           # Entry point
+│   ├── css/                   # Оригинальные стили
+│   ├── images/                # Статические изображения
+│   ├── svg/                   # SVG иконки
+│   └── index.html             # HTML entry point
+├── vite.config.js             # Vite конфигурация (root: './frontend')
+├── package.json               # Frontend зависимости
 ├── docker-compose.yml         # Docker для разработки
 ├── start-all.sh              # Скрипт запуска всего стека
 └── README.md                  # Этот файл
@@ -92,13 +96,49 @@ mnu_events/
 
 ## 🚀 Быстрый старт
 
+### Windows (PowerShell)
+```powershell
+.\start-clean.ps1
+```
+
+### WSL/Linux (Bash)
+```bash
+chmod +x start-clean.sh clean-start.sh
+./start-clean.sh
+```
+
+## 🚀 Быстрый старт (детали)
+
 ### Требования
 - Node.js 20+
 - Docker и Docker Compose
 - npm или yarn
 
+### 🧹 Очистка перед запуском
+
+**Windows PowerShell:**
+```powershell
+# Остановить все процессы и контейнеры
+.\clean-start.ps1
+```
+
+**Linux/Mac:**
+```bash
+# Остановить Node.js процессы
+pkill -f "node.*backend" || true
+pkill -f "node.*vite" || true
+docker-compose down
+```
+
 ### Автоматический запуск
 
+**Windows PowerShell:**
+```powershell
+# Чистый запуск всего стека
+.\start-clean.ps1
+```
+
+**Linux/Mac:**
 ```bash
 # Один скрипт запустит всё: БД + Бэкенд + Фронтенд
 ./start-all.sh
@@ -130,11 +170,19 @@ npm install
 cp .env.example .env
 # Отредактируйте .env файл
 
-npx prisma generate
-npx prisma migrate dev
-npm run prisma:seed              # Тестовые данные
+# ⚠️ ВАЖНО: При первом запуске или после изменений в schema.prisma
+npx prisma generate              # Генерация Prisma Client
+npx prisma migrate dev           # Применение миграций
+npm run prisma:seed              # Тестовые данные (опционально)
+
 npm run start:dev                # http://localhost:3001
 ```
+
+**Примечание:** 
+- `prisma generate` нужно запускать после изменений в `schema.prisma` или после клонирования проекта
+- `prisma migrate dev` нужно запускать при создании новых миграций или при первом запуске
+- При обычном запуске (если ничего не менялось) можно сразу запускать `npm run start:dev`
+- Скрипт `start-clean.ps1` автоматически выполняет эти команды
 
 #### 3. Настройка Frontend
 
@@ -166,10 +214,13 @@ npm run dev                      # http://localhost:5173
 
 ## 📚 Документация
 
+- **AI Developer Workflow:** [UPDATE_PLAN.md](UPDATE_PLAN.md) (рабочий протокол с MCP инструментами) ⭐
+- **Quick Start & Reference:** [QUICKSTART.md](QUICKSTART.md) (объединенный гайд)
 - **Backend API:** [backend/README.md](backend/README.md)
 - **Frontend Architecture:** [ARCHITECTURE.md](ARCHITECTURE.md)
+- **Roadmap:** [ROADMAP.md](ROADMAP.md) (план задач и прогресс)
 - **Deployment:** [DEPLOYMENT.md](DEPLOYMENT.md)
-- **Quick Start:** [QUICKSTART.md](QUICKSTART.md)
+- **Environment Setup:** [backend/ENV_SETUP.md](backend/ENV_SETUP.md) (настройка .env)
 - **API Docs:** http://localhost:3001/api/docs (после запуска)
 
 ## 🗄 База данных
@@ -331,6 +382,14 @@ docker-compose logs -f postgres  # Посмотреть логи
 - Database indexes
 - Pagination
 - Error handling
+
+## 📚 Дополнительная документация
+
+- **[QUICKSTART.md](./QUICKSTART.md)** - Быстрый старт, основные команды и решение проблем
+- **[UPDATE_PLAN.md](./UPDATE_PLAN.md)** - План обновлений и следующие шаги
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Архитектура проекта
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Руководство по развертыванию
+- **[ROADMAP.md](./ROADMAP.md)** - Roadmap проекта и прогресс
 
 ## 📄 Лицензия
 

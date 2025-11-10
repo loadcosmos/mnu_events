@@ -28,6 +28,8 @@ model User {
   // Relations
   createdEvents    Event[]        @relation("EventCreator")
   registrations    Registration[]
+  clubMemberships  ClubMembership[]
+  organizedClubs   Club[]         @relation("ClubOrganizer")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -112,4 +114,59 @@ enum RegistrationStatus {
   REGISTERED
   WAITLIST
   CANCELLED
+}
+
+model Club {
+  id          String   @id @default(uuid())
+  name        String
+  description String   @db.Text
+  category    ClubCategory
+  imageUrl    String?
+  
+  // Organizer relation
+  organizerId String
+  organizer   User     @relation("ClubOrganizer", fields: [organizerId], references: [id], onDelete: Cascade)
+  
+  // Members
+  members     ClubMembership[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([organizerId])
+  @@index([category])
+  @@map("clubs")
+}
+
+enum ClubCategory {
+  ACADEMIC
+  ARTS
+  SERVICE
+  TECH
+  SPORTS
+  CULTURAL
+  OTHER
+}
+
+model ClubMembership {
+  id        String   @id @default(uuid())
+  userId    String
+  clubId    String
+  role      ClubMemberRole @default(MEMBER)
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  
+  joinedAt  DateTime @default(now())
+
+  @@unique([userId, clubId])
+  @@index([userId])
+  @@index([clubId])
+  @@map("club_memberships")
+}
+
+enum ClubMemberRole {
+  MEMBER
+  ADMIN
 }

@@ -35,6 +35,7 @@ async function bootstrap() {
     .addTag('Users', 'User management endpoints')
     .addTag('Events', 'Event management endpoints')
     .addTag('Registrations', 'Event registration endpoints')
+    .addTag('Clubs', 'Club management endpoints')
     .addBearerAuth()
     .build();
 

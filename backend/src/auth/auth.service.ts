@@ -245,6 +245,17 @@ export class AuthService {
     return user;
   }
 
+  /**
+   * Выход из системы
+   * В текущей реализации JWT токены stateless, поэтому просто возвращаем успешный ответ
+   * В будущем можно добавить blacklist токенов для их инвалидации
+   */
+  async logout() {
+    return {
+      message: 'Logged out successfully',
+    };
+  }
+
   private async generateTokens(userId: string, email: string, role: string) {
     const payload = { sub: userId, email, role };
 

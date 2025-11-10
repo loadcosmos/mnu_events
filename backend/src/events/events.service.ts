@@ -82,10 +82,14 @@ export class EventsService {
     }
 
     if (filterDto?.search) {
+      // Note: mode: 'insensitive' only works with String fields, not Text fields
+      // description is @db.Text, so we can't use mode: 'insensitive' for it
       where.OR = [
         { title: { contains: filterDto.search, mode: 'insensitive' } },
-        { description: { contains: filterDto.search, mode: 'insensitive' } },
         { location: { contains: filterDto.search, mode: 'insensitive' } },
+        // description is Text field, so we search it case-sensitively
+        // If case-insensitive search is needed for description, we'd need to use raw SQL
+        { description: { contains: filterDto.search } },
       ];
     }
 
@@ -93,40 +97,45 @@ export class EventsService {
       where.creatorId = filterDto.creatorId;
     }
 
-    const [events, total] = await Promise.all([
-      this.prisma.event.findMany({
-        where,
-        skip,
-        take: limit,
-        include: {
-          creator: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
+    try {
+      const [events, total] = await Promise.all([
+        this.prisma.event.findMany({
+          where,
+          skip,
+          take: limit,
+          include: {
+            creator: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              },
+            },
+            _count: {
+              select: {
+                registrations: true,
+              },
             },
           },
-          _count: {
-            select: {
-              registrations: true,
-            },
-          },
-        },
-        orderBy: { startDate: 'asc' },
-      }),
-      this.prisma.event.count({ where }),
-    ]);
+          orderBy: { startDate: 'asc' },
+        }),
+        this.prisma.event.count({ where }),
+      ]);
 
-    return {
-      data: events,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+      return {
+        data: events,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      console.error('[EventsService] findAll error:', error);
+      throw error;
+    }
   }
 
   async findOne(id: string) {
