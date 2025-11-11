@@ -180,9 +180,9 @@ E2E tests use Playwright and are located in `e2e/` directory. Tests assume both 
 
 ## Test Accounts (after seeding)
 
-- Admin: admin@mnu.edu.kz / Admin123!
-- Organizer: organizer@mnu.edu.kz / Organizer123!
-- Student: student@mnu.edu.kz / Student123!
+- Admin: admin@kazguu.kz / Password123!
+- Organizer: organizer@kazguu.kz / Password123!
+- Student: student1@kazguu.kz / Password123!
 
 ## Important Implementation Notes
 
