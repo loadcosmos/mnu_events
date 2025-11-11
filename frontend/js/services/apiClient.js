@@ -5,6 +5,12 @@ import { retry } from '../utils/retry.js';
 // Базовый URL API - настройте согласно вашему бэкенду
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
+// Логируем используемый API URL при загрузке (для отладки)
+if (import.meta.env.DEV) {
+  console.log('[API Client] Using API base URL:', API_BASE_URL);
+  console.log('[API Client] VITE_API_URL from env:', import.meta.env.VITE_API_URL || 'not set (using default)');
+}
+
 // Создание axios instance
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -135,15 +141,37 @@ apiClient.interceptors.response.use(
     } else if (error.request) {
       // Запрос был отправлен, но ответа не получено
       console.error('[API Error] No response received', error.request);
+      
+      // Определяем тип ошибки для более информативного сообщения
+      let errorMessage = 'Unable to connect to the server.';
+      let errorDescription = 'Please check your internet connection.';
+      
+      // Проверяем, является ли это ошибкой connection refused (бэкенд не запущен)
+      if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED' || error.message?.includes('ERR_CONNECTION_REFUSED')) {
+        errorMessage = 'Backend server is not running';
+        errorDescription = `Cannot connect to ${API_BASE_URL}. Please make sure the backend is running on port 3001.`;
+        
+        console.error('[API Error] Backend connection refused:', {
+          baseURL: API_BASE_URL,
+          code: error.code,
+          message: error.message,
+          hint: 'Make sure backend is running: cd backend && npm run start:dev',
+        });
+      } else if (error.code === 'ETIMEDOUT') {
+        errorMessage = 'Connection timeout';
+        errorDescription = 'The server is taking too long to respond. Please try again later.';
+      }
 
-      toast.error('Network error', {
-        description: 'Unable to connect to the server. Please check your internet connection.',
-        duration: 5000,
+      toast.error(errorMessage, {
+        description: errorDescription,
+        duration: 6000,
       });
 
       return Promise.reject({
         status: 0,
-        message: 'Network error - no response from server',
+        message: errorMessage,
+        description: errorDescription,
+        code: error.code,
         errors: {},
       });
     } else {

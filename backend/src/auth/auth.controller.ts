@@ -76,4 +76,12 @@ export class AuthController {
   async logout() {
     return this.authService.logout();
   }
+
+  @Public()
+  @Get('email-status')
+  @ApiOperation({ summary: 'Check email service configuration status (for debugging)' })
+  @ApiResponse({ status: 200, description: 'Email service status' })
+  async getEmailStatus() {
+    return this.authService.getEmailServiceStatus();
+  }
 }
