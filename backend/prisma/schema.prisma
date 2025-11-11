@@ -24,6 +24,7 @@ model User {
   emailVerified Boolean @default(false)
   verificationCode String?
   verificationCodeExpiry DateTime?
+  lastCodeSentAt DateTime?  // Для защиты от спама - 5 минут между отправками
 
   // Relations
   createdEvents    Event[]        @relation("EventCreator")

@@ -119,6 +119,7 @@ export class AuthService {
     // Generate verification code (6 digits)
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const verificationCodeExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    const now = new Date();
 
     // Create user
     const user = await this.prisma.user.create({
@@ -129,6 +130,7 @@ export class AuthService {
         lastName,
         verificationCode,
         verificationCodeExpiry,
+        lastCodeSentAt: now,
       },
       select: {
         id: true,
@@ -294,15 +296,36 @@ export class AuthService {
       );
     }
 
+    // ЗАЩИТА ОТ СПАМА: проверяем, прошло ли 5 минут с последней отправки
+    const RESEND_COOLDOWN_MS = 5 * 60 * 1000; // 5 минут в миллисекундах
+    const now = new Date();
+
+    if (user.lastCodeSentAt) {
+      const timeSinceLastSent = now.getTime() - user.lastCodeSentAt.getTime();
+      const remainingTime = RESEND_COOLDOWN_MS - timeSinceLastSent;
+
+      if (timeSinceLastSent < RESEND_COOLDOWN_MS) {
+        const remainingSeconds = Math.ceil(remainingTime / 1000);
+        const remainingMinutes = Math.floor(remainingSeconds / 60);
+        const remainingSecondsDisplay = remainingSeconds % 60;
+
+        throw new BadRequestException(
+          `Please wait ${remainingMinutes}:${remainingSecondsDisplay.toString().padStart(2, '0')} before requesting a new code`
+        );
+      }
+    }
+
     // Generate new verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const verificationCodeExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
+    // Обновляем код и время последней отправки
     await this.prisma.user.update({
       where: { id: user.id },
       data: {
         verificationCode,
         verificationCodeExpiry,
+        lastCodeSentAt: now,
       },
     });
 
@@ -316,7 +339,7 @@ export class AuthService {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error(`[AuthService] Failed to resend verification email to ${email}:`, error);
-      
+
       // Log detailed error
       if (error instanceof Error) {
         console.error('[AuthService] Error details:', {

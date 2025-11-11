@@ -19,20 +19,29 @@ export default function VerifyEmailPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(300); // 5 минут в секундах
-  const [canResend, setCanResend] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(300); // 5 минут в секундах (cooldown для resend)
+  const [canResend, setCanResend] = useState(false); // Нельзя отправить сразу (код уже отправлен при регистрации)
+
+  // При первой загрузке страницы (после регистрации) запускаем таймер
+  useEffect(() => {
+    // Если пришли с state (после регистрации), запускаем таймер
+    if (emailFromState) {
+      setCanResend(false);
+      setTimeLeft(300);
+    }
+  }, []); // Только при монтировании
 
   // Таймер обратного отсчета
   useEffect(() => {
-    if (timeLeft > 0) {
+    if (timeLeft > 0 && !canResend) {
       const timer = setTimeout(() => {
         setTimeLeft(timeLeft - 1);
       }, 1000);
       return () => clearTimeout(timer);
-    } else {
+    } else if (timeLeft === 0) {
       setCanResend(true);
     }
-  }, [timeLeft]);
+  }, [timeLeft, canResend]);
 
   // Форматирование времени для отображения
   const formatTime = (seconds) => {
@@ -90,13 +99,29 @@ export default function VerifyEmailPage() {
       setResendLoading(true);
       setError('');
       await authService.resendVerificationCode(email);
-      
-      // Сбрасываем таймер
+
+      // Запускаем таймер на 5 минут (защита от спама)
       setTimeLeft(300);
       setCanResend(false);
       setCode('');
+
+      // Показываем успешное сообщение
+      alert('Verification code sent! Check your email and console.');
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to resend code. Please try again.');
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to resend code. Please try again.';
+      setError(errorMessage);
+
+      // Если ошибка содержит информацию о времени ожидания, не даём повторно отправлять
+      if (errorMessage.includes('wait')) {
+        setCanResend(false);
+        // Попытка извлечь оставшееся время из сообщения (например "Please wait 4:32 before...")
+        const timeMatch = errorMessage.match(/(\d+):(\d+)/);
+        if (timeMatch) {
+          const mins = parseInt(timeMatch[1]);
+          const secs = parseInt(timeMatch[2]);
+          setTimeLeft(mins * 60 + secs);
+        }
+      }
     } finally {
       setResendLoading(false);
     }
@@ -108,7 +133,9 @@ export default function VerifyEmailPage() {
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-bold">Verify Your Email</CardTitle>
           <CardDescription>
-            We've sent a 6-digit verification code to your email address
+            We've sent a 6-digit verification code to your email address.
+            <br />
+            <span className="text-xs">Code expires in 24 hours</span>
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -161,9 +188,17 @@ export default function VerifyEmailPage() {
 
           <div className="mt-6 space-y-2 text-center">
             {!canResend ? (
-              <p className="text-sm text-muted-foreground">
-                Resend code in {formatTime(timeLeft)}
-              </p>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">
+                  Code sent! You can request a new code in:
+                </p>
+                <p className="text-lg font-mono font-bold text-primary">
+                  {formatTime(timeLeft)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  (Protection against spam)
+                </p>
+              </div>
             ) : (
               <Button
                 type="button"
