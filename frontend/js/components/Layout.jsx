@@ -124,8 +124,8 @@ export default function Layout({ children }) {
         }`}
       >
         <div className="container mx-auto flex h-20 items-center justify-between px-4">
-          {/* Left side - Language selector */}
-          <div className="flex flex-1 items-center justify-start">
+          {/* Left side - Language selector (Desktop only) */}
+          <div className="hidden md:flex flex-1 items-center justify-start">
             <div className="relative" ref={langDropdownRef}>
               <Button
                 variant="ghost"
@@ -161,6 +161,8 @@ export default function Layout({ children }) {
               )}
             </div>
           </div>
+          {/* Mobile left spacer */}
+          <div className="md:hidden flex-1"></div>
 
           {/* Center - Logo */}
           <Link
@@ -196,75 +198,79 @@ export default function Layout({ children }) {
               </Button>
             </nav>
 
-            {/* Auth buttons */}
-            {isAuthenticated() ? (
-              <>
-                {/* Profile dropdown */}
-                <div className="relative" ref={profileDropdownRef}>
-                  <Button
-                    variant="ghost"
-                    size="default"
-                    onClick={() => setProfileOpen(!profileOpen)}
-                    className="gap-2 text-white hover:text-white hover:bg-white/10 text-base"
-                  >
-                    <i className="fa-regular fa-circle-user text-lg" />
-                    <span className="hidden sm:inline">
-                      {user?.firstName || user?.email}
-                    </span>
-                    <i
-                      className={`fa-solid fa-chevron-down text-xs transition-transform ${
-                        profileOpen ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </Button>
-                  {profileOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-56 rounded-md border border-white/10 bg-[#1a1a1a] shadow-lg z-50">
-                      <div className="p-1">
-                        {user?.role === 'STUDENT' && (
+            {/* Auth buttons (Desktop only) */}
+            <div className="hidden md:flex flex-1 items-center justify-end space-x-4">
+              {isAuthenticated() ? (
+                <>
+                  {/* Profile dropdown (Desktop only) */}
+                  <div className="relative" ref={profileDropdownRef}>
+                    <Button
+                      variant="ghost"
+                      size="default"
+                      onClick={() => setProfileOpen(!profileOpen)}
+                      className="gap-2 text-white hover:text-white hover:bg-white/10 text-base"
+                    >
+                      <i className="fa-regular fa-circle-user text-lg" />
+                      <span className="hidden sm:inline">
+                        {user?.firstName || user?.email}
+                      </span>
+                      <i
+                        className={`fa-solid fa-chevron-down text-xs transition-transform ${
+                          profileOpen ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </Button>
+                    {profileOpen && (
+                      <div className="absolute right-0 top-full mt-2 w-56 rounded-md border border-white/10 bg-[#1a1a1a] shadow-lg z-50">
+                        <div className="p-1">
+                          {user?.role === 'STUDENT' && (
+                            <Link
+                              to="/registrations"
+                              onClick={() => setProfileOpen(false)}
+                              className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#a0a0a0] hover:bg-white/10 hover:text-white transition-colors rounded-sm"
+                            >
+                              <i className="fa-solid fa-calendar-check w-4 text-center" />
+                              My Registrations
+                            </Link>
+                          )}
                           <Link
-                            to="/registrations"
+                            to="/profile"
                             onClick={() => setProfileOpen(false)}
                             className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#a0a0a0] hover:bg-white/10 hover:text-white transition-colors rounded-sm"
                           >
-                            <i className="fa-solid fa-calendar-check w-4 text-center" />
-                            My Registrations
+                            <i className="fa-solid fa-user-edit w-4 text-center" />
+                            Edit Profile
                           </Link>
-                        )}
-                        <Link
-                          to="/profile"
-                          onClick={() => setProfileOpen(false)}
-                          className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#a0a0a0] hover:bg-white/10 hover:text-white transition-colors rounded-sm"
-                        >
-                          <i className="fa-solid fa-user-edit w-4 text-center" />
-                          Edit Profile
-                        </Link>
-                        <div className="my-1 h-px bg-white/10" />
-                        <button
-                          onClick={() => {
-                            setProfileOpen(false);
-                            handleLogout();
-                          }}
-                          className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white transition-colors rounded-sm"
-                        >
-                          <i className="fa-solid fa-sign-out-alt w-4 text-center" />
-                          Logout
-                        </button>
+                          <div className="my-1 h-px bg-white/10" />
+                          <button
+                            onClick={() => {
+                              setProfileOpen(false);
+                              handleLogout();
+                            }}
+                            className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white transition-colors rounded-sm"
+                          >
+                            <i className="fa-solid fa-sign-out-alt w-4 text-center" />
+                            Logout
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Desktop Only: Login Button */}
-                <Button
-                  asChild
-                  className="hidden md:inline-flex bg-[#d62e1f] text-white hover:bg-[#b91c1c] rounded-full text-base px-6 font-semibold transition-colors"
-                >
-                  <Link to="/login">Log In</Link>
-                </Button>
-              </>
-            )}
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Desktop Only: Login Button */}
+                  <Button
+                    asChild
+                    className="bg-[#d62e1f] text-white hover:bg-[#b91c1c] rounded-full text-base px-6 font-semibold transition-colors"
+                  >
+                    <Link to="/login">Log In</Link>
+                  </Button>
+                </>
+              )}
+            </div>
+            {/* Mobile right spacer */}
+            <div className="md:hidden flex-1"></div>
           </div>
         </div>
       </header>
