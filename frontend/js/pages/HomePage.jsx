@@ -428,29 +428,38 @@ export default function HomePage() {
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     {/* Enhanced Content */}
-                    <div className="p-5 md:p-6 space-y-3">
-                      <div className="flex items-center gap-2.5 flex-wrap">
+                    <div className="p-4 md:p-5 lg:p-6 space-y-3 overflow-hidden">
+                      {/* Category */}
+                      <div>
                         <span className="inline-block bg-[#d62e1f] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                           {event.category}
                         </span>
-                        <div className="flex items-center gap-2 text-[#a0a0a0]">
-                          <i className="fa-regular fa-calendar text-sm" />
-                          <span className="text-sm font-medium">{formatDate(event.startDate)}</span>
-                        </div>
                       </div>
-                      <h3 className="text-xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
+
+                      {/* Date/Time - Red and Bold */}
+                      <div className="flex items-center gap-2">
+                        <i className="fa-regular fa-calendar text-sm text-[#d62e1f]" />
+                        <span className="text-sm md:text-base font-bold text-[#d62e1f]">{formatDate(event.startDate)}</span>
+                      </div>
+
+                      {/* Title - Large and Bold */}
+                      <h3 className="text-xl md:text-2xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
                         {event.title}
                       </h3>
+
+                      {/* Description */}
                       <p className="text-[#a0a0a0] text-sm line-clamp-2 leading-relaxed">
                         {event.description}
                       </p>
-                      <div className="flex items-center justify-between pt-2 border-t border-[#2a2a2a]">
+
+                      {/* Meta Info - Vertical Layout */}
+                      <div className="space-y-2 pt-2 border-t border-[#2a2a2a]">
                         <div className="flex items-center gap-2 text-[#a0a0a0]">
-                          <i className="fa-solid fa-location-dot text-base text-[#d62e1f]" />
+                          <i className="fa-solid fa-location-dot text-base text-[#d62e1f] flex-shrink-0" />
                           <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                         </div>
                         <div className="flex items-center gap-2 text-[#a0a0a0]">
-                          <i className="fa-solid fa-users text-base text-[#d62e1f]" />
+                          <i className="fa-solid fa-users text-base text-[#d62e1f] flex-shrink-0" />
                           <span className="text-sm font-semibold">
                             {event._count?.registrations || 0} / {event.capacity}
                           </span>
@@ -536,29 +545,38 @@ export default function HomePage() {
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                       {/* Enhanced Content */}
-                      <div className="p-5 md:p-6 space-y-3">
-                        <div className="flex items-center gap-2.5 flex-wrap">
+                      <div className="p-4 md:p-5 lg:p-6 space-y-3 overflow-hidden">
+                        {/* Category */}
+                        <div>
                           <span className="inline-block bg-[#d62e1f] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                             {event.category}
                           </span>
-                          <div className="flex items-center gap-2 text-[#a0a0a0]">
-                            <i className="fa-regular fa-calendar text-sm" />
-                            <span className="text-sm font-medium">{formatDate(event.startDate)}</span>
-                          </div>
                         </div>
-                        <h3 className="text-xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
+
+                        {/* Date/Time - Red and Bold */}
+                        <div className="flex items-center gap-2">
+                          <i className="fa-regular fa-calendar text-sm text-[#d62e1f]" />
+                          <span className="text-sm md:text-base font-bold text-[#d62e1f]">{formatDate(event.startDate)}</span>
+                        </div>
+
+                        {/* Title - Large and Bold */}
+                        <h3 className="text-xl md:text-2xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
                           {event.title}
                         </h3>
+
+                        {/* Description */}
                         <p className="text-[#a0a0a0] text-sm line-clamp-2 leading-relaxed">
                           {event.description}
                         </p>
-                        <div className="flex items-center justify-between pt-2 border-t border-[#2a2a2a]">
+
+                        {/* Meta Info - Vertical Layout */}
+                        <div className="space-y-2 pt-2 border-t border-[#2a2a2a]">
                           <div className="flex items-center gap-2 text-[#a0a0a0]">
-                            <i className="fa-solid fa-location-dot text-base text-[#d62e1f]" />
+                            <i className="fa-solid fa-location-dot text-base text-[#d62e1f] flex-shrink-0" />
                             <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                           </div>
                           <div className="flex items-center gap-2 text-[#a0a0a0]">
-                            <i className="fa-solid fa-users text-base text-[#d62e1f]" />
+                            <i className="fa-solid fa-users text-base text-[#d62e1f] flex-shrink-0" />
                             <span className="text-sm font-semibold">
                               {event._count?.registrations || 0} / {event.capacity}
                             </span>

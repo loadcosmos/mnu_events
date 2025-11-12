@@ -233,25 +233,35 @@ export default function ClubsPage() {
                         </div>
                       </div>
 
-                      <div className="p-6 space-y-4">
-                        <h3 className="text-xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors">
+                      <div className="p-4 md:p-5 lg:p-6 space-y-3 md:space-y-4 overflow-hidden">
+                        {/* Category */}
+                        <div>
+                          <span className="inline-block bg-[#d62e1f] text-white px-3 py-1.5 rounded text-xs font-bold uppercase">
+                            {club.category}
+                          </span>
+                        </div>
+
+                        {/* Title - Large and Bold */}
+                        <h3 className="text-xl md:text-2xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors">
                           {club.name}
                         </h3>
 
+                        {/* Description */}
                         <p className="text-[#a0a0a0] text-sm line-clamp-3">
                           {club.description || 'No description available'}
                         </p>
 
-                        <div className="space-y-2 pt-2">
+                        {/* Meta Info - Vertical Layout */}
+                        <div className="space-y-2 pt-2 border-t border-[#2a2a2a]">
                           <div className="flex items-center text-[#a0a0a0] text-sm">
-                            <i className="fa-solid fa-users mr-2" />
-                            <span>
+                            <i className="fa-solid fa-users mr-2 text-[#d62e1f] flex-shrink-0" />
+                            <span className="line-clamp-1">
                               {membersCount} {membersCount === 1 ? 'member' : 'members'}
                             </span>
                           </div>
                           {club.organizer && (
                             <div className="flex items-center text-[#a0a0a0] text-sm">
-                              <i className="fa-solid fa-user-tie mr-2" />
+                              <i className="fa-solid fa-user-tie mr-2 text-[#d62e1f] flex-shrink-0" />
                               <span className="line-clamp-1">
                                 {club.organizer.firstName} {club.organizer.lastName}
                               </span>

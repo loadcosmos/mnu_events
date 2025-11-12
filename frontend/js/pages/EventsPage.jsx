@@ -245,11 +245,11 @@ export default function EventsPage() {
                   return (
                     <div
                       key={event.id}
-                      className="bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
+                      className="bg-[#1a1a1a] rounded-xl border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl flex flex-col"
                       onClick={() => openEventModal(event.id)}
                     >
-                      {/* Enhanced Image with Gradient Overlay */}
-                      <div className="relative h-52 md:h-48 overflow-hidden bg-[#0a0a0a]">
+                      {/* Image Section - Fixed Height, No Scroll */}
+                      <div className="relative h-48 md:h-52 flex-shrink-0 overflow-hidden bg-[#0a0a0a]">
                         <img
                           src={imageUrl}
                           alt={event.title}
@@ -258,41 +258,46 @@ export default function EventsPage() {
                             e.target.src = '/images/event-placeholder.jpg';
                           }}
                         />
-                        {/* Enhanced gradient for visual depth */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {/* Subtle gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                       </div>
 
-                      {/* Enhanced Card Content with Better Spacing */}
-                      <div className="p-5 md:p-6 space-y-4">
-                        {/* Category and Date - Improved Layout */}
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <span className="inline-block bg-[#d62e1f] text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
+                      {/* Content Section - Strict Vertical Layout with Proper Padding */}
+                      <div className="flex-1 flex flex-col px-5 py-5 md:px-6 md:py-6 space-y-4">
+                        {/* Category Badge */}
+                        <div className="flex-shrink-0">
+                          <span className="inline-block bg-[#d62e1f] text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide">
                             {event.category}
                           </span>
-                          <div className="flex items-center gap-2 text-[#a0a0a0]">
-                            <i className="fa-regular fa-calendar text-sm" />
-                            <span className="text-sm font-medium">{formatDate(event.startDate)}</span>
-                          </div>
                         </div>
 
-                        {/* Title - Larger and More Prominent */}
-                        <h3 className="text-xl md:text-2xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
+                        {/* Date/Time - MNU Red + Bold */}
+                        <div className="flex items-center gap-2.5 flex-shrink-0">
+                          <i className="fa-regular fa-calendar text-[#d62e1f] text-base" />
+                          <span className="text-base font-bold text-[#d62e1f]">{formatDate(event.startDate)}</span>
+                        </div>
+
+                        {/* Event Title - Large + Bold */}
+                        <h3 className="text-2xl md:text-2xl font-bold text-white line-clamp-2 leading-tight flex-shrink-0">
                           {event.title}
                         </h3>
 
-                        {/* Description - Better Readability */}
-                        <p className="text-[#a0a0a0] text-sm md:text-base line-clamp-2 leading-relaxed">{event.description}</p>
+                        {/* Description - Controlled Height */}
+                        <p className="text-[#a0a0a0] text-sm leading-relaxed line-clamp-2 flex-shrink-0">
+                          {event.description}
+                        </p>
 
-                        {/* Meta Info - Improved Icons and Spacing */}
-                        <div className="flex items-center justify-between pt-3 border-t border-[#2a2a2a]">
-                          <div className="flex items-center gap-2 text-[#a0a0a0]">
-                            <i className="fa-solid fa-location-dot text-base text-[#d62e1f]" />
-                            <span className="text-sm font-medium line-clamp-1">{event.location}</span>
+                        {/* Meta Info - Vertical Stack */}
+                        <div className="flex flex-col gap-2.5 pt-4 border-t border-[#2a2a2a] flex-shrink-0">
+                          {/* Location */}
+                          <div className="flex items-center gap-2.5">
+                            <i className="fa-solid fa-location-dot text-[#d62e1f] text-base flex-shrink-0" />
+                            <span className="text-sm font-medium text-[#a0a0a0] truncate">{event.location}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[#a0a0a0]">
-                            <i className="fa-solid fa-users text-base text-[#d62e1f]" />
-                            <span className="text-sm font-semibold">
+                          {/* Capacity */}
+                          <div className="flex items-center gap-2.5">
+                            <i className="fa-solid fa-users text-[#d62e1f] text-base flex-shrink-0" />
+                            <span className="text-sm font-semibold text-[#a0a0a0]">
                               {event._count?.registrations || 0} / {event.capacity}
                             </span>
                           </div>
