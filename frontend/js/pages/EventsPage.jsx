@@ -10,6 +10,8 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -17,6 +19,11 @@ export default function EventsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  // Collapsible filter sections
+  const [categoryExpanded, setCategoryExpanded] = useState(false);
+  const [statusExpanded, setStatusExpanded] = useState(false);
+  const [dateExpanded, setDateExpanded] = useState(false);
 
   const categories = ['ALL', ...Object.values(EVENT_CATEGORIES)];
   const statuses = ['ALL', 'UPCOMING', 'ONGOING', 'COMPLETED'];
@@ -40,7 +47,7 @@ export default function EventsPage() {
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, selectedStatus, searchQuery]);
+  }, [selectedCategory, selectedStatus, searchQuery, startDate, endDate]);
 
   const loadEvents = async () => {
     try {
@@ -62,6 +69,14 @@ export default function EventsPage() {
 
       if (searchQuery) {
         params.search = searchQuery;
+      }
+
+      if (startDate) {
+        params.startDateFrom = startDate;
+      }
+
+      if (endDate) {
+        params.startDateTo = endDate;
       }
 
       const response = await eventsService.getAll(params);
@@ -287,55 +302,129 @@ export default function EventsPage() {
         onClose={() => setFilterSheetOpen(false)}
         title="Filter Events"
       >
-        <div className="space-y-6">
-          <div>
-            <label className="block text-white font-semibold mb-3">Category</label>
-            <div className="space-y-2">
-              {categories.map((category) => (
-                <label
-                  key={category}
-                  className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
-                    selectedCategory === category
-                      ? 'bg-[#d62e1f] text-white'
-                      : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="category"
-                    checked={selectedCategory === category}
-                    onChange={() => setSelectedCategory(category)}
-                    className="mr-3 accent-[#d62e1f]"
-                  />
-                  {category}
-                </label>
-              ))}
-            </div>
+        <div className="space-y-4">
+          {/* Category Filter - Collapsible */}
+          <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
+            <button
+              onClick={() => setCategoryExpanded(!categoryExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-[#2a2a2a] text-white font-semibold hover:bg-[#3a3a3a] transition-colors"
+            >
+              <span>Category</span>
+              <i
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${
+                  categoryExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {categoryExpanded && (
+              <div className="p-3 space-y-2 bg-[#1a1a1a]">
+                {categories.map((category) => (
+                  <label
+                    key={category}
+                    className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+                      selectedCategory === category
+                        ? 'bg-[#d62e1f] text-white'
+                        : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="category"
+                      checked={selectedCategory === category}
+                      onChange={() => setSelectedCategory(category)}
+                      className="mr-3 accent-[#d62e1f]"
+                    />
+                    {category}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div>
-            <label className="block text-white font-semibold mb-3">Status</label>
-            <div className="space-y-2">
-              {statuses.map((status) => (
-                <label
-                  key={status}
-                  className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
-                    selectedStatus === status
-                      ? 'bg-[#d62e1f] text-white'
-                      : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
-                  }`}
-                >
+          {/* Status Filter - Collapsible */}
+          <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
+            <button
+              onClick={() => setStatusExpanded(!statusExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-[#2a2a2a] text-white font-semibold hover:bg-[#3a3a3a] transition-colors"
+            >
+              <span>Status</span>
+              <i
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${
+                  statusExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {statusExpanded && (
+              <div className="p-3 space-y-2 bg-[#1a1a1a]">
+                {statuses.map((status) => (
+                  <label
+                    key={status}
+                    className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+                      selectedStatus === status
+                        ? 'bg-[#d62e1f] text-white'
+                        : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="status"
+                      checked={selectedStatus === status}
+                      onChange={() => setSelectedStatus(status)}
+                      className="mr-3 accent-[#d62e1f]"
+                    />
+                    {status}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Date Range Filter - Collapsible */}
+          <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
+            <button
+              onClick={() => setDateExpanded(!dateExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-[#2a2a2a] text-white font-semibold hover:bg-[#3a3a3a] transition-colors"
+            >
+              <span>Date Range</span>
+              <i
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${
+                  dateExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {dateExpanded && (
+              <div className="p-4 space-y-4 bg-[#1a1a1a]">
+                <div>
+                  <label className="block text-[#a0a0a0] text-sm mb-2">From Date</label>
                   <input
-                    type="radio"
-                    name="status"
-                    checked={selectedStatus === status}
-                    onChange={() => setSelectedStatus(status)}
-                    className="mr-3 accent-[#d62e1f]"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-[#2a2a2a] bg-[#2a2a2a] text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none"
                   />
-                  {status}
-                </label>
-              ))}
-            </div>
+                </div>
+                <div>
+                  <label className="block text-[#a0a0a0] text-sm mb-2">To Date</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-[#2a2a2a] bg-[#2a2a2a] text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none"
+                  />
+                </div>
+                {(startDate || endDate) && (
+                  <button
+                    onClick={() => {
+                      setStartDate('');
+                      setEndDate('');
+                    }}
+                    className="w-full px-4 py-2 rounded-lg bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white transition-colors text-sm"
+                  >
+                    Clear Dates
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </FilterSheet>
