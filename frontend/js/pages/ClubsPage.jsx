@@ -15,6 +15,9 @@ export default function ClubsPage() {
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
+  // Collapsible filter sections
+  const [categoryExpanded, setCategoryExpanded] = useState(false);
+
   const categories = ['ALL', ...Object.values(CLUB_CATEGORIES)];
 
   useEffect(() => {
@@ -270,30 +273,43 @@ export default function ClubsPage() {
         onClose={() => setFilterSheetOpen(false)}
         title="Filter Clubs"
       >
-        <div className="space-y-6">
-          <div>
-            <label className="block text-white font-semibold mb-3">Category</label>
-            <div className="space-y-2">
-              {categories.map((category) => (
-                <label
-                  key={category}
-                  className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
-                    selectedCategory === category
-                      ? 'bg-[#d62e1f] text-white'
-                      : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="category"
-                    checked={selectedCategory === category}
-                    onChange={() => setSelectedCategory(category)}
-                    className="mr-3 accent-[#d62e1f]"
-                  />
-                  {category}
-                </label>
-              ))}
-            </div>
+        <div className="space-y-4">
+          {/* Category Filter - Collapsible */}
+          <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
+            <button
+              onClick={() => setCategoryExpanded(!categoryExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-[#2a2a2a] text-white font-semibold hover:bg-[#3a3a3a] transition-colors"
+            >
+              <span>Category</span>
+              <i
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${
+                  categoryExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {categoryExpanded && (
+              <div className="p-3 space-y-2 bg-[#1a1a1a]">
+                {categories.map((category) => (
+                  <label
+                    key={category}
+                    className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+                      selectedCategory === category
+                        ? 'bg-[#d62e1f] text-white'
+                        : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="category"
+                      checked={selectedCategory === category}
+                      onChange={() => setSelectedCategory(category)}
+                      className="mr-3 accent-[#d62e1f]"
+                    />
+                    {category}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </FilterSheet>

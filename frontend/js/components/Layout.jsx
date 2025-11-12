@@ -120,12 +120,12 @@ export default function Layout({ children }) {
         className={`fixed top-0 z-50 w-full border-b transition-all duration-300 ease-in-out ${
           isScrolled
             ? 'border-white/10 bg-black/80 backdrop-blur-lg'
-            : 'border-transparent bg-transparent'
+            : 'border-transparent bg-transparent md:bg-transparent bg-black/60 md:backdrop-blur-none backdrop-blur-md'
         }`}
       >
-        <div className="container mx-auto flex h-20 items-center justify-between px-4">
+        <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
           {/* Left side - Language selector (Desktop only) */}
-          <div className="hidden md:flex flex-1 items-center justify-start">
+          <div className="hidden md:flex flex-1 items-center justify-start max-w-[200px]">
             <div className="relative" ref={langDropdownRef}>
               <Button
                 variant="ghost"
@@ -177,9 +177,9 @@ export default function Layout({ children }) {
           </Link>
 
           {/* Right side - Navigation and Auth */}
-          <div className="flex flex-1 items-center justify-end space-x-4">
+          <div className="flex flex-1 items-center justify-end space-x-2">
             {/* Desktop Only: Navigation */}
-            <nav className="hidden md:flex items-center space-x-2">
+            <nav className="hidden md:flex items-center space-x-1 mr-2">
               <Button
                 variant="ghost"
                 size="default"
