@@ -116,15 +116,15 @@ export default function EventModal({ eventId, isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center md:p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Dark Backdrop with blur - More transparent on mobile */}
       <div
-        className="absolute inset-0 bg-black/60 md:bg-black/80 backdrop-blur-md transition-opacity duration-300"
+        className="absolute inset-0 bg-black/50 md:bg-black/80 backdrop-blur-md transition-opacity duration-300"
         onClick={onClose}
       />
 
-      {/* Dark Premium Modal Content - No scroll on desktop */}
-      <div className="relative w-full max-w-5xl h-screen md:h-auto overflow-y-auto md:overflow-visible bg-neutral-900 md:rounded-lg shadow-2xl border border-neutral-800 transform transition-all duration-300 scale-100 animate-in fade-in zoom-in">
+      {/* Dark Premium Modal Content - Compact on mobile, no scroll on desktop */}
+      <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto md:overflow-visible bg-neutral-900 rounded-lg shadow-2xl border border-neutral-800 transform transition-all duration-300 scale-100 animate-in fade-in zoom-in">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-neutral-800 border-t-primary"></div>
