@@ -158,7 +158,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       {/* Hero Section - Event Slider */}
-      <section className="relative h-[60vh] bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a]">
+      <section className="relative h-screen -mt-20 pt-20 bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a]">
         {loading ? (
           // Loading state
           <div className="absolute inset-0 flex items-center justify-center">
