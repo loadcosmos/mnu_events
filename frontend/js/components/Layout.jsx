@@ -119,7 +119,7 @@ export default function Layout({ children }) {
       <header
         className={`fixed top-0 z-50 w-full border-b transition-all duration-300 ease-in-out ${
           isScrolled
-            ? 'border-white/10 bg-black/80 backdrop-blur-lg'
+            ? 'border-white/10 bg-black/70 backdrop-blur-lg'
             : 'border-transparent bg-transparent md:bg-transparent bg-black/60 md:backdrop-blur-none backdrop-blur-md'
         }`}
       >

@@ -248,7 +248,7 @@ export default function EventsPage() {
                       className="bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
                       onClick={() => openEventModal(event.id)}
                     >
-                      {/* Enhanced Image with Gradient Overlay */}
+                      {/* Image */}
                       <div className="relative h-52 md:h-48 overflow-hidden bg-[#0a0a0a]">
                         <img
                           src={imageUrl}
@@ -258,8 +258,6 @@ export default function EventsPage() {
                             e.target.src = '/images/event-placeholder.jpg';
                           }}
                         />
-                        {/* Enhanced gradient for visual depth */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
 
