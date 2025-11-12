@@ -291,59 +291,59 @@ export default function EventDetailsPage() {
             {/* Registration Card */}
             <Card>
               <CardHeader>
-                <CardTitle>Event Details</CardTitle>
+                <CardTitle className="text-2xl">Event Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 {/* Date & Time */}
                 <div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                    <i className="fa-regular fa-calendar text-primary" />
-                    <span className="font-medium">Start</span>
+                  <div className="flex items-center gap-3 text-base md:text-lg text-muted-foreground mb-2">
+                    <i className="fa-regular fa-calendar text-xl text-primary" />
+                    <span className="font-semibold">Start</span>
                   </div>
-                  <p className="text-base font-medium">{startDate.full}</p>
+                  <p className="text-base md:text-lg font-medium pl-8">{startDate.full}</p>
                 </div>
 
                 {event.endDate && event.endDate !== event.startDate && (
                   <div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                      <i className="fa-regular fa-calendar text-primary" />
-                      <span className="font-medium">End</span>
+                    <div className="flex items-center gap-3 text-base md:text-lg text-muted-foreground mb-2">
+                      <i className="fa-regular fa-calendar text-xl text-primary" />
+                      <span className="font-semibold">End</span>
                     </div>
-                    <p className="text-base font-medium">{endDate.full}</p>
+                    <p className="text-base md:text-lg font-medium pl-8">{endDate.full}</p>
                   </div>
                 )}
 
                 {/* Location */}
                 <div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                    <i className="fa-solid fa-location-dot text-primary" />
-                    <span className="font-medium">Location</span>
+                  <div className="flex items-center gap-3 text-base md:text-lg text-muted-foreground mb-2">
+                    <i className="fa-solid fa-location-dot text-xl text-primary" />
+                    <span className="font-semibold">Location</span>
                   </div>
-                  <p className="text-base">{event.location}</p>
+                  <p className="text-base md:text-lg pl-8">{event.location}</p>
                 </div>
 
                 {/* Capacity */}
                 <div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                    <i className="fa-solid fa-users text-primary" />
-                    <span className="font-medium">Capacity</span>
+                  <div className="flex items-center gap-3 text-base md:text-lg text-muted-foreground mb-2">
+                    <i className="fa-solid fa-users text-xl text-primary" />
+                    <span className="font-semibold">Capacity</span>
                   </div>
-                  <p className="text-base">
+                  <p className="text-base md:text-lg pl-8">
                     {event.availableSeats} of {event.capacity} seats available
                   </p>
                   {isFull && (
-                    <p className="text-sm text-destructive mt-1">Event is full</p>
+                    <p className="text-base text-destructive mt-2 pl-8 font-medium">Event is full</p>
                   )}
                 </div>
 
                 {/* Registration Status */}
                 {isRegistered && myRegistration && (
-                  <div className="p-3 rounded-md bg-green-50 border border-green-200">
-                    <p className="text-sm font-medium text-green-800">
+                  <div className="p-4 rounded-md bg-green-50 border border-green-200">
+                    <p className="text-base md:text-lg font-semibold text-green-800">
                       ✓ You are registered
                     </p>
                     {myRegistration.status === 'WAITLIST' && (
-                      <p className="text-xs text-green-600 mt-1">
+                      <p className="text-sm md:text-base text-green-600 mt-1">
                         You are on the waitlist
                       </p>
                     )}
@@ -352,11 +352,11 @@ export default function EventDetailsPage() {
 
                 {/* Action Buttons - только для студентов */}
                 {!isPast && user?.role === 'STUDENT' && (
-                  <div className="space-y-2 pt-4">
+                  <div className="space-y-3 pt-4">
                     {isRegistered ? (
                       <Button
                         variant="outline"
-                        className="w-full"
+                        className="w-full text-base md:text-lg py-6"
                         onClick={handleCancelRegistration}
                         disabled={registering}
                       >
@@ -364,7 +364,7 @@ export default function EventDetailsPage() {
                       </Button>
                     ) : (
                       <Button
-                        className="w-full"
+                        className="w-full text-base md:text-lg py-6"
                         onClick={handleRegister}
                         disabled={registering || isFull || !isAuthenticated()}
                       >
@@ -378,8 +378,8 @@ export default function EventDetailsPage() {
                       </Button>
                     )}
                     {!isAuthenticated() && (
-                      <p className="text-xs text-center text-muted-foreground">
-                        <Link to="/login" className="text-primary hover:underline">
+                      <p className="text-sm md:text-base text-center text-muted-foreground">
+                        <Link to="/login" className="text-primary hover:underline font-medium">
                           Sign in
                         </Link>{' '}
                         to register for this event
@@ -387,12 +387,12 @@ export default function EventDetailsPage() {
                     )}
                   </div>
                 )}
-                
+
                 {/* Сообщение для организаторов и админов */}
                 {!isPast && isAuthenticated() && user?.role !== 'STUDENT' && (
-                  <div className="p-3 rounded-md bg-gray-50 border border-gray-200 mt-4">
-                    <p className="text-sm text-muted-foreground text-center">
-                      {user?.role === 'ORGANIZER' 
+                  <div className="p-4 rounded-md bg-gray-50 border border-gray-200 mt-4">
+                    <p className="text-sm md:text-base text-muted-foreground text-center">
+                      {user?.role === 'ORGANIZER'
                         ? 'Organizers cannot register for events. Manage your events from the dashboard.'
                         : 'Only students can register for events.'}
                     </p>
@@ -400,8 +400,8 @@ export default function EventDetailsPage() {
                 )}
 
                 {isPast && (
-                  <div className="p-3 rounded-md bg-gray-50 border border-gray-200">
-                    <p className="text-sm text-muted-foreground text-center">
+                  <div className="p-4 rounded-md bg-gray-50 border border-gray-200">
+                    <p className="text-sm md:text-base text-muted-foreground text-center font-medium">
                       This event has ended
                     </p>
                   </div>
