@@ -36,6 +36,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   @@index([email])
+  @@index([verificationCode]) // For email verification lookups
   @@map("users")
 }
 
@@ -71,6 +72,8 @@ model Event {
   @@index([category])
   @@index([status])
   @@index([startDate])
+  @@index([endDate]) // For filtering past events
+  @@index([category, status]) // Composite index for common filter combinations
   @@map("events")
 }
 
@@ -108,6 +111,9 @@ model Registration {
   @@unique([userId, eventId])
   @@index([userId])
   @@index([eventId])
+  @@index([status]) // For statistics queries
+  @@index([checkedIn]) // For check-in statistics
+  @@index([eventId, status]) // Composite index for event registration queries
   @@map("registrations")
 }
 
@@ -164,6 +170,7 @@ model ClubMembership {
   @@unique([userId, clubId])
   @@index([userId])
   @@index([clubId])
+  @@index([role]) // For filtering by member role
   @@map("club_memberships")
 }
 

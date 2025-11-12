@@ -1,5 +1,5 @@
 export default () => ({
-  port: parseInt(process.env.PORT, 10) || 3001,
+  port: parseInt(process.env.PORT || '3001', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
   database: {
     url: process.env.DATABASE_URL,
@@ -19,7 +19,7 @@ export default () => ({
   email: {
     smtp: {
       host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT, 10) || 587,
+      port: parseInt(process.env.SMTP_PORT || '587', 10),
       user: process.env.SMTP_USER,
       password: process.env.SMTP_PASSWORD,
     },
@@ -29,11 +29,11 @@ export default () => ({
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   },
   throttle: {
-    ttl: parseInt(process.env.THROTTLE_TTL, 10) || 60,
-    limit: parseInt(process.env.THROTTLE_LIMIT, 10) || 10,
+    ttl: parseInt(process.env.THROTTLE_TTL || '60', 10),
+    limit: parseInt(process.env.THROTTLE_LIMIT || '10', 10),
   },
   upload: {
-    maxFileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 5242880, // 5MB
+    maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB
     uploadDir: process.env.UPLOAD_DIR || './uploads',
   },
 });

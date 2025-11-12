@@ -255,7 +255,7 @@ export class EventsService {
     return { message: 'Event deleted successfully' };
   }
 
-  async getMyEvents(userId: string, page: number = 1, limit: number = 10) {
+  async getMyEvents(userId: string, page?: number, limit?: number) {
     return this.findAll(page, limit, { creatorId: userId });
   }
 

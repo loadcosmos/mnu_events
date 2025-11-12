@@ -1,0 +1,89 @@
+/**
+ * Application-wide constants
+ * Centralized configuration to avoid hardcoded values throughout the codebase
+ */
+
+// User roles
+export const ROLES = {
+  STUDENT: 'STUDENT',
+  ORGANIZER: 'ORGANIZER',
+  ADMIN: 'ADMIN',
+};
+
+// Event categories
+export const EVENT_CATEGORIES = {
+  ACADEMIC: 'ACADEMIC',
+  SPORTS: 'SPORTS',
+  CULTURAL: 'CULTURAL',
+  TECH: 'TECH',
+  SOCIAL: 'SOCIAL',
+  CAREER: 'CAREER',
+  OTHER: 'OTHER',
+};
+
+// Event statuses
+export const EVENT_STATUSES = {
+  UPCOMING: 'UPCOMING',
+  ONGOING: 'ONGOING',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+};
+
+// Registration statuses
+export const REGISTRATION_STATUSES = {
+  REGISTERED: 'REGISTERED',
+  WAITLIST: 'WAITLIST',
+  CANCELLED: 'CANCELLED',
+};
+
+// Club categories
+export const CLUB_CATEGORIES = {
+  ACADEMIC: 'ACADEMIC',
+  ARTS: 'ARTS',
+  SERVICE: 'SERVICE',
+  TECH: 'TECH',
+  SPORTS: 'SPORTS',
+  CULTURAL: 'CULTURAL',
+  OTHER: 'OTHER',
+};
+
+// Asset paths
+export const ASSETS = {
+  LOGO: '/images/logo.png',
+  BACKGROUND: '/images/backg.jpg',
+  EVENT_PLACEHOLDER: '/images/event-placeholder.jpg',
+};
+
+// API configuration
+export const API_CONFIG = {
+  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+  TIMEOUT: 10000, // 10 seconds
+};
+
+// Pagination defaults
+export const PAGINATION = {
+  DEFAULT_PAGE: 1,
+  DEFAULT_LIMIT: 10,
+  DEFAULT_EVENT_LIMIT: 50,
+  MAX_LIMIT: 100,
+};
+
+// Time constants
+export const TIME = {
+  DEBOUNCE_DELAY: 500, // milliseconds
+  SLIDER_INTERVAL: 5000, // milliseconds
+  TOAST_DURATION: 3000, // milliseconds
+};
+
+// Language options
+export const LANGUAGES = {
+  EN: 'en',
+  RU: 'ru',
+  KK: 'kk',
+};
+
+// Brand colors
+export const COLORS = {
+  PRIMARY: '#d62e1f',
+  PRIMARY_DARK: '#b91c1c',
+};

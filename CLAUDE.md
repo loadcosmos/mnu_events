@@ -99,6 +99,9 @@ E2E tests use Playwright and are located in `e2e/` directory. Tests assume both 
 - `clubs/` - Club management and memberships
 - `prisma/` - Database service (singleton pattern)
 - `config/` - Configuration loader
+- `common/` - Shared utilities and constants (⭐ NEW)
+  - `common/utils/` - Pagination, authorization, and helper functions
+  - `common/constants/` - Application-wide constants (pagination, time, etc.)
 
 **Global Infrastructure (configured in `app.module.ts`):**
 - **Guards**: JWT authentication (all routes protected by default), role-based authorization, rate limiting (ThrottlerGuard)
@@ -131,6 +134,7 @@ E2E tests use Playwright and are located in `e2e/` directory. Tests assume both 
 - `frontend/js/components/` - Reusable UI components including:
   - `Layout.jsx`, `OrganizerLayout.jsx`, `AdminLayout.jsx` - Page wrappers with navigation
   - `ProtectedRoute.jsx` - Route wrapper for role-based access control
+  - `LanguageSelector.jsx` - Reusable language selector component (⭐ NEW)
   - `ui/` - shadcn/ui-style components (button, card, input, etc.)
 - `frontend/js/pages/` - Route components (HomePage, EventsPage, AdminDashboardPage, etc.)
 - `frontend/js/services/` - API client and service layers:
@@ -138,6 +142,11 @@ E2E tests use Playwright and are located in `e2e/` directory. Tests assume both 
   - `authService.js`, `eventsService.js`, `registrationsService.js`, etc. - Domain services
 - `frontend/js/context/` - React Context providers:
   - `AuthContext.jsx` - Global auth state, user info, login/logout methods
+- `frontend/js/utils/` - Shared utilities and constants (⭐ NEW)
+  - `constants.js` - Application-wide constants (roles, categories, colors, etc.)
+  - `categoryMappers.js` - Category and status display name mappers
+  - `dateFormatters.js` - Date formatting utilities
+  - `errorHandlers.js` - Error handling and extraction utilities
 - `frontend/css/` - Tailwind CSS styles
 
 **Routing (React Router v7):**
@@ -167,7 +176,14 @@ E2E tests use Playwright and are located in `e2e/` directory. Tests assume both 
 '@services' → 'frontend/js/services'
 '@context' → 'frontend/js/context'
 '@pages' → 'frontend/js/pages'
+'@utils' → 'frontend/js/utils'  // ⭐ NEW
 '@css' → 'frontend/css'
+```
+
+**Importing utilities:**
+```javascript
+import { ROLES, formatDate, extractErrorMessage } from '@/utils';
+import { getCategoryColor, getStatusDisplayName } from '@/utils';
 ```
 
 ## Access URLs
@@ -194,6 +210,12 @@ E2E tests use Playwright and are located in `e2e/` directory. Tests assume both 
 4. **Public Routes**: Use `@Public()` decorator to bypass JWT authentication
 5. **Database Cascades**: User/Event deletions cascade to related records
 6. **Swagger Tags**: Use appropriate tags for API organization (Authentication, Users, Events, etc.)
+7. **⭐ Use Shared Utilities**: Import from `common/utils` to avoid code duplication
+8. **⭐ Pagination**: Use `validatePagination()` and `createPaginatedResponse()` from `common/utils`
+9. **⭐ Authorization**: Use `requireCreatorOrAdmin()`, `requireAdmin()` from `common/utils`
+10. **⭐ TypeScript**: Project uses strict mode - ensure all types are explicit
+11. **⭐ Performance**: Avoid N+1 queries - use Prisma's `include` or `relationLoadStrategy: "join"`
+12. **⭐ Security**: Verification codes use `crypto.randomBytes()` (cryptographically secure)
 
 ### Frontend
 
@@ -202,6 +224,13 @@ E2E tests use Playwright and are located in `e2e/` directory. Tests assume both 
 3. **API Base URL**: Configurable via `VITE_API_URL` env var (defaults to http://localhost:3001/api)
 4. **Layout Selection**: Regular users use `Layout`, organizers use `OrganizerLayout`, admins use `AdminLayout`
 5. **Error Handling**: apiClient handles 401 (logout), 5xx (retry), others (toast notification)
+6. **⭐ Use Shared Utilities**: Import from `@/utils` for constants, formatters, error handlers
+7. **⭐ Date Formatting**: Use `formatDate()`, `formatDateShort()`, `formatTime()` from `@/utils`
+8. **⭐ Category Display**: Use `getCategoryDisplayName()`, `getCategoryColor()` from `@/utils`
+9. **⭐ Error Messages**: Use `extractErrorMessage()` from `@/utils` for consistent error handling
+10. **⭐ Constants**: Use `ROLES`, `EVENT_CATEGORIES`, `ASSETS` from `@/utils` instead of hardcoded strings
+11. **⚠️ Error Boundaries**: Currently MISSING - should be added for production
+12. **⚠️ Performance**: Consider using `React.memo()` and `useMemo()` for heavy components
 
 ### Testing
 
@@ -239,6 +268,205 @@ E2E tests use Playwright and are located in `e2e/` directory. Tests assume both 
 4. Update seed file if needed: `backend/prisma/seed.ts`
 5. Restart backend server to pick up changes
 
+## Best Practices & Code Examples
+
+### Backend Best Practices
+
+#### ⭐ Using Pagination Utilities
+
+```typescript
+import { validatePagination, createPaginatedResponse } from '../common/utils';
+
+async findAll(page?: number, limit?: number) {
+  // Automatically validates and normalizes pagination (max 100 limit)
+  const { skip, take, page: validatedPage } = validatePagination({ page, limit });
+
+  const [items, total] = await Promise.all([
+    this.prisma.event.findMany({ skip, take }),
+    this.prisma.event.count()
+  ]);
+
+  // Returns standardized paginated response
+  return createPaginatedResponse(items, total, validatedPage, take);
+}
+```
+
+#### ⭐ Using Authorization Utilities
+
+```typescript
+import { requireCreatorOrAdmin, requireAdmin } from '../common/utils';
+
+async update(id: string, dto: UpdateDto, userId: string, userRole: Role) {
+  const item = await this.prisma.event.findUnique({ where: { id } });
+
+  // Throws ForbiddenException if user is not creator or admin
+  requireCreatorOrAdmin(userId, item.creatorId, userRole, 'event');
+
+  return this.prisma.event.update({ where: { id }, data: dto });
+}
+```
+
+#### ⭐ Avoiding N+1 Queries (Prisma Best Practice)
+
+```typescript
+// ❌ BAD: N+1 query problem
+const users = await prisma.user.findMany();
+users.forEach(async (user) => {
+  const posts = await prisma.post.findMany({ where: { authorId: user.id } });
+});
+
+// ✅ GOOD: Use include
+const users = await prisma.user.findMany({
+  include: { posts: true }
+});
+
+// ✅ BETTER: Use relationLoadStrategy for large datasets
+const users = await prisma.user.findMany({
+  relationLoadStrategy: "join",
+  include: { posts: true }
+});
+```
+
+#### ⭐ Single PrismaClient Instance (Performance)
+
+```typescript
+// ❌ BAD: Multiple instances
+async function getUsers() {
+  const prisma = new PrismaClient();
+  await prisma.user.findMany();
+}
+
+// ✅ GOOD: Reuse single instance (already done in prisma.service.ts)
+@Injectable()
+export class PrismaService extends PrismaClient implements OnModuleInit {
+  // Singleton pattern - one instance for entire app
+}
+```
+
+### Frontend Best Practices
+
+#### ⭐ Using Shared Constants
+
+```javascript
+// ❌ BAD: Hardcoded strings
+if (user.role === 'ADMIN') { ... }
+const categoryColor = event.category === 'TECH' ? 'bg-gray-100' : 'bg-blue-100';
+
+// ✅ GOOD: Use constants
+import { ROLES } from '@/utils';
+if (user.role === ROLES.ADMIN) { ... }
+
+import { getCategoryColor } from '@/utils';
+const categoryColor = getCategoryColor(event.category);
+```
+
+#### ⭐ Using Date Formatters
+
+```javascript
+// ❌ BAD: Duplicate formatting logic
+const formatted = new Date(event.startDate).toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric'
+});
+
+// ✅ GOOD: Use utility
+import { formatDate, formatDateRange } from '@/utils';
+const formatted = formatDate(event.startDate);
+const range = formatDateRange(event.startDate, event.endDate);
+```
+
+#### ⭐ Using Error Handlers
+
+```javascript
+// ❌ BAD: Inconsistent error extraction
+const message = error.response?.data?.message || error.message || 'Error';
+
+// ✅ GOOD: Use utility
+import { extractErrorMessage } from '@/utils';
+const message = extractErrorMessage(error, 'Failed to load events');
+```
+
+#### ⚠️ Error Boundaries (TODO - Not Yet Implemented)
+
+```javascript
+// TODO: Add Error Boundary
+function App() {
+  return (
+    <ErrorBoundary fallback={<ErrorFallback />}>
+      <Routes>
+        {/* routes */}
+      </Routes>
+    </ErrorBoundary>
+  );
+}
+```
+
+#### ⭐ Performance Optimization with React.memo
+
+```javascript
+// ⚠️ Heavy component re-renders unnecessarily
+export default function EventCard({ event, onClick }) {
+  return <div onClick={() => onClick(event.id)}>{event.title}</div>;
+}
+
+// ✅ Wrap with memo to prevent re-renders
+import { memo } from 'react';
+export default memo(function EventCard({ event, onClick }) {
+  return <div onClick={() => onClick(event.id)}>{event.title}</div>;
+});
+```
+
+## Database Indexes
+
+The schema includes performance-optimized indexes:
+
+```prisma
+// User model
+@@index([email])
+@@index([verificationCode])  // ⭐ NEW: For verification lookups
+
+// Event model
+@@index([creatorId])
+@@index([category])
+@@index([status])
+@@index([startDate])
+@@index([endDate])  // ⭐ NEW: For past event filtering
+@@index([category, status])  // ⭐ NEW: Composite for common filters
+
+// Registration model
+@@index([userId])
+@@index([eventId])
+@@index([status])  // ⭐ NEW: For statistics
+@@index([checkedIn])  // ⭐ NEW: For check-in stats
+@@index([eventId, status])  // ⭐ NEW: Composite
+
+// ClubMembership model
+@@index([role])  // ⭐ NEW: For role filtering
+```
+
+**After adding new indexes:**
+```bash
+cd backend
+npx prisma migrate dev --name add-performance-indexes
+npx prisma generate
+```
+
+## Security Notes
+
+### Backend Security
+
+1. **Cryptographically Secure Random**: Verification codes use `crypto.randomBytes()` instead of `Math.random()`
+2. **SSL Validation**: Certificate validation only disabled in development (`process.env.NODE_ENV !== 'development'`)
+3. **TypeScript Strict Mode**: Enabled to catch type errors at compile-time
+4. **Password Hashing**: bcrypt with 10 rounds (never plain-text)
+5. **Rate Limiting**: Global throttling configured in `app.module.ts`
+6. **Input Validation**: All DTOs validated with `class-validator`
+
+### Frontend Security
+
+1. **Token Storage**: Currently in localStorage (consider httpOnly cookies for production)
+2. **XSS Prevention**: All user input should be sanitized
+3. **CSRF Protection**: Not currently implemented (add for production)
+
 ## Debugging Tips
 
 - **Backend not starting**: Check if port 3001 is in use, verify DATABASE_URL in `.env`
@@ -247,3 +475,4 @@ E2E tests use Playwright and are located in `e2e/` directory. Tests assume both 
 - **Prisma errors**: Try regenerating client: `npx prisma generate`
 - **bcrypt errors on WSL**: Run `npm rebuild bcrypt` in backend directory
 - **Email verification not working**: SMTP configuration is optional in development; check backend logs for email transporter status
+- **TypeScript errors after updates**: Run `npm run build` in backend to check for type issues
