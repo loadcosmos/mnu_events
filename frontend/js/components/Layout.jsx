@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 import OrganizerLayout from './OrganizerLayout.jsx';
@@ -11,6 +12,7 @@ export default function Layout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
 
   // Все хуки должны быть объявлены до любых условных return
   const [langOpen, setLangOpen] = useState(false);
@@ -115,33 +117,49 @@ export default function Layout({ children }) {
   const isHomePage = location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
       <header
         className={`fixed top-0 z-50 w-full border-b transition-all duration-300 ease-in-out ${
           isScrolled
-            ? 'border-white/10 bg-black/70 backdrop-blur-lg'
-            : 'border-transparent bg-black/60 backdrop-blur-md'
+            ? 'border-black/10 dark:border-white/10 bg-white/80 dark:bg-black/80 backdrop-blur-xl shadow-sm'
+            : 'border-transparent bg-white/70 dark:bg-black/70 backdrop-blur-lg'
         }`}
       >
         <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
-          {/* Left side - Language selector (Desktop only) */}
-          <div className="hidden md:flex flex-1 items-center justify-start max-w-[200px]">
+          {/* Left side - Language selector & Theme toggle (Desktop only) */}
+          <div className="hidden md:flex flex-1 items-center justify-start gap-2 max-w-[250px]">
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="text-gray-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+            >
+              {isDark ? (
+                <i className="fa-solid fa-sun text-lg" />
+              ) : (
+                <i className="fa-solid fa-moon text-lg" />
+              )}
+            </Button>
+
+            {/* Language Selector */}
             <div className="relative" ref={langDropdownRef}>
               <Button
                 variant="ghost"
                 size="default"
                 onClick={() => setLangOpen(!langOpen)}
-                className="gap-2 text-white hover:text-white hover:bg-white/10 text-base"
+                className="gap-2 text-gray-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 text-base transition-colors"
               >
                 {selectedLang}
                 <i
                   className={`fa-solid fa-chevron-down text-xs transition-transform ${
-                    langOpen ? 'rotate-188' : ''
+                    langOpen ? 'rotate-180' : ''
                   }`}
                 />
               </Button>
               {langOpen && (
-                <div className="absolute left-0 top-full mt-2 w-32 rounded-md border border-white/10 bg-[#1a1a1a] p-1 shadow-lg z-50">
+                <div className="absolute left-0 top-full mt-2 w-32 rounded-lg border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-xl p-1 shadow-lg z-50">
                   {['ENG', 'РУС', 'ҚАЗ'].map((lang) => (
                     <button
                       key={lang}
@@ -150,8 +168,8 @@ export default function Layout({ children }) {
                         setLangOpen(false);
                       }}
                       className={cn(
-                        'w-full text-left px-3 py-1.5 text-sm rounded-sm text-[#a0a0a0] hover:bg-white/10 hover:text-white transition-colors',
-                        selectedLang === lang && 'bg-white/10 text-white'
+                        'w-full text-left px-3 py-1.5 text-sm rounded-sm text-gray-600 dark:text-[#a0a0a0] hover:bg-black/10 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors',
+                        selectedLang === lang && 'bg-black/10 dark:bg-white/10 text-gray-900 dark:text-white'
                       )}
                     >
                       {lang}
@@ -161,8 +179,22 @@ export default function Layout({ children }) {
               )}
             </div>
           </div>
-          {/* Mobile left spacer */}
-          <div className="md:hidden flex-1"></div>
+          {/* Mobile left spacer - with theme toggle */}
+          <div className="md:hidden flex items-center gap-2 flex-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="text-gray-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/10"
+              aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+            >
+              {isDark ? (
+                <i className="fa-solid fa-sun text-lg" />
+              ) : (
+                <i className="fa-solid fa-moon text-lg" />
+              )}
+            </Button>
+          </div>
 
           {/* Center - Logo */}
           <Link
@@ -184,7 +216,7 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="default"
                 asChild
-                className="text-white hover:text-white hover:bg-white/10 text-base"
+                className="text-gray-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 text-base transition-colors"
               >
                 <Link to="/events">Events</Link>
               </Button>
@@ -192,7 +224,7 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="default"
                 asChild
-                className="text-white hover:text-white hover:bg-white/10 text-base"
+                className="text-gray-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 text-base transition-colors"
               >
                 <Link to="/clubs">Clubs</Link>
               </Button>
@@ -208,7 +240,7 @@ export default function Layout({ children }) {
                       variant="ghost"
                       size="default"
                       onClick={() => setProfileOpen(!profileOpen)}
-                      className="gap-2 text-white hover:text-white hover:bg-white/10 text-base"
+                      className="gap-2 text-gray-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 text-base transition-colors"
                     >
                       <i className="fa-regular fa-circle-user text-lg" />
                       <span className="hidden sm:inline">
@@ -221,13 +253,13 @@ export default function Layout({ children }) {
                       />
                     </Button>
                     {profileOpen && (
-                      <div className="absolute right-0 top-full mt-2 w-56 rounded-md border border-white/10 bg-[#1a1a1a] shadow-lg z-50">
+                      <div className="absolute right-0 top-full mt-2 w-56 rounded-lg border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-xl shadow-lg z-50">
                         <div className="p-1">
                           {user?.role === 'STUDENT' && (
                             <Link
                               to="/registrations"
                               onClick={() => setProfileOpen(false)}
-                              className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#a0a0a0] hover:bg-white/10 hover:text-white transition-colors rounded-sm"
+                              className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:bg-black/10 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors rounded-sm"
                             >
                               <i className="fa-solid fa-calendar-check w-4 text-center" />
                               My Registrations
@@ -236,12 +268,12 @@ export default function Layout({ children }) {
                           <Link
                             to="/profile"
                             onClick={() => setProfileOpen(false)}
-                            className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#a0a0a0] hover:bg-white/10 hover:text-white transition-colors rounded-sm"
+                            className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:bg-black/10 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors rounded-sm"
                           >
                             <i className="fa-solid fa-user-edit w-4 text-center" />
                             Edit Profile
                           </Link>
-                          <div className="my-1 h-px bg-white/10" />
+                          <div className="my-1 h-px bg-black/10 dark:bg-white/10" />
                           <button
                             onClick={() => {
                               setProfileOpen(false);
@@ -262,7 +294,7 @@ export default function Layout({ children }) {
                   {/* Desktop Only: Login Button */}
                   <Button
                     asChild
-                    className="bg-[#d62e1f] text-white hover:bg-[#b91c1c] rounded-full text-base px-6 font-semibold transition-colors"
+                    className="bg-[#d62e1f] text-white hover:bg-[#b91c1c] rounded-full text-base px-6 font-semibold transition-colors shadow-md"
                   >
                     <Link to="/login">Log In</Link>
                   </Button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Layout from './components/Layout.jsx';
 import OrganizerLayout from './components/OrganizerLayout.jsx';
@@ -29,15 +30,16 @@ import AdminClubsPage from './pages/AdminClubsPage.jsx';
 
 /**
  * Главный компонент приложения
- * Настраивает роутинг и оборачивает приложение в AuthProvider
+ * Настраивает роутинг и оборачивает приложение в ThemeProvider и AuthProvider
  */
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <AuthProvider>
-        <Toaster />
-        <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <Toaster />
+          <Routes>
           {/* Публичные маршруты без Layout */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -107,7 +109,8 @@ function App() {
           {/* 404 - не найдено */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
-      </AuthProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

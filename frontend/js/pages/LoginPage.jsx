@@ -148,7 +148,7 @@ export default function LoginPage() {
             setLoginType(loginType === 'student' ? 'admin' : 'student');
             setError('');
           }}
-          className="fixed top-4 right-4 z-50 bg-white"
+          className="fixed top-4 right-4 z-50 bg-white dark:bg-[#1a1a1a] border-gray-300 dark:border-[#2a2a2a] transition-colors duration-300"
         >
           {loginType === 'student' ? 'Admin' : 'Student'}
         </Button>

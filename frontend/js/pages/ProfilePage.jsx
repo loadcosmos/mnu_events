@@ -160,9 +160,9 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#2a2a2a] border-t-[#d62e1f] mb-4"></div>
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex items-center justify-center transition-colors duration-300">
+        <div className="text-center text-gray-900 dark:text-white transition-colors duration-300">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 dark:border-[#2a2a2a] border-t-[#d62e1f] mb-4"></div>
           <p className="text-xl">Loading profile...</p>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex items-center justify-center px-4 transition-colors duration-300">
         <div className="text-center">
           <p className="text-[#d62e1f] mb-4">Failed to load profile</p>
           <Button onClick={loadUserData} className="bg-[#d62e1f] hover:bg-[#b91c1c]">
@@ -183,13 +183,13 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pb-24 md:pb-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] pb-24 md:pb-8 transition-colors duration-300">
       {/* Hero Section with Avatar and User Info */}
-      <div className="bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] py-8 px-4 border-b border-[#2a2a2a]">
+      <div className="bg-gradient-to-b from-gray-200 via-gray-100 to-gray-50 dark:from-[#1a1a1a] dark:via-[#0f0f0f] dark:to-[#0a0a0a] py-8 px-4 border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
           {/* Avatar and Basic Info */}
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-[#2a2a2a] mb-4 ring-4 ring-[#d62e1f]/20">
+            <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-gray-200 dark:bg-[#2a2a2a] mb-4 ring-4 ring-[#d62e1f]/20 transition-colors duration-300">
               {user.avatar ? (
                 <img
                   src={user.avatar}
@@ -211,17 +211,17 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
               {user.firstName} {user.lastName}
             </h1>
-            <p className="text-[#a0a0a0] text-sm md:text-base mb-3">{user.email}</p>
+            <p className="text-gray-600 dark:text-[#a0a0a0] text-sm md:text-base mb-3 transition-colors duration-300">{user.email}</p>
 
             <div className="flex items-center gap-3 mb-2">
               <span className={cn('px-4 py-1.5 rounded-full text-white text-sm font-semibold', getRoleBadgeColor(user.role))}>
                 {user.role}
               </span>
               {user.faculty && (
-                <span className="px-4 py-1.5 rounded-full bg-[#2a2a2a] text-white text-sm font-semibold">
+                <span className="px-4 py-1.5 rounded-full bg-gray-300 dark:bg-[#2a2a2a] text-gray-900 dark:text-white text-sm font-semibold transition-colors duration-300">
                   {user.faculty}
                 </span>
               )}
@@ -239,7 +239,7 @@ export default function ProfilePage() {
             </button>
             <button
               onClick={handleShareProfile}
-              className="px-6 py-3 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white font-semibold rounded-lg transition-colors"
+              className="px-6 py-3 bg-gray-300 dark:bg-[#2a2a2a] hover:bg-gray-400 dark:hover:bg-[#3a3a3a] text-gray-900 dark:text-white font-semibold rounded-lg transition-colors"
             >
               <i className="fa-solid fa-share-nodes mr-2" />
               Share Profile
@@ -249,86 +249,86 @@ export default function ProfilePage() {
       </div>
 
       {/* My Stats Section */}
-      <div className="py-8 px-4 bg-[#0a0a0a]">
+      <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-white mb-6">
+          <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
             My <span className="text-[#d62e1f]">Stats</span>
           </h2>
 
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-[#1a1a1a] rounded-lg p-6 text-center border border-[#2a2a2a] hover:border-[#d62e1f] transition-colors">
+            <div className="bg-white dark:bg-[#1a1a1a] rounded-lg p-6 text-center border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all shadow-lg hover:shadow-2xl">
               <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
                 {stats.eventsAttended}
               </div>
-              <div className="text-xs md:text-sm text-[#a0a0a0] font-semibold">Events Attended</div>
+              <div className="text-xs md:text-sm text-gray-600 dark:text-[#a0a0a0] font-semibold transition-colors duration-300">Events Attended</div>
             </div>
 
-            <div className="bg-[#1a1a1a] rounded-lg p-6 text-center border border-[#2a2a2a] hover:border-[#d62e1f] transition-colors">
+            <div className="bg-white dark:bg-[#1a1a1a] rounded-lg p-6 text-center border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all shadow-lg hover:shadow-2xl">
               <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
                 {stats.upcomingEvents}
               </div>
-              <div className="text-xs md:text-sm text-[#a0a0a0] font-semibold">Upcoming Events</div>
+              <div className="text-xs md:text-sm text-gray-600 dark:text-[#a0a0a0] font-semibold transition-colors duration-300">Upcoming Events</div>
             </div>
 
-            <div className="bg-[#1a1a1a] rounded-lg p-6 text-center border border-[#2a2a2a] hover:border-[#d62e1f] transition-colors">
+            <div className="bg-white dark:bg-[#1a1a1a] rounded-lg p-6 text-center border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all shadow-lg hover:shadow-2xl">
               <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
                 {stats.clubsJoined}
               </div>
-              <div className="text-xs md:text-sm text-[#a0a0a0] font-semibold">Clubs Joined</div>
+              <div className="text-xs md:text-sm text-gray-600 dark:text-[#a0a0a0] font-semibold transition-colors duration-300">Clubs Joined</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Quick Links Section */}
-      <div className="py-8 px-4 bg-[#0a0a0a]">
+      <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-white mb-6">
+          <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
             Quick <span className="text-[#d62e1f]">Access</span>
           </h2>
 
           <Link
             to="/registrations"
-            className="flex items-center justify-between p-6 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a] hover:border-[#d62e1f] transition-all group"
+            className="flex items-center justify-between p-6 bg-white dark:bg-[#1a1a1a] rounded-lg border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all group shadow-lg hover:shadow-2xl"
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-[#d62e1f] rounded-full flex items-center justify-center">
                 <i className="fa-solid fa-calendar-check text-white text-xl" />
               </div>
               <div>
-                <h3 className="text-white font-bold text-lg group-hover:text-[#d62e1f] transition-colors">
+                <h3 className="text-gray-900 dark:text-white font-bold text-lg group-hover:text-[#d62e1f] transition-colors">
                   My Registrations
                 </h3>
-                <p className="text-[#a0a0a0] text-sm">View and manage your event registrations</p>
+                <p className="text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">View and manage your event registrations</p>
               </div>
             </div>
-            <i className="fa-solid fa-chevron-right text-[#a0a0a0] group-hover:text-[#d62e1f] transition-colors" />
+            <i className="fa-solid fa-chevron-right text-gray-600 dark:text-[#a0a0a0] group-hover:text-[#d62e1f] transition-colors" />
           </Link>
         </div>
       </div>
 
       {/* Settings Section */}
-      <div className="py-8 px-4 bg-[#0a0a0a]">
+      <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-white mb-6">
+          <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
             <span className="text-[#d62e1f]">Settings</span>
           </h2>
 
-          <div className="bg-[#1a1a1a] rounded-lg border border-[#2a2a2a] divide-y divide-[#2a2a2a]">
+          <div className="bg-white dark:bg-[#1a1a1a] rounded-lg border border-gray-200 dark:border-[#2a2a2a] divide-y divide-gray-200 dark:divide-[#2a2a2a] transition-colors duration-300 shadow-lg">
             {/* Language Setting */}
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <i className="fa-solid fa-language text-[#d62e1f] text-xl" />
                   <div>
-                    <h3 className="text-white font-semibold">Language</h3>
-                    <p className="text-[#a0a0a0] text-sm">Choose your preferred language</p>
+                    <h3 className="text-gray-900 dark:text-white font-semibold transition-colors duration-300">Language</h3>
+                    <p className="text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">Choose your preferred language</p>
                   </div>
                 </div>
                 <select
                   value={selectedLanguage}
                   onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="px-4 py-2 bg-[#2a2a2a] text-white rounded-lg border border-[#3a3a3a] focus:border-[#d62e1f] focus:outline-none"
+                  className="px-4 py-2 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white rounded-lg border border-gray-300 dark:border-[#3a3a3a] focus:border-[#d62e1f] focus:outline-none transition-colors duration-300"
                 >
                   <option value="ENG">English</option>
                   <option value="РУС">Русский</option>
@@ -343,11 +343,11 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-4">
                   <i className="fa-solid fa-bell text-[#d62e1f] text-xl" />
                   <div>
-                    <h3 className="text-white font-semibold">Notifications</h3>
-                    <p className="text-[#a0a0a0] text-sm">Manage notification preferences</p>
+                    <h3 className="text-gray-900 dark:text-white font-semibold transition-colors duration-300">Notifications</h3>
+                    <p className="text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">Manage notification preferences</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg transition-colors">
+                <button className="px-4 py-2 bg-gray-200 dark:bg-[#2a2a2a] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] text-gray-900 dark:text-white rounded-lg transition-colors">
                   <i className="fa-solid fa-chevron-right" />
                 </button>
               </div>
@@ -359,11 +359,11 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-4">
                   <i className="fa-solid fa-shield-halved text-[#d62e1f] text-xl" />
                   <div>
-                    <h3 className="text-white font-semibold">Privacy & Security</h3>
-                    <p className="text-[#a0a0a0] text-sm">Control your privacy settings</p>
+                    <h3 className="text-gray-900 dark:text-white font-semibold transition-colors duration-300">Privacy & Security</h3>
+                    <p className="text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">Control your privacy settings</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg transition-colors">
+                <button className="px-4 py-2 bg-gray-200 dark:bg-[#2a2a2a] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] text-gray-900 dark:text-white rounded-lg transition-colors">
                   <i className="fa-solid fa-chevron-right" />
                 </button>
               </div>
@@ -375,11 +375,11 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-4">
                   <i className="fa-solid fa-circle-info text-[#d62e1f] text-xl" />
                   <div>
-                    <h3 className="text-white font-semibold">About & Help</h3>
-                    <p className="text-[#a0a0a0] text-sm">Get help and learn about the app</p>
+                    <h3 className="text-gray-900 dark:text-white font-semibold transition-colors duration-300">About & Help</h3>
+                    <p className="text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">Get help and learn about the app</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg transition-colors">
+                <button className="px-4 py-2 bg-gray-200 dark:bg-[#2a2a2a] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] text-gray-900 dark:text-white rounded-lg transition-colors">
                   <i className="fa-solid fa-chevron-right" />
                 </button>
               </div>
@@ -394,11 +394,11 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-4">
                   <i className="fa-solid fa-right-from-bracket text-[#d62e1f] text-xl" />
                   <div className="text-left">
-                    <h3 className="text-white font-semibold group-hover:text-[#d62e1f] transition-colors">Logout</h3>
-                    <p className="text-[#a0a0a0] text-sm">Sign out of your account</p>
+                    <h3 className="text-gray-900 dark:text-white font-semibold group-hover:text-[#d62e1f] transition-colors">Logout</h3>
+                    <p className="text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">Sign out of your account</p>
                   </div>
                 </div>
-                <i className="fa-solid fa-chevron-right text-[#a0a0a0] group-hover:text-[#d62e1f] transition-colors" />
+                <i className="fa-solid fa-chevron-right text-gray-600 dark:text-[#a0a0a0] group-hover:text-[#d62e1f] transition-colors" />
               </button>
             </div>
           </div>
@@ -410,19 +410,19 @@ export default function ProfilePage() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/80 z-40"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
             onClick={() => setIsEditModalOpen(false)}
           />
 
           {/* Modal */}
           <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-            <div className="bg-[#1a1a1a] w-full md:max-w-2xl md:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-[#1a1a1a] w-full md:max-w-2xl md:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-2xl transition-colors duration-300">
               {/* Header */}
-              <div className="sticky top-0 bg-[#1a1a1a] border-b border-[#2a2a2a] px-6 py-4 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white">Edit Profile</h2>
+              <div className="sticky top-0 bg-white dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-[#2a2a2a] px-6 py-4 flex items-center justify-between transition-colors duration-300">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-300">Edit Profile</h2>
                 <button
                   onClick={() => setIsEditModalOpen(false)}
-                  className="text-[#a0a0a0] hover:text-white transition-colors"
+                  className="text-gray-600 dark:text-[#a0a0a0] hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
                   <i className="fa-solid fa-xmark text-2xl" />
                 </button>
@@ -432,7 +432,7 @@ export default function ProfilePage() {
               <div className="p-6 space-y-6">
                 {/* Avatar */}
                 <div>
-                  <Label htmlFor="avatar" className="text-white">Avatar URL</Label>
+                  <Label htmlFor="avatar" className="text-gray-900 dark:text-white transition-colors duration-300">Avatar URL</Label>
                   <Input
                     id="avatar"
                     name="avatar"
@@ -440,13 +440,13 @@ export default function ProfilePage() {
                     value={formData.avatar}
                     onChange={handleChange}
                     placeholder="https://example.com/avatar.jpg"
-                    className="mt-2 bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666666] focus:border-[#d62e1f]"
+                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
                   />
                 </div>
 
                 {/* First Name */}
                 <div>
-                  <Label htmlFor="firstName" className="text-white">
+                  <Label htmlFor="firstName" className="text-gray-900 dark:text-white transition-colors duration-300">
                     First Name <span className="text-[#d62e1f]">*</span>
                   </Label>
                   <Input
@@ -454,14 +454,14 @@ export default function ProfilePage() {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="mt-2 bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666666] focus:border-[#d62e1f]"
+                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
                     required
                   />
                 </div>
 
                 {/* Last Name */}
                 <div>
-                  <Label htmlFor="lastName" className="text-white">
+                  <Label htmlFor="lastName" className="text-gray-900 dark:text-white transition-colors duration-300">
                     Last Name <span className="text-[#d62e1f]">*</span>
                   </Label>
                   <Input
@@ -469,39 +469,39 @@ export default function ProfilePage() {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="mt-2 bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666666] focus:border-[#d62e1f]"
+                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
                     required
                   />
                 </div>
 
                 {/* Faculty */}
                 <div>
-                  <Label htmlFor="faculty" className="text-white">Faculty</Label>
+                  <Label htmlFor="faculty" className="text-gray-900 dark:text-white transition-colors duration-300">Faculty</Label>
                   <Input
                     id="faculty"
                     name="faculty"
                     value={formData.faculty}
                     onChange={handleChange}
                     placeholder="e.g., Computer Science"
-                    className="mt-2 bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666666] focus:border-[#d62e1f]"
+                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
                   />
                 </div>
 
                 {/* Email (read-only) */}
                 <div>
-                  <Label className="text-white">Email</Label>
+                  <Label className="text-gray-900 dark:text-white transition-colors duration-300">Email</Label>
                   <Input
                     type="email"
                     value={user.email || ''}
                     disabled
-                    className="mt-2 bg-[#0a0a0a] border-[#3a3a3a] text-[#a0a0a0] cursor-not-allowed"
+                    className="mt-2 bg-gray-200 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#3a3a3a] text-gray-500 dark:text-[#a0a0a0] cursor-not-allowed transition-colors duration-300"
                   />
-                  <p className="text-xs text-[#666666] mt-1">Email cannot be changed</p>
+                  <p className="text-xs text-gray-500 dark:text-[#666666] mt-1 transition-colors duration-300">Email cannot be changed</p>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="sticky bottom-0 bg-[#1a1a1a] border-t border-[#2a2a2a] p-6 flex gap-3">
+              <div className="sticky bottom-0 bg-white dark:bg-[#1a1a1a] border-t border-gray-200 dark:border-[#2a2a2a] p-6 flex gap-3 transition-colors duration-300">
                 <button
                   onClick={handleSave}
                   disabled={saving}
@@ -519,7 +519,7 @@ export default function ProfilePage() {
                 <button
                   onClick={() => setIsEditModalOpen(false)}
                   disabled={saving}
-                  className="px-6 py-3 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                  className="px-6 py-3 bg-gray-300 dark:bg-[#2a2a2a] hover:bg-gray-400 dark:hover:bg-[#3a3a3a] text-gray-900 dark:text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>

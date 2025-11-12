@@ -58,7 +58,7 @@ const BottomNavigation = () => {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#2a2a2a] z-50"
+      className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-xl border-t border-black/10 dark:border-white/10 z-50 transition-colors duration-300"
       role="navigation"
       aria-label="Mobile bottom navigation"
     >
@@ -72,7 +72,7 @@ const BottomNavigation = () => {
               className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
                 active
                   ? 'text-[#d62e1f]'
-                  : 'text-[#a0a0a0] hover:text-white'
+                  : 'text-gray-600 dark:text-[#a0a0a0] hover:text-gray-900 dark:hover:text-white'
               }`}
               aria-current={active ? 'page' : undefined}
             >

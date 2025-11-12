@@ -83,29 +83,29 @@ export default function ClubsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
       {/* Hero Section (Not Sticky) */}
-      <div className="py-12 px-4 border-b border-[#2a2a2a]">
+      <div className="py-12 px-4 border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4">
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
             Student <span className="text-[#d62e1f]">Clubs</span>
           </h1>
-          <p className="text-xl text-[#a0a0a0]">Join communities that share your interests</p>
+          <p className="text-xl text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Join communities that share your interests</p>
         </div>
       </div>
 
       {/* Desktop: Sticky Search Bar and Filters */}
-      <div className="hidden md:block sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-[#2a2a2a]">
+      <div className="hidden md:block sticky top-20 z-30 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-2xl">
-              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#a0a0a0] text-lg" />
+              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#a0a0a0] text-lg transition-colors duration-300" />
               <Input
                 type="search"
                 placeholder="Search clubs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-6 py-3 rounded-lg border-[#2a2a2a] bg-[#1a1a1a] text-white placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20"
+                className="pl-12 pr-6 py-3 rounded-lg border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 transition-colors duration-300"
               />
             </div>
           </div>
@@ -120,7 +120,7 @@ export default function ClubsPage() {
                 className={`px-4 py-2 rounded-full font-semibold transition-colors ${
                   selectedCategory === cat
                     ? 'bg-[#d62e1f] text-white'
-                    : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
+                    : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 {cat}
@@ -131,11 +131,11 @@ export default function ClubsPage() {
       </div>
 
       {/* Mobile: Compact Sticky Bar with Icons */}
-      <div className="md:hidden sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-[#2a2a2a]">
+      <div className="md:hidden sticky top-20 z-30 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="flex items-center gap-2 px-4 py-3">
           <button
             onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-            className="flex-1 flex items-center gap-3 px-4 py-3 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a] text-[#a0a0a0]"
+            className="flex-1 flex items-center gap-3 px-4 py-3 bg-white dark:bg-[#1a1a1a] rounded-lg border border-gray-300 dark:border-[#2a2a2a] text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300"
           >
             <i className="fa-solid fa-magnifying-glass text-lg" />
             <span className="text-sm">Search clubs...</span>
@@ -160,14 +160,14 @@ export default function ClubsPage() {
         {mobileSearchOpen && (
           <div className="px-4 pb-3">
             <div className="relative">
-              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#a0a0a0] text-lg" />
+              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#a0a0a0] text-lg transition-colors duration-300" />
               <Input
                 type="search"
                 placeholder="Search clubs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="pl-12 pr-6 py-3 rounded-lg border-[#2a2a2a] bg-[#1a1a1a] text-white placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20"
+                className="pl-12 pr-6 py-3 rounded-lg border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 transition-colors duration-300"
               />
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function ClubsPage() {
       <div className="py-8 px-4">
         <div className="max-w-7xl mx-auto">
           {error && (
-            <div className="mb-8 p-6 rounded-lg bg-[#1a1a1a] border border-[#d62e1f]/50">
+            <div className="mb-8 p-6 rounded-lg bg-white dark:bg-[#1a1a1a] border border-red-300 dark:border-[#d62e1f]/50 transition-colors duration-300">
               <div className="flex items-center gap-3 text-[#d62e1f]">
                 <i className="fa-solid fa-exclamation-circle text-xl" />
                 <p className="font-semibold">{error}</p>
@@ -188,21 +188,21 @@ export default function ClubsPage() {
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#2a2a2a] border-t-[#d62e1f]"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 dark:border-[#2a2a2a] border-t-[#d62e1f]"></div>
             </div>
           ) : clubs.length === 0 ? (
-            <div className="text-center py-20 bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a]">
-              <i className="fa-regular fa-users text-5xl text-[#666666] mb-6"></i>
-              <h3 className="text-2xl font-bold text-white mb-2">No clubs found</h3>
-              <p className="text-[#a0a0a0]">
+            <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+              <i className="fa-regular fa-users text-5xl text-gray-400 dark:text-[#666666] mb-6 transition-colors duration-300"></i>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">No clubs found</h3>
+              <p className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
                 {error ? 'Failed to load clubs' : 'Try adjusting your search or filters'}
               </p>
             </div>
           ) : (
             <>
               <div className="mb-6">
-                <p className="text-sm text-[#a0a0a0]">
-                  Showing <span className="font-semibold text-white">{clubs.length}</span>{' '}
+                <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                  Showing <span className="font-semibold text-gray-900 dark:text-white">{clubs.length}</span>{' '}
                   {clubs.length === 1 ? 'club' : 'clubs'}
                 </p>
               </div>
@@ -215,10 +215,10 @@ export default function ClubsPage() {
                   return (
                     <div
                       key={club.id}
-                      className="bg-[#1a1a1a] rounded-lg overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group"
+                      className="bg-white dark:bg-[#1a1a1a] rounded-lg overflow-hidden border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
                       onClick={() => navigate(`/clubs/${club.id}`)}
                     >
-                      <div className="relative h-48 overflow-hidden bg-[#0a0a0a]">
+                      <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-[#0a0a0a]">
                         <img
                           src={imageUrl}
                           alt={club.name}
@@ -242,25 +242,25 @@ export default function ClubsPage() {
                         </div>
 
                         {/* Title - Large and Bold */}
-                        <h3 className="text-xl md:text-2xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors">
+                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors">
                           {club.name}
                         </h3>
 
                         {/* Description */}
-                        <p className="text-[#a0a0a0] text-sm line-clamp-3">
+                        <p className="text-gray-600 dark:text-[#a0a0a0] text-sm line-clamp-3 transition-colors duration-300">
                           {club.description || 'No description available'}
                         </p>
 
                         {/* Meta Info - Vertical Layout */}
-                        <div className="space-y-2 pt-2 border-t border-[#2a2a2a]">
-                          <div className="flex items-center text-[#a0a0a0] text-sm">
+                        <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+                          <div className="flex items-center text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">
                             <i className="fa-solid fa-users mr-2 text-[#d62e1f] flex-shrink-0" />
                             <span className="line-clamp-1">
                               {membersCount} {membersCount === 1 ? 'member' : 'members'}
                             </span>
                           </div>
                           {club.organizer && (
-                            <div className="flex items-center text-[#a0a0a0] text-sm">
+                            <div className="flex items-center text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">
                               <i className="fa-solid fa-user-tie mr-2 text-[#d62e1f] flex-shrink-0" />
                               <span className="line-clamp-1">
                                 {club.organizer.firstName} {club.organizer.lastName}
@@ -285,10 +285,10 @@ export default function ClubsPage() {
       >
         <div className="space-y-4">
           {/* Category Filter - Collapsible */}
-          <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
+          <div className="border border-gray-200 dark:border-[#2a2a2a] rounded-lg overflow-hidden transition-colors duration-300">
             <button
               onClick={() => setCategoryExpanded(!categoryExpanded)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-[#2a2a2a] text-white font-semibold hover:bg-[#3a3a3a] transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition-colors"
             >
               <span>Category</span>
               <i
@@ -298,14 +298,14 @@ export default function ClubsPage() {
               />
             </button>
             {categoryExpanded && (
-              <div className="p-3 space-y-2 bg-[#1a1a1a]">
+              <div className="p-3 space-y-2 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
                 {categories.map((category) => (
                   <label
                     key={category}
                     className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
                       selectedCategory === category
                         ? 'bg-[#d62e1f] text-white'
-                        : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
+                        : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     <input

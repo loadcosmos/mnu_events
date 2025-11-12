@@ -113,29 +113,29 @@ export default function EventsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
       {/* Hero Section (Not Sticky) */}
-      <div className="py-12 px-4 border-b border-[#2a2a2a]">
+      <div className="py-12 px-4 border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4">
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
             Discover <span className="text-[#d62e1f]">Events</span>
           </h1>
-          <p className="text-xl text-[#a0a0a0]">Find your next adventure</p>
+          <p className="text-xl text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Find your next adventure</p>
         </div>
       </div>
 
       {/* Desktop: Sticky Search Bar and Filters */}
-      <div className="hidden md:block sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-[#2a2a2a]">
+      <div className="hidden md:block sticky top-20 z-30 bg-white/90 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-2xl">
-              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#a0a0a0] text-lg" />
+              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#a0a0a0] text-lg transition-colors duration-300" />
               <Input
                 type="search"
                 placeholder="Search events..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-6 py-3 rounded-lg border-[#2a2a2a] bg-[#1a1a1a] text-white placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20"
+                className="pl-12 pr-6 py-3 rounded-lg border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 transition-colors duration-300"
               />
             </div>
           </div>
@@ -147,10 +147,10 @@ export default function EventsPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full font-semibold transition-colors ${
+                className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300 ${
                   selectedCategory === cat
                     ? 'bg-[#d62e1f] text-white'
-                    : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
+                    : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 {cat}
@@ -161,12 +161,12 @@ export default function EventsPage() {
       </div>
 
       {/* Mobile: Compact Sticky Bar with Icons */}
-      <div className="md:hidden sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-[#2a2a2a]">
+      <div className="md:hidden sticky top-20 z-30 bg-white/90 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="flex items-center gap-2 px-4 py-3">
           {/* Search Icon */}
           <button
             onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-            className="flex-1 flex items-center gap-3 px-4 py-3 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a] text-[#a0a0a0]"
+            className="flex-1 flex items-center gap-3 px-4 py-3 bg-gray-100 dark:bg-[#1a1a1a] rounded-lg border border-gray-300 dark:border-[#2a2a2a] text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300"
           >
             <i className="fa-solid fa-magnifying-glass text-lg" />
             <span className="text-sm">Search events...</span>
@@ -193,14 +193,14 @@ export default function EventsPage() {
         {mobileSearchOpen && (
           <div className="px-4 pb-3">
             <div className="relative">
-              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#a0a0a0] text-lg" />
+              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#a0a0a0] text-lg transition-colors duration-300" />
               <Input
                 type="search"
                 placeholder="Search events..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="pl-12 pr-6 py-3 rounded-lg border-[#2a2a2a] bg-[#1a1a1a] text-white placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20"
+                className="pl-12 pr-6 py-3 rounded-lg border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 transition-colors duration-300"
               />
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function EventsPage() {
       <div className="py-8 px-4">
         <div className="max-w-7xl mx-auto">
           {error && (
-            <div className="mb-8 p-6 rounded-lg bg-[#1a1a1a] border border-[#d62e1f]/50">
+            <div className="mb-8 p-6 rounded-lg bg-white dark:bg-[#1a1a1a] border border-[#d62e1f]/50 transition-colors duration-300">
               <div className="flex items-center gap-3 text-[#d62e1f]">
                 <i className="fa-solid fa-exclamation-circle text-xl" />
                 <p className="font-semibold">{error}</p>
@@ -221,19 +221,19 @@ export default function EventsPage() {
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#2a2a2a] border-t-[#d62e1f]"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 dark:border-[#2a2a2a] border-t-[#d62e1f]"></div>
             </div>
           ) : sortedEvents.length === 0 ? (
-            <div className="text-center py-20 bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a]">
-              <i className="fa-regular fa-calendar-xmark text-5xl text-[#666666] mb-6"></i>
-              <h3 className="text-2xl font-bold text-white mb-2">No events found</h3>
-              <p className="text-[#a0a0a0]">Try adjusting your search or filters</p>
+            <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+              <i className="fa-regular fa-calendar-xmark text-5xl text-gray-400 dark:text-[#666666] mb-6 transition-colors duration-300"></i>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">No events found</h3>
+              <p className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Try adjusting your search or filters</p>
             </div>
           ) : (
             <>
               <div className="mb-6">
-                <p className="text-sm text-[#a0a0a0]">
-                  Showing <span className="font-semibold text-white">{sortedEvents.length}</span>{' '}
+                <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                  Showing <span className="font-semibold text-gray-900 dark:text-white">{sortedEvents.length}</span>{' '}
                   {sortedEvents.length === 1 ? 'event' : 'events'}
                 </p>
               </div>
@@ -245,11 +245,11 @@ export default function EventsPage() {
                   return (
                     <div
                       key={event.id}
-                      className="bg-[#1a1a1a] rounded-xl border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl flex flex-col"
+                      className="bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl flex flex-col"
                       onClick={() => openEventModal(event.id)}
                     >
                       {/* Image Section - Fixed Height, No Scroll */}
-                      <div className="relative h-48 md:h-52 flex-shrink-0 overflow-hidden bg-[#0a0a0a]">
+                      <div className="relative h-48 md:h-52 flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
                         <img
                           src={imageUrl}
                           alt={event.title}
@@ -278,26 +278,26 @@ export default function EventsPage() {
                         </div>
 
                         {/* Event Title - Large + Bold */}
-                        <h3 className="text-2xl md:text-2xl font-bold text-white line-clamp-2 leading-tight flex-shrink-0">
+                        <h3 className="text-2xl md:text-2xl font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight flex-shrink-0 transition-colors duration-300">
                           {event.title}
                         </h3>
 
                         {/* Description - Controlled Height */}
-                        <p className="text-[#a0a0a0] text-sm leading-relaxed line-clamp-2 flex-shrink-0">
+                        <p className="text-gray-600 dark:text-[#a0a0a0] text-sm leading-relaxed line-clamp-2 flex-shrink-0 transition-colors duration-300">
                           {event.description}
                         </p>
 
                         {/* Meta Info - Vertical Stack */}
-                        <div className="flex flex-col gap-2.5 pt-4 border-t border-[#2a2a2a] flex-shrink-0">
+                        <div className="flex flex-col gap-2.5 pt-4 border-t border-gray-200 dark:border-[#2a2a2a] flex-shrink-0 transition-colors duration-300">
                           {/* Location */}
                           <div className="flex items-center gap-2.5">
                             <i className="fa-solid fa-location-dot text-[#d62e1f] text-base flex-shrink-0" />
-                            <span className="text-sm font-medium text-[#a0a0a0] truncate">{event.location}</span>
+                            <span className="text-sm font-medium text-gray-600 dark:text-[#a0a0a0] truncate transition-colors duration-300">{event.location}</span>
                           </div>
                           {/* Capacity */}
                           <div className="flex items-center gap-2.5">
                             <i className="fa-solid fa-users text-[#d62e1f] text-base flex-shrink-0" />
-                            <span className="text-sm font-semibold text-[#a0a0a0]">
+                            <span className="text-sm font-semibold text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
                               {event._count?.registrations || 0} / {event.capacity}
                             </span>
                           </div>
@@ -320,10 +320,10 @@ export default function EventsPage() {
       >
         <div className="space-y-4">
           {/* Category Filter - Collapsible */}
-          <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
+          <div className="border border-gray-200 dark:border-[#2a2a2a] rounded-lg overflow-hidden transition-colors duration-300">
             <button
               onClick={() => setCategoryExpanded(!categoryExpanded)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-[#2a2a2a] text-white font-semibold hover:bg-[#3a3a3a] transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition-colors"
             >
               <span>Category</span>
               <i
@@ -333,14 +333,14 @@ export default function EventsPage() {
               />
             </button>
             {categoryExpanded && (
-              <div className="p-3 space-y-2 bg-[#1a1a1a]">
+              <div className="p-3 space-y-2 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
                 {categories.map((category) => (
                   <label
                     key={category}
                     className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
                       selectedCategory === category
                         ? 'bg-[#d62e1f] text-white'
-                        : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
+                        : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     <input
@@ -358,10 +358,10 @@ export default function EventsPage() {
           </div>
 
           {/* Status Filter - Collapsible */}
-          <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
+          <div className="border border-gray-200 dark:border-[#2a2a2a] rounded-lg overflow-hidden transition-colors duration-300">
             <button
               onClick={() => setStatusExpanded(!statusExpanded)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-[#2a2a2a] text-white font-semibold hover:bg-[#3a3a3a] transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition-colors"
             >
               <span>Status</span>
               <i
@@ -371,14 +371,14 @@ export default function EventsPage() {
               />
             </button>
             {statusExpanded && (
-              <div className="p-3 space-y-2 bg-[#1a1a1a]">
+              <div className="p-3 space-y-2 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
                 {statuses.map((status) => (
                   <label
                     key={status}
                     className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
                       selectedStatus === status
                         ? 'bg-[#d62e1f] text-white'
-                        : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
+                        : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     <input
@@ -396,10 +396,10 @@ export default function EventsPage() {
           </div>
 
           {/* Date Range Filter - Collapsible */}
-          <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
+          <div className="border border-gray-200 dark:border-[#2a2a2a] rounded-lg overflow-hidden transition-colors duration-300">
             <button
               onClick={() => setDateExpanded(!dateExpanded)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-[#2a2a2a] text-white font-semibold hover:bg-[#3a3a3a] transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition-colors"
             >
               <span>Date Range</span>
               <i
@@ -409,23 +409,23 @@ export default function EventsPage() {
               />
             </button>
             {dateExpanded && (
-              <div className="p-4 space-y-4 bg-[#1a1a1a]">
+              <div className="p-4 space-y-4 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
                 <div>
-                  <label className="block text-[#a0a0a0] text-sm mb-2">From Date</label>
+                  <label className="block text-gray-600 dark:text-[#a0a0a0] text-sm mb-2 transition-colors duration-300">From Date</label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-[#2a2a2a] bg-[#2a2a2a] text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none transition-colors duration-300"
                   />
                 </div>
                 <div>
-                  <label className="block text-[#a0a0a0] text-sm mb-2">To Date</label>
+                  <label className="block text-gray-600 dark:text-[#a0a0a0] text-sm mb-2 transition-colors duration-300">To Date</label>
                   <input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-[#2a2a2a] bg-[#2a2a2a] text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none transition-colors duration-300"
                   />
                 </div>
                 {(startDate || endDate) && (
@@ -434,7 +434,7 @@ export default function EventsPage() {
                       setStartDate('');
                       setEndDate('');
                     }}
-                    className="w-full px-4 py-2 rounded-lg bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white transition-colors text-sm"
+                    className="w-full px-4 py-2 rounded-lg bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   >
                     Clear Dates
                   </button>

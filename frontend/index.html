@@ -4,7 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MNU Events</title>
+    <meta name="theme-color" content="#0a0a0a" />
     <link rel="icon" type="image/x-icon" href="/images/redlogo.png">
+
+    <!-- Theme initialization script - Prevents FOUC (Flash of Unstyled Content) -->
+    <script>
+      (function() {
+        const storageKey = 'mnu-events-theme';
+        const theme = localStorage.getItem(storageKey) ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.add(theme);
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#0a0a0a' : '#fafafa');
+      })();
+    </script>
 
     <!-- Google Fonts - Manrope -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

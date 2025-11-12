@@ -326,10 +326,10 @@ export default function ClubDetailsPage() {
       {/* Сообщение для организаторов и админов */}
       {isAuthenticated() && user?.role !== 'STUDENT' && (
         <div className="mb-6">
-          <Card className="bg-gray-50 border border-gray-200">
+          <Card className="bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
             <CardContent className="pt-6">
               <p className="text-sm text-muted-foreground text-center">
-                {user?.role === 'ORGANIZER' 
+                {user?.role === 'ORGANIZER'
                   ? 'Organizers cannot join clubs. Manage your clubs from the dashboard.'
                   : 'Only students can join clubs.'}
               </p>

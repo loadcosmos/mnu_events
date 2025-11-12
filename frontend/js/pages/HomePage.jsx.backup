@@ -307,14 +307,14 @@ export default function HomePage() {
 
       {/* My Upcoming Events - Horizontal Scroll (Only for authenticated users) */}
       {isAuthenticated() && myUpcomingEvents.length > 0 && (
-        <section className="py-16 px-4 bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+        <section className="py-16 px-4 bg-[#0a0a0a]">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-end justify-between mb-8">
               <div>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">
                   My <span className="text-[#d62e1f]">Upcoming Events</span>
                 </h2>
-                <p className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Events you're registered for</p>
+                <p className="text-[#a0a0a0]">Events you're registered for</p>
               </div>
               <Link
                 to="/registrations"
@@ -331,7 +331,7 @@ export default function HomePage() {
                 {myUpcomingEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="w-80 bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
+                    className="w-80 bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
                     onClick={() => openEventModal(event.id)}
                   >
                     {/* Enhanced Image with Gradient */}
@@ -353,15 +353,15 @@ export default function HomePage() {
                         <span className="inline-block bg-[#d62e1f] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                           {event.category}
                         </span>
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                        <div className="flex items-center gap-2 text-[#a0a0a0]">
                           <i className="fa-regular fa-calendar text-sm" />
                           <span className="text-sm font-medium">{formatDate(event.startDate)}</span>
                         </div>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
+                      <h3 className="text-xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
                         {event.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-[#a0a0a0] pt-2 border-t border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+                      <div className="flex items-center gap-2 text-[#a0a0a0] pt-2 border-t border-[#2a2a2a]">
                         <i className="fa-solid fa-location-dot text-base text-[#d62e1f]" />
                         <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                       </div>
@@ -387,14 +387,14 @@ export default function HomePage() {
 
       {/* Recommended For You - Horizontal Scroll (Only for authenticated users with no registrations) */}
       {isAuthenticated() && myUpcomingEvents.length === 0 && recommendedEvents.length > 0 && (
-        <section className="py-16 px-4 bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+        <section className="py-16 px-4 bg-[#0a0a0a]">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-end justify-between mb-8">
               <div>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">
                   Recommended <span className="text-[#d62e1f]">For You</span>
                 </h2>
-                <p className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Events you might enjoy based on your interests</p>
+                <p className="text-[#a0a0a0]">Events you might enjoy based on your interests</p>
               </div>
               <Link
                 to="/events"
@@ -411,7 +411,7 @@ export default function HomePage() {
                 {recommendedEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="w-80 bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
+                    className="w-80 bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
                     onClick={() => openEventModal(event.id)}
                   >
                     {/* Enhanced Image with Gradient */}
@@ -443,22 +443,22 @@ export default function HomePage() {
                       </div>
 
                       {/* Title - Large and Bold */}
-                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
+                      <h3 className="text-xl md:text-2xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
                         {event.title}
                       </h3>
 
                       {/* Description */}
-                      <p className="text-gray-600 dark:text-[#a0a0a0] text-sm line-clamp-2 leading-relaxed transition-colors duration-300">
+                      <p className="text-[#a0a0a0] text-sm line-clamp-2 leading-relaxed">
                         {event.description}
                       </p>
 
                       {/* Meta Info - Vertical Layout */}
-                      <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                      <div className="space-y-2 pt-2 border-t border-[#2a2a2a]">
+                        <div className="flex items-center gap-2 text-[#a0a0a0]">
                           <i className="fa-solid fa-location-dot text-base text-[#d62e1f] flex-shrink-0" />
                           <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                        <div className="flex items-center gap-2 text-[#a0a0a0]">
                           <i className="fa-solid fa-users text-base text-[#d62e1f] flex-shrink-0" />
                           <span className="text-sm font-semibold">
                             {event._count?.registrations || 0} / {event.capacity}
@@ -486,14 +486,14 @@ export default function HomePage() {
       )}
 
       {/* Trending This Week - Horizontal Scroll */}
-      <section className="py-16 px-4 bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+      <section className="py-16 px-4 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">
                 Trending <span className="text-[#d62e1f]">This Week</span>
               </h2>
-              <p className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Most popular events by registrations</p>
+              <p className="text-[#a0a0a0]">Most popular events by registrations</p>
             </div>
             <Link
               to="/events"
@@ -509,16 +509,16 @@ export default function HomePage() {
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#2a2a2a] border-t-[#d62e1f]"></div>
             </div>
           ) : error ? (
-            <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+            <div className="text-center py-20 bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a]">
               <i className="fa-solid fa-exclamation-circle text-4xl text-[#d62e1f] mb-4"></i>
-              <p className="text-gray-900 dark:text-white font-semibold mb-2 transition-colors duration-300">Failed to load events</p>
-              <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">{error}</p>
+              <p className="text-white font-semibold mb-2">Failed to load events</p>
+              <p className="text-sm text-[#a0a0a0]">{error}</p>
             </div>
           ) : trendingEvents.length === 0 ? (
-            <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
-              <i className="fa-regular fa-calendar-xmark text-4xl text-gray-400 dark:text-[#666666] mb-4 transition-colors duration-300"></i>
-              <p className="text-gray-900 dark:text-white font-semibold mb-2 transition-colors duration-300">No upcoming events</p>
-              <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Check back later for new events!</p>
+            <div className="text-center py-20 bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a]">
+              <i className="fa-regular fa-calendar-xmark text-4xl text-[#666666] mb-4"></i>
+              <p className="text-white font-semibold mb-2">No upcoming events</p>
+              <p className="text-sm text-[#a0a0a0]">Check back later for new events!</p>
             </div>
           ) : (
             <>
@@ -528,7 +528,7 @@ export default function HomePage() {
                   {trendingEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="w-80 bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
+                      className="w-80 bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
                       onClick={() => openEventModal(event.id)}
                     >
                       {/* Enhanced Image with Gradient */}
@@ -560,22 +560,22 @@ export default function HomePage() {
                         </div>
 
                         {/* Title - Large and Bold */}
-                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
+                        <h3 className="text-xl md:text-2xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
                           {event.title}
                         </h3>
 
                         {/* Description */}
-                        <p className="text-gray-600 dark:text-[#a0a0a0] text-sm line-clamp-2 leading-relaxed transition-colors duration-300">
+                        <p className="text-[#a0a0a0] text-sm line-clamp-2 leading-relaxed">
                           {event.description}
                         </p>
 
                         {/* Meta Info - Vertical Layout */}
-                        <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
-                          <div className="flex items-center gap-2 text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                        <div className="space-y-2 pt-2 border-t border-[#2a2a2a]">
+                          <div className="flex items-center gap-2 text-[#a0a0a0]">
                             <i className="fa-solid fa-location-dot text-base text-[#d62e1f] flex-shrink-0" />
                             <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                          <div className="flex items-center gap-2 text-[#a0a0a0]">
                             <i className="fa-solid fa-users text-base text-[#d62e1f] flex-shrink-0" />
                             <span className="text-sm font-semibold">
                               {event._count?.registrations || 0} / {event.capacity}
