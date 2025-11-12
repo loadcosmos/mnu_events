@@ -245,10 +245,11 @@ export default function EventsPage() {
                   return (
                     <div
                       key={event.id}
-                      className="bg-[#1a1a1a] rounded-lg overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group"
+                      className="bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
                       onClick={() => openEventModal(event.id)}
                     >
-                      <div className="relative h-48 overflow-hidden bg-[#0a0a0a]">
+                      {/* Enhanced Image with Gradient Overlay */}
+                      <div className="relative h-52 md:h-48 overflow-hidden bg-[#0a0a0a]">
                         <img
                           src={imageUrl}
                           alt={event.title}
@@ -257,31 +258,41 @@ export default function EventsPage() {
                             e.target.src = '/images/event-placeholder.jpg';
                           }}
                         />
+                        {/* Enhanced gradient for visual depth */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
 
-                      <div className="p-6 space-y-4">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-block bg-[#d62e1f] text-white px-3 py-1 rounded text-xs font-bold uppercase">
+                      {/* Enhanced Card Content with Better Spacing */}
+                      <div className="p-5 md:p-6 space-y-4">
+                        {/* Category and Date - Improved Layout */}
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <span className="inline-block bg-[#d62e1f] text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                             {event.category}
                           </span>
-                          <span className="text-[#a0a0a0] text-sm">{formatDate(event.startDate)}</span>
+                          <div className="flex items-center gap-2 text-[#a0a0a0]">
+                            <i className="fa-regular fa-calendar text-sm" />
+                            <span className="text-sm font-medium">{formatDate(event.startDate)}</span>
+                          </div>
                         </div>
 
-                        <h3 className="text-xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors">
+                        {/* Title - Larger and More Prominent */}
+                        <h3 className="text-xl md:text-2xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
                           {event.title}
                         </h3>
 
-                        <p className="text-[#a0a0a0] text-sm line-clamp-2">{event.description}</p>
+                        {/* Description - Better Readability */}
+                        <p className="text-[#a0a0a0] text-sm md:text-base line-clamp-2 leading-relaxed">{event.description}</p>
 
-                        <div className="flex items-center justify-between pt-2">
-                          <div className="flex items-center text-[#a0a0a0] text-sm">
-                            <i className="fa-solid fa-location-dot mr-2" />
-                            <span className="line-clamp-1">{event.location}</span>
+                        {/* Meta Info - Improved Icons and Spacing */}
+                        <div className="flex items-center justify-between pt-3 border-t border-[#2a2a2a]">
+                          <div className="flex items-center gap-2 text-[#a0a0a0]">
+                            <i className="fa-solid fa-location-dot text-base text-[#d62e1f]" />
+                            <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                           </div>
-                          <div className="flex items-center text-[#a0a0a0] text-sm">
-                            <i className="fa-solid fa-users mr-2" />
-                            <span>
+                          <div className="flex items-center gap-2 text-[#a0a0a0]">
+                            <i className="fa-solid fa-users text-base text-[#d62e1f]" />
+                            <span className="text-sm font-semibold">
                               {event._count?.registrations || 0} / {event.capacity}
                             </span>
                           </div>

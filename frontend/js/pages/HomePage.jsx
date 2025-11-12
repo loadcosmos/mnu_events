@@ -331,9 +331,10 @@ export default function HomePage() {
                 {myUpcomingEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="w-80 bg-[#1a1a1a] rounded-lg overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group"
+                    className="w-80 bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
                     onClick={() => openEventModal(event.id)}
                   >
+                    {/* Enhanced Image with Gradient */}
                     <div className="relative">
                       <img
                         src={event.imageUrl || '/images/event-placeholder.jpg'}
@@ -343,23 +344,26 @@ export default function HomePage() {
                           e.target.src = '/images/event-placeholder.jpg';
                         }}
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <div className="p-6">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="inline-block bg-[#d62e1f] text-white px-3 py-1 rounded text-xs font-bold uppercase">
+                    {/* Enhanced Content */}
+                    <div className="p-5 md:p-6 space-y-3">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="inline-block bg-[#d62e1f] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                           {event.category}
                         </span>
-                        <span className="text-[#a0a0a0] text-sm">
-                          {formatDate(event.startDate)}
-                        </span>
+                        <div className="flex items-center gap-2 text-[#a0a0a0]">
+                          <i className="fa-regular fa-calendar text-sm" />
+                          <span className="text-sm font-medium">{formatDate(event.startDate)}</span>
+                        </div>
                       </div>
-                      <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-[#d62e1f] transition-colors">
+                      <h3 className="text-xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
                         {event.title}
                       </h3>
-                      <div className="flex items-center text-[#a0a0a0] text-sm">
-                        <i className="fa-solid fa-location-dot mr-2" />
-                        <span className="line-clamp-1">{event.location}</span>
+                      <div className="flex items-center gap-2 text-[#a0a0a0] pt-2 border-t border-[#2a2a2a]">
+                        <i className="fa-solid fa-location-dot text-base text-[#d62e1f]" />
+                        <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                       </div>
                     </div>
                   </div>
@@ -407,9 +411,10 @@ export default function HomePage() {
                 {recommendedEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="w-80 bg-[#1a1a1a] rounded-lg overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group"
+                    className="w-80 bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
                     onClick={() => openEventModal(event.id)}
                   >
+                    {/* Enhanced Image with Gradient */}
                     <div className="relative">
                       <img
                         src={event.imageUrl || '/images/event-placeholder.jpg'}
@@ -419,31 +424,34 @@ export default function HomePage() {
                           e.target.src = '/images/event-placeholder.jpg';
                         }}
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <div className="p-6">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="inline-block bg-[#d62e1f] text-white px-3 py-1 rounded text-xs font-bold uppercase">
+                    {/* Enhanced Content */}
+                    <div className="p-5 md:p-6 space-y-3">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="inline-block bg-[#d62e1f] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                           {event.category}
                         </span>
-                        <span className="text-[#a0a0a0] text-sm">
-                          {formatDate(event.startDate)}
-                        </span>
+                        <div className="flex items-center gap-2 text-[#a0a0a0]">
+                          <i className="fa-regular fa-calendar text-sm" />
+                          <span className="text-sm font-medium">{formatDate(event.startDate)}</span>
+                        </div>
                       </div>
-                      <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-[#d62e1f] transition-colors">
+                      <h3 className="text-xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
                         {event.title}
                       </h3>
-                      <p className="text-[#a0a0a0] text-sm mb-4 line-clamp-2">
+                      <p className="text-[#a0a0a0] text-sm line-clamp-2 leading-relaxed">
                         {event.description}
                       </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-[#a0a0a0] text-sm">
-                          <i className="fa-solid fa-location-dot mr-2" />
-                          <span className="line-clamp-1">{event.location}</span>
+                      <div className="flex items-center justify-between pt-2 border-t border-[#2a2a2a]">
+                        <div className="flex items-center gap-2 text-[#a0a0a0]">
+                          <i className="fa-solid fa-location-dot text-base text-[#d62e1f]" />
+                          <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                         </div>
-                        <div className="flex items-center text-[#a0a0a0] text-sm">
-                          <i className="fa-solid fa-users mr-2" />
-                          <span>
+                        <div className="flex items-center gap-2 text-[#a0a0a0]">
+                          <i className="fa-solid fa-users text-base text-[#d62e1f]" />
+                          <span className="text-sm font-semibold">
                             {event._count?.registrations || 0} / {event.capacity}
                           </span>
                         </div>
@@ -511,9 +519,10 @@ export default function HomePage() {
                   {trendingEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="w-80 bg-[#1a1a1a] rounded-lg overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group"
+                      className="w-80 bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl"
                       onClick={() => openEventModal(event.id)}
                     >
+                      {/* Enhanced Image with Gradient */}
                       <div className="relative">
                         <img
                           src={event.imageUrl || '/images/event-placeholder.jpg'}
@@ -523,31 +532,34 @@ export default function HomePage() {
                             e.target.src = '/images/event-placeholder.jpg';
                           }}
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <div className="p-6">
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="inline-block bg-[#d62e1f] text-white px-3 py-1 rounded text-xs font-bold uppercase">
+                      {/* Enhanced Content */}
+                      <div className="p-5 md:p-6 space-y-3">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className="inline-block bg-[#d62e1f] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                             {event.category}
                           </span>
-                          <span className="text-[#a0a0a0] text-sm">
-                            {formatDate(event.startDate)}
-                          </span>
+                          <div className="flex items-center gap-2 text-[#a0a0a0]">
+                            <i className="fa-regular fa-calendar text-sm" />
+                            <span className="text-sm font-medium">{formatDate(event.startDate)}</span>
+                          </div>
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-[#d62e1f] transition-colors">
+                        <h3 className="text-xl font-bold text-white line-clamp-2 group-hover:text-[#d62e1f] transition-colors leading-tight">
                           {event.title}
                         </h3>
-                        <p className="text-[#a0a0a0] text-sm mb-4 line-clamp-2">
+                        <p className="text-[#a0a0a0] text-sm line-clamp-2 leading-relaxed">
                           {event.description}
                         </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center text-[#a0a0a0] text-sm">
-                            <i className="fa-solid fa-location-dot mr-2" />
-                            <span className="line-clamp-1">{event.location}</span>
+                        <div className="flex items-center justify-between pt-2 border-t border-[#2a2a2a]">
+                          <div className="flex items-center gap-2 text-[#a0a0a0]">
+                            <i className="fa-solid fa-location-dot text-base text-[#d62e1f]" />
+                            <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                           </div>
-                          <div className="flex items-center text-[#a0a0a0] text-sm">
-                            <i className="fa-solid fa-users mr-2" />
-                            <span>
+                          <div className="flex items-center gap-2 text-[#a0a0a0]">
+                            <i className="fa-solid fa-users text-base text-[#d62e1f]" />
+                            <span className="text-sm font-semibold">
                               {event._count?.registrations || 0} / {event.capacity}
                             </span>
                           </div>
