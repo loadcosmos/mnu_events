@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Layout from './components/Layout.jsx';
 import OrganizerLayout from './components/OrganizerLayout.jsx';
 import AdminLayout from './components/AdminLayout.jsx';
+import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from './components/ui/sonner.jsx';
 
 // Pages
@@ -33,6 +34,7 @@ import AdminClubsPage from './pages/AdminClubsPage.jsx';
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <Toaster />
         <Routes>

@@ -81,6 +81,6 @@ PostgreSQL запускается в Docker:
 
 ## Тестовые пользователи (после seed)
 
-- **Admin:** admin@mnu.edu.kz / Admin123!
-- **Organizer:** organizer@mnu.edu.kz / Organizer123!
-- **Student:** student@mnu.edu.kz / Student123!
+- **Admin:** admin@kazguu.kz / Password123
+- **Organizer:** organizer@kazguu.kz / Password123
+- **Student:** student@mkazguu.kz / Password123

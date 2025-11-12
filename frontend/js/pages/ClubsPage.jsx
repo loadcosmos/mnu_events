@@ -100,72 +100,92 @@ export default function ClubsPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold mb-2">Student Clubs</h1>
-        <p className="text-muted-foreground text-lg">
-          Discover student organizations and join communities that interest you
-        </p>
+    <div className="min-h-screen bg-black">
+      {/* Dark Premium Header */}
+      <div className="bg-gradient-to-b from-neutral-900 to-black py-16 md:py-20 border-b border-neutral-800">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight">
+              Student Clubs
+            </h1>
+            <p className="text-lg md:text-xl text-neutral-400">
+              Discover student organizations and join communities that interest you
+            </p>
+
+            {/* Dark Search Bar */}
+            <div className="relative max-w-2xl mx-auto">
+              <i className="fa-solid fa-magnifying-glass absolute left-6 top-1/2 -translate-y-1/2 text-neutral-500 text-lg" />
+              <Input
+                type="text"
+                placeholder="Search clubs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-14 pr-6 py-6 rounded-lg border border-neutral-700 bg-neutral-900 text-white placeholder:text-neutral-500 focus:border-primary focus:ring-2 focus:ring-primary/20 text-base w-full"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="mb-8 space-y-4">
-        <div className="max-w-md mx-auto">
-          <Input
-            type="text"
-            placeholder="Search clubs..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
-          />
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-2">
+      {/* Dark Category Filters */}
+      <div className="container mx-auto px-4 pt-8">
+        <div className="flex flex-wrap justify-center gap-3 mb-8">
           {categories.map((cat) => (
-            <Button
+            <button
               key={cat}
-              variant={selectedCategory === cat ? 'default' : 'outline'}
+              type="button"
               onClick={() => setSelectedCategory(cat)}
-              size="sm"
+              className={`px-6 py-2.5 rounded-lg font-semibold text-sm transition-all ${
+                selectedCategory === cat
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                  : 'bg-neutral-900 text-neutral-300 border border-neutral-700 hover:border-neutral-600 hover:bg-neutral-800'
+              }`}
             >
               {cat}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
       {/* Content */}
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-          <p className="text-muted-foreground">Loading clubs...</p>
-        </div>
-      ) : error ? (
-        <div className="text-center py-12">
-          <p className="text-destructive mb-2">Failed to load clubs</p>
-          <p className="text-sm text-muted-foreground">{error}</p>
-          <Button className="mt-4" onClick={loadClubs}>
-            Try Again
-          </Button>
-        </div>
-      ) : filteredClubs.length === 0 ? (
-        <div className="text-center py-12">
-          <i className="fa-regular fa-users text-4xl text-muted-foreground mb-4 block"></i>
-          <p className="text-muted-foreground text-lg font-semibold">
-            {clubs.length === 0 ? 'No clubs available' : 'No clubs found'}
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">
-            {clubs.length === 0 
-              ? 'Check back later for new clubs!' 
-              : 'Try adjusting your search or filters'}
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className="mb-4 text-sm text-muted-foreground text-center">
-            Found {filteredClubs.length} {filteredClubs.length === 1 ? 'club' : 'clubs'}
+      <div className="container mx-auto px-4 pb-16">
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-neutral-800 border-t-primary mb-4"></div>
+            <p className="text-neutral-400">Loading clubs...</p>
           </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <div className="mb-8 p-6 rounded-lg bg-red-950/50 border border-red-900/50 inline-block">
+              <p className="text-red-400 font-semibold mb-2">Failed to load clubs</p>
+              <p className="text-sm text-neutral-400">{error}</p>
+            </div>
+            <div>
+              <button
+                onClick={loadClubs}
+                className="px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        ) : filteredClubs.length === 0 ? (
+          <div className="text-center py-20">
+            <i className="fa-regular fa-users text-5xl text-neutral-700 mb-6 block"></i>
+            <p className="text-white text-xl font-bold mb-2">
+              {clubs.length === 0 ? 'No clubs available' : 'No clubs found'}
+            </p>
+            <p className="text-neutral-400">
+              {clubs.length === 0
+                ? 'Check back later for new clubs!'
+                : 'Try adjusting your search or filters'}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-6 text-sm text-neutral-400 text-center">
+              Found <span className="font-semibold text-white">{filteredClubs.length}</span> {filteredClubs.length === 1 ? 'club' : 'clubs'}
+            </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredClubs.map((club) => {
               const imageUrl = club.imageUrl || club.image || '/images/event-placeholder.jpg';
@@ -178,50 +198,63 @@ export default function ClubsPage() {
               const membersCount = club._count?.members || club.members || 0;
 
               return (
-                <Card
+                <div
                   key={club.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+                  className="bg-neutral-900 rounded-lg overflow-hidden border border-neutral-800 hover:border-neutral-700 transition-all hover:shadow-xl hover:shadow-primary/5 cursor-pointer group"
                 >
-                  <div className="relative h-48 overflow-hidden">
+                  {/* Image Section */}
+                  <div className="relative h-48 overflow-hidden bg-neutral-950">
                     <img
                       src={imageUrl}
                       alt={club.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.target.src = '/images/event-placeholder.jpg';
                       }}
                     />
-                    <Badge className={`absolute top-3 right-3 ${getCategoryColor(club.category)}`}>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute top-3 right-3 px-3 py-1.5 bg-primary text-white rounded-md text-sm font-bold">
                       {uiCategory}
-                    </Badge>
+                    </div>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-xl">{club.name}</CardTitle>
-                    <CardDescription className="line-clamp-2">{shortDescription}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <i className="fa-solid fa-users text-primary" />
+
+                  {/* Content Section */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
+                      {club.name}
+                    </h3>
+                    <p className="text-neutral-400 text-sm line-clamp-2 mb-4">
+                      {shortDescription}
+                    </p>
+
+                    {/* Meta Info */}
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center gap-2 text-sm text-neutral-400">
+                        <i className="fa-solid fa-users text-primary w-4" />
                         <span>{membersCount} {membersCount === 1 ? 'member' : 'members'}</span>
                       </div>
                       {club.organizer && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <i className="fa-solid fa-user-tie text-primary" />
+                        <div className="flex items-center gap-2 text-sm text-neutral-400">
+                          <i className="fa-solid fa-user-tie text-primary w-4" />
                           <span>Organized by {club.organizer.firstName} {club.organizer.lastName}</span>
                         </div>
                       )}
                     </div>
-                    <Button className="w-full" asChild>
-                      <Link to={`/clubs/${club.id}`}>View Club</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
+
+                    {/* View Club Button */}
+                    <Link to={`/clubs/${club.id}`}>
+                      <button className="w-full px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors">
+                        View Club
+                      </button>
+                    </Link>
+                  </div>
+                </div>
               );
             })}
           </div>
         </>
       )}
+      </div>
     </div>
   );
 }

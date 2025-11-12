@@ -8,7 +8,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { FilterEventsDto } from './dto/filter-events.dto';
-import { Role } from '@prisma/client';
+import { Role, Prisma } from '@prisma/client';
+import {
+  validatePagination,
+  createPaginatedResponse,
+  requireCreatorOrAdmin,
+} from '../common/utils';
 
 @Injectable()
 export class EventsService {
@@ -55,13 +60,13 @@ export class EventsService {
   }
 
   async findAll(
-    page: number = 1,
-    limit: number = 10,
+    page?: number,
+    limit?: number,
     filterDto?: FilterEventsDto,
   ) {
-    const skip = (page - 1) * limit;
+    const { skip, take, page: validatedPage } = validatePagination({ page, limit });
 
-    const where: any = {};
+    const where: Prisma.EventWhereInput = {};
 
     if (filterDto?.category) {
       where.category = filterDto.category;
@@ -90,6 +95,24 @@ export class EventsService {
         // description is Text field, so we search it case-sensitively
         // If case-insensitive search is needed for description, we'd need to use raw SQL
         { description: { contains: filterDto.search } },
+        // Search by organizer's first name
+        {
+          creator: {
+            firstName: { contains: filterDto.search, mode: 'insensitive' }
+          }
+        },
+        // Search by organizer's last name
+        {
+          creator: {
+            lastName: { contains: filterDto.search, mode: 'insensitive' }
+          }
+        },
+        // Search by organizer's email
+        {
+          creator: {
+            email: { contains: filterDto.search, mode: 'insensitive' }
+          }
+        },
       ];
     }
 
@@ -102,7 +125,7 @@ export class EventsService {
         this.prisma.event.findMany({
           where,
           skip,
-          take: limit,
+          take,
           include: {
             creator: {
               select: {
@@ -123,15 +146,7 @@ export class EventsService {
         this.prisma.event.count({ where }),
       ]);
 
-      return {
-        data: events,
-        meta: {
-          total,
-          page,
-          limit,
-          totalPages: Math.ceil(total / limit),
-        },
-      };
+      return createPaginatedResponse(events, total, validatedPage, take);
     } catch (error) {
       console.error('[EventsService] findAll error:', error);
       throw error;
@@ -182,9 +197,7 @@ export class EventsService {
     }
 
     // Only creator or admin can update
-    if (event.creatorId !== userId && userRole !== Role.ADMIN) {
-      throw new ForbiddenException('You do not have permission to update this event');
-    }
+    requireCreatorOrAdmin(userId, event.creatorId, userRole, 'event');
 
     // Validate dates if provided
     if (updateEventDto.startDate || updateEventDto.endDate) {
@@ -233,9 +246,7 @@ export class EventsService {
     }
 
     // Only creator or admin can delete
-    if (event.creatorId !== userId && userRole !== Role.ADMIN) {
-      throw new ForbiddenException('You do not have permission to delete this event');
-    }
+    requireCreatorOrAdmin(userId, event.creatorId, userRole, 'event');
 
     await this.prisma.event.delete({
       where: { id },

@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
+import { randomBytes } from 'crypto';
 import { RegisterDto, VerifyEmailDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -63,7 +64,9 @@ export class AuthService {
         },
         // Additional options for better compatibility
         tls: {
-          rejectUnauthorized: false, // For self-signed certificates
+          // Only disable certificate validation in development
+          // WARNING: Never use rejectUnauthorized: false in production!
+          rejectUnauthorized: process.env.NODE_ENV !== 'development',
         },
       });
 
@@ -116,8 +119,8 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate verification code (6 digits)
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate cryptographically secure verification code (6 digits)
+    const verificationCode = this.generateSecureVerificationCode();
     const verificationCodeExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
     const now = new Date();
 
@@ -315,8 +318,8 @@ export class AuthService {
       }
     }
 
-    // Generate new verification code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate new cryptographically secure verification code
+    const verificationCode = this.generateSecureVerificationCode();
     const verificationCodeExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     // Обновляем код и время последней отправки
@@ -401,6 +404,22 @@ export class AuthService {
     return {
       message: 'Logged out successfully',
     };
+  }
+
+  /**
+   * Generate a cryptographically secure 6-digit verification code
+   * Uses crypto.randomBytes() instead of Math.random() for security
+   */
+  private generateSecureVerificationCode(): string {
+    // Generate random bytes and convert to a 6-digit number
+    // We need 3 bytes (24 bits) to get numbers up to 16,777,215
+    const randomBuffer = randomBytes(3);
+    const randomNumber = randomBuffer.readUIntBE(0, 3);
+
+    // Ensure it's a 6-digit number (100000-999999)
+    const code = (randomNumber % 900000) + 100000;
+
+    return code.toString();
   }
 
   /**
