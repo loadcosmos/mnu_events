@@ -178,7 +178,7 @@ export default function HomePage() {
               <p className="text-xl md:text-2xl text-[#a0a0a0] mb-8 max-w-2xl text-center">
                 Join the best university events at MNU
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="hidden md:flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
                   className="bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors"
@@ -241,7 +241,7 @@ export default function HomePage() {
                           <span>{event.location}</span>
                         </div>
                       </div>
-                      <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                      <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center pt-4">
                         <button
                           type="button"
                           onClick={() => openEventModal(event.id)}

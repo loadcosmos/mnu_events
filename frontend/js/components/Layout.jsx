@@ -177,9 +177,9 @@ export default function Layout({ children }) {
           </Link>
 
           {/* Right side - Navigation and Auth */}
-          <div className="flex flex-1 items-center justify-end space-x-2">
+          <div className="flex flex-1 items-center justify-end gap-4">
             {/* Desktop Only: Navigation */}
-            <nav className="hidden md:flex items-center space-x-1 mr-2">
+            <nav className="hidden md:flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="default"
@@ -199,7 +199,7 @@ export default function Layout({ children }) {
             </nav>
 
             {/* Auth buttons (Desktop only) */}
-            <div className="hidden md:flex flex-1 items-center justify-end space-x-4">
+            <div className="hidden md:flex items-center">
               {isAuthenticated() ? (
                 <>
                   {/* Profile dropdown (Desktop only) */}
