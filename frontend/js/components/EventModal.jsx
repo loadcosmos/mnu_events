@@ -116,7 +116,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center md:p-4">
       {/* Dark Backdrop with blur */}
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300"
@@ -124,7 +124,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
       />
 
       {/* Dark Premium Modal Content - Optimized Size */}
-      <div className="relative w-full max-w-5xl min-h-[500px] max-h-[85vh] h-auto overflow-y-auto bg-neutral-900 rounded-lg shadow-2xl border border-neutral-800 transform transition-all duration-300 scale-100 animate-in fade-in zoom-in my-4">
+      <div className="relative w-full max-w-5xl md:min-h-[500px] md:max-h-[85vh] max-h-screen h-auto md:overflow-y-auto overflow-y-auto bg-neutral-900 md:rounded-lg shadow-2xl border border-neutral-800 transform transition-all duration-300 scale-100 animate-in fade-in zoom-in md:my-4">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-neutral-800 border-t-primary"></div>
@@ -151,12 +151,12 @@ export default function EventModal({ eventId, isOpen, onClose }) {
             </button>
 
             {/* Two Column Layout */}
-            <div className="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-8 p-4 md:p-8">
               {/* Left Column - Image & Main Info */}
-              <div className="space-y-5">
+              <div className="space-y-3 md:space-y-5">
                 {/* Event Image - Optimized Size */}
                 {event.imageUrl && (
-                  <div className="relative h-64 md:h-72 overflow-hidden rounded-lg bg-neutral-950">
+                  <div className="relative h-40 md:h-72 overflow-hidden rounded-lg bg-neutral-950">
                     <img
                       src={event.imageUrl}
                       alt={event.title}
@@ -175,24 +175,24 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                 )}
 
                 {/* Title */}
-                <h2 className="text-xl md:text-2xl font-bold text-white leading-tight">
+                <h2 className="text-lg md:text-2xl font-bold text-white leading-tight">
                   {event.title}
                 </h2>
 
                 {/* Description */}
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-2">About this event</h3>
-                  <p className="text-neutral-400 text-sm leading-relaxed line-clamp-5">
+                  <h3 className="text-xs md:text-sm font-bold text-white mb-1 md:mb-2">About this event</h3>
+                  <p className="text-neutral-400 text-xs md:text-sm leading-relaxed line-clamp-3 md:line-clamp-5">
                     {event.description || 'No description provided.'}
                   </p>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col gap-2 pt-2">
+                <div className="flex flex-col gap-2 pt-1 md:pt-2">
                   <button
                     onClick={handleRegister}
                     disabled={registering || !user}
-                    className="w-full px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                    className="w-full px-3 md:px-4 py-2 md:py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg text-xs md:text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                   >
                     {registering ? (
                       <>
@@ -208,7 +208,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                   </button>
                   <button
                     onClick={onClose}
-                    className="w-full px-4 py-2.5 border border-neutral-700 text-white hover:bg-neutral-800 rounded-lg text-sm font-semibold transition-colors"
+                    className="w-full px-3 md:px-4 py-2 md:py-2.5 border border-neutral-700 text-white hover:bg-neutral-800 rounded-lg text-xs md:text-sm font-semibold transition-colors"
                   >
                     Close
                   </button>
@@ -216,52 +216,52 @@ export default function EventModal({ eventId, isOpen, onClose }) {
               </div>
 
               {/* Right Column - Meta Info & Organizer */}
-              <div className="space-y-5">
+              <div className="space-y-3 md:space-y-5">
                 {/* Meta Info */}
-                <div className="p-5 bg-neutral-950/50 border border-neutral-800 rounded-lg space-y-4">
+                <div className="p-3 md:p-5 bg-neutral-950/50 border border-neutral-800 rounded-lg space-y-3 md:space-y-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <i className="fa-regular fa-calendar text-primary text-sm" />
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <i className="fa-regular fa-calendar text-primary text-xs md:text-sm" />
                     </div>
                     <div>
-                      <p className="text-xs text-neutral-500 font-medium">Date</p>
-                      <p className="text-sm font-semibold text-white">
+                      <p className="text-[10px] md:text-xs text-neutral-500 font-medium">Date</p>
+                      <p className="text-xs md:text-sm font-semibold text-white">
                         {formatDate(event.startDate).date}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <i className="fa-solid fa-clock text-primary text-sm" />
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <i className="fa-solid fa-clock text-primary text-xs md:text-sm" />
                     </div>
                     <div>
-                      <p className="text-xs text-neutral-500 font-medium">Time</p>
-                      <p className="text-sm font-semibold text-white">
+                      <p className="text-[10px] md:text-xs text-neutral-500 font-medium">Time</p>
+                      <p className="text-xs md:text-sm font-semibold text-white">
                         {formatDate(event.startDate).time} - {formatDate(event.endDate).time}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <i className="fa-solid fa-location-dot text-primary text-sm" />
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <i className="fa-solid fa-location-dot text-primary text-xs md:text-sm" />
                     </div>
                     <div>
-                      <p className="text-xs text-neutral-500 font-medium">Location</p>
-                      <p className="text-sm font-semibold text-white line-clamp-1">
+                      <p className="text-[10px] md:text-xs text-neutral-500 font-medium">Location</p>
+                      <p className="text-xs md:text-sm font-semibold text-white line-clamp-1">
                         {event.location}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <i className="fa-solid fa-users text-primary text-sm" />
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <i className="fa-solid fa-users text-primary text-xs md:text-sm" />
                     </div>
                     <div>
-                      <p className="text-xs text-neutral-500 font-medium">Capacity</p>
-                      <p className="text-sm font-semibold text-white">
+                      <p className="text-[10px] md:text-xs text-neutral-500 font-medium">Capacity</p>
+                      <p className="text-xs md:text-sm font-semibold text-white">
                         {event.availableSeats || event.capacity} seats
                       </p>
                     </div>
@@ -270,19 +270,19 @@ export default function EventModal({ eventId, isOpen, onClose }) {
 
                 {/* Organizer */}
                 {event.creator && (
-                  <div className="p-5 bg-neutral-950/50 border border-neutral-800 rounded-lg">
-                    <p className="text-xs text-neutral-500 font-medium mb-2">Organized by</p>
+                  <div className="p-3 md:p-5 bg-neutral-950/50 border border-neutral-800 rounded-lg">
+                    <p className="text-[10px] md:text-xs text-neutral-500 font-medium mb-1 md:mb-2">Organized by</p>
                     <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center flex-shrink-0">
-                        <span className="text-base font-bold text-primary">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm md:text-base font-bold text-primary">
                           {event.creator.firstName?.[0]}{event.creator.lastName?.[0]}
                         </span>
                       </div>
                       <div>
-                        <p className="font-semibold text-white text-sm">
+                        <p className="font-semibold text-white text-xs md:text-sm">
                           {event.creator.firstName} {event.creator.lastName}
                         </p>
-                        <p className="text-xs text-neutral-400">{event.creator.email}</p>
+                        <p className="text-[10px] md:text-xs text-neutral-400">{event.creator.email}</p>
                       </div>
                     </div>
                   </div>

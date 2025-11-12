@@ -109,24 +109,44 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Desktop: Sticky Search Bar Only */}
-      <div className="hidden md:block sticky top-28 z-30 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-[#2a2a2a] py-4">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="relative max-w-2xl">
-            <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#a0a0a0] text-lg" />
-            <Input
-              type="search"
-              placeholder="Search events..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 pr-6 py-3 rounded-lg border-[#2a2a2a] bg-[#1a1a1a] text-white placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20"
-            />
+      {/* Desktop: Sticky Search Bar and Filters */}
+      <div className="hidden md:block sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-[#2a2a2a]">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-2xl">
+              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#a0a0a0] text-lg" />
+              <Input
+                type="search"
+                placeholder="Search events..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-6 py-3 rounded-lg border-[#2a2a2a] bg-[#1a1a1a] text-white placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20"
+              />
+            </div>
+          </div>
+        </div>
+        {/* Category Filters */}
+        <div className="max-w-7xl mx-auto px-4 pb-4">
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-full font-semibold transition-colors ${
+                  selectedCategory === cat
+                    ? 'bg-[#d62e1f] text-white'
+                    : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Mobile: Compact Sticky Bar with Icons */}
-      <div className="md:hidden sticky top-28 z-30 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-[#2a2a2a]">
+      <div className="md:hidden sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-[#2a2a2a]">
         <div className="flex items-center gap-2 px-4 py-3">
           {/* Search Icon */}
           <button
@@ -170,27 +190,6 @@ export default function EventsPage() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Desktop: Non-Sticky Category Filters */}
-      <div className="hidden md:block py-6 px-4 bg-[#0a0a0a]">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full font-semibold transition-colors ${
-                  selectedCategory === cat
-                    ? 'bg-[#d62e1f] text-white'
-                    : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Events Grid */}
