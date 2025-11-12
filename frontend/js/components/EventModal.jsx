@@ -123,22 +123,22 @@ export default function EventModal({ eventId, isOpen, onClose }) {
         onClick={onClose}
       />
 
-      {/* Modern Modal Content - Single Column Layout */}
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-[#0a0a0a] rounded-2xl shadow-2xl border border-[#2a2a2a] transform transition-all duration-300 scale-100">
+      {/* Modern Modal Content - Single Column Layout with Liquid Glass */}
+      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200 dark:border-[#2a2a2a] transform transition-all duration-300 scale-100">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#2a2a2a] border-t-[#d62e1f]"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 dark:border-[#2a2a2a] border-t-[#d62e1f]"></div>
           </div>
         ) : error ? (
           <div className="p-8 text-center">
             <i className="fa-solid fa-exclamation-circle text-4xl text-[#d62e1f] mb-4"></i>
-            <p className="text-white font-semibold mb-2">{error}</p>
+            <p className="text-gray-900 dark:text-white font-semibold mb-2 transition-colors duration-300">{error}</p>
           </div>
         ) : event ? (
           <>
             {/* Hero Image with Overlay Information */}
             {event.imageUrl && (
-              <div className="relative h-72 md:h-96 overflow-hidden rounded-t-2xl bg-[#0a0a0a]">
+              <div className="relative h-72 md:h-96 overflow-hidden rounded-t-2xl bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
                 <img
                   src={event.imageUrl}
                   alt={event.title}
@@ -158,14 +158,14 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                   </span>
                 </div>
 
-                {/* Meta Info Overlay - Bottom Section */}
+                {/* Meta Info Overlay - Bottom Section - Liquid Glass Cards */}
                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     {/* Date */}
-                    <div className="flex items-center gap-2.5 bg-black/50 backdrop-blur-sm px-3 py-2.5 rounded-lg border border-white/10">
+                    <div className="flex items-center gap-2.5 bg-white/10 dark:bg-black/50 backdrop-blur-md px-3 py-2.5 rounded-lg border border-white/20 shadow-lg transition-colors duration-300">
                       <i className="fa-regular fa-calendar text-[#d62e1f] text-lg flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-white/70 font-semibold mb-0.5">Date</p>
+                        <p className="text-xs text-white/80 font-semibold mb-0.5">Date</p>
                         <p className="text-sm font-bold text-white truncate">
                           {formatDate(event.startDate).date}
                         </p>
@@ -173,10 +173,10 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                     </div>
 
                     {/* Time */}
-                    <div className="flex items-center gap-2.5 bg-black/50 backdrop-blur-sm px-3 py-2.5 rounded-lg border border-white/10">
+                    <div className="flex items-center gap-2.5 bg-white/10 dark:bg-black/50 backdrop-blur-md px-3 py-2.5 rounded-lg border border-white/20 shadow-lg transition-colors duration-300">
                       <i className="fa-solid fa-clock text-[#d62e1f] text-lg flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-white/70 font-semibold mb-0.5">Time</p>
+                        <p className="text-xs text-white/80 font-semibold mb-0.5">Time</p>
                         <p className="text-sm font-bold text-white truncate">
                           {formatDate(event.startDate).time}
                         </p>
@@ -184,10 +184,10 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                     </div>
 
                     {/* Location */}
-                    <div className="flex items-center gap-2.5 bg-black/50 backdrop-blur-sm px-3 py-2.5 rounded-lg border border-white/10">
+                    <div className="flex items-center gap-2.5 bg-white/10 dark:bg-black/50 backdrop-blur-md px-3 py-2.5 rounded-lg border border-white/20 shadow-lg transition-colors duration-300">
                       <i className="fa-solid fa-location-dot text-[#d62e1f] text-lg flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-white/70 font-semibold mb-0.5">Location</p>
+                        <p className="text-xs text-white/80 font-semibold mb-0.5">Location</p>
                         <p className="text-sm font-bold text-white truncate">
                           {event.location}
                         </p>
@@ -195,10 +195,10 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                     </div>
 
                     {/* Capacity */}
-                    <div className="flex items-center gap-2.5 bg-black/50 backdrop-blur-sm px-3 py-2.5 rounded-lg border border-white/10">
+                    <div className="flex items-center gap-2.5 bg-white/10 dark:bg-black/50 backdrop-blur-md px-3 py-2.5 rounded-lg border border-white/20 shadow-lg transition-colors duration-300">
                       <i className="fa-solid fa-users text-[#d62e1f] text-lg flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-white/70 font-semibold mb-0.5">Capacity</p>
+                        <p className="text-xs text-white/80 font-semibold mb-0.5">Capacity</p>
                         <p className="text-sm font-bold text-white truncate">
                           {event._count?.registrations || 0} / {event.capacity}
                         </p>
@@ -213,7 +213,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
             <div className="p-6 md:p-8 space-y-6">
               {/* Organizer Section - Above Title */}
               {event.creator && (
-                <div className="flex items-center justify-between gap-4 pb-4 border-b border-[#2a2a2a]">
+                <div className="flex items-center justify-between gap-4 pb-4 border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d62e1f]/30 to-[#d62e1f]/10 flex items-center justify-center flex-shrink-0">
                       <span className="text-lg font-bold text-[#d62e1f]">
@@ -221,8 +221,8 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-[#a0a0a0] font-semibold mb-0.5">Organized by</p>
-                      <p className="font-bold text-white text-base truncate">
+                      <p className="text-xs text-gray-600 dark:text-[#a0a0a0] font-semibold mb-0.5 transition-colors duration-300">Organized by</p>
+                      <p className="font-bold text-gray-900 dark:text-white text-base truncate transition-colors duration-300">
                         {event.creator.firstName} {event.creator.lastName}
                       </p>
                     </div>
@@ -234,7 +234,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                       e.stopPropagation();
                       window.location.href = '/clubs';
                     }}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg font-semibold text-sm transition-colors flex-shrink-0"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-gray-200 dark:bg-[#2a2a2a] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] text-gray-900 dark:text-white rounded-lg font-semibold text-sm transition-colors flex-shrink-0"
                   >
                     <i className="fa-solid fa-arrow-right text-[#d62e1f]" />
                     <span className="hidden sm:inline">Go to Club</span>
@@ -243,14 +243,14 @@ export default function EventModal({ eventId, isOpen, onClose }) {
               )}
 
               {/* Event Title - Large and Bold */}
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white leading-tight transition-colors duration-300">
                 {event.title}
               </h2>
 
               {/* Description */}
               <div>
-                <h3 className="text-base font-bold text-white mb-3">About this event</h3>
-                <p className="text-[#a0a0a0] text-base leading-relaxed">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-3 transition-colors duration-300">About this event</h3>
+                <p className="text-gray-700 dark:text-[#a0a0a0] text-base leading-relaxed transition-colors duration-300">
                   {event.description || 'No description provided.'}
                 </p>
               </div>

@@ -34,33 +34,33 @@ const FilterSheet = ({ isOpen, onClose, children, title = 'Filters' }) => {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop with blur */}
       <div
-        className="fixed inset-0 bg-black/60 z-40 md:hidden"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Bottom Sheet */}
+      {/* Bottom Sheet with Liquid Glass Effect */}
       <div
-        className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] rounded-t-2xl z-50 md:hidden max-h-[80vh] overflow-y-auto"
+        className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-lg rounded-t-2xl z-50 md:hidden max-h-[80vh] overflow-y-auto border-t border-gray-200 dark:border-[#2a2a2a] shadow-2xl transition-colors duration-300"
         role="dialog"
         aria-modal="true"
         aria-labelledby="filter-sheet-title"
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 bg-[#2a2a2a] rounded-full" />
+          <div className="w-10 h-1 bg-gray-300 dark:bg-[#2a2a2a] rounded-full transition-colors duration-300" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]">
-          <h2 id="filter-sheet-title" className="text-xl font-bold text-white">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+          <h2 id="filter-sheet-title" className="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="text-[#a0a0a0] hover:text-white transition-colors"
+            className="text-gray-600 dark:text-[#a0a0a0] hover:text-gray-900 dark:hover:text-white transition-colors"
             aria-label="Close filters"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,10 +75,10 @@ const FilterSheet = ({ isOpen, onClose, children, title = 'Filters' }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-[#1a1a1a] border-t border-[#2a2a2a] p-4 pb-safe">
+        <div className="sticky bottom-0 bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-lg border-t border-gray-200 dark:border-[#2a2a2a] p-4 pb-safe transition-colors duration-300">
           <button
             onClick={onClose}
-            className="w-full bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            className="w-full bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-lg"
           >
             Apply Filters
           </button>

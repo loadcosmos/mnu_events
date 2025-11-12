@@ -130,8 +130,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4"
+    <div
+      className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300"
       style={{
         backgroundImage: 'url(/images/glassback.png)',
         backgroundSize: 'cover',
@@ -148,18 +148,18 @@ export default function LoginPage() {
             setLoginType(loginType === 'student' ? 'admin' : 'student');
             setError('');
           }}
-          className="fixed top-4 right-4 z-50 bg-white dark:bg-[#1a1a1a] border-gray-300 dark:border-[#2a2a2a] transition-colors duration-300"
+          className="fixed top-4 right-4 z-50 bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-md border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white hover:bg-white dark:hover:bg-[#2a2a2a] transition-all duration-300 shadow-lg"
         >
           {loginType === 'student' ? 'Admin' : 'Student'}
         </Button>
       )}
 
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-md shadow-2xl bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-lg border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold">
+          <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
             {showSignup ? 'Create Account' : 'Welcome Back'}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
             {showSignup
               ? 'Register with your @kazguu.kz account'
               : 'Please enter your details to sign in'}
@@ -167,7 +167,7 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="mb-4 p-3 rounded-md bg-destructive/10 text-destructive text-sm text-center border border-destructive/20">
+            <div className="mb-4 p-3 rounded-md bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm text-center border border-red-200 dark:border-red-900/50 transition-colors duration-300">
               {error}
             </div>
           )}
@@ -175,7 +175,7 @@ export default function LoginPage() {
           {!showSignup ? (
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-gray-900 dark:text-white transition-colors duration-300">Email</Label>
                 <Input
                   id="email"
                   name="email"
@@ -185,10 +185,11 @@ export default function LoginPage() {
                   onChange={handleChange}
                   disabled={loading}
                   required
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-gray-900 dark:text-white transition-colors duration-300">Password</Label>
                 <Input
                   id="password"
                   name="password"
@@ -199,16 +200,17 @@ export default function LoginPage() {
                   disabled={loading}
                   autoComplete="current-password"
                   required
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-[#d62e1f] hover:bg-[#b91c1c] text-white transition-colors" disabled={loading}>
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
           ) : (
             <form onSubmit={handleSignup} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="signup-email">Email</Label>
+                <Label htmlFor="signup-email" className="text-gray-900 dark:text-white transition-colors duration-300">Email</Label>
                 <Input
                   id="signup-email"
                   name="email"
@@ -218,10 +220,11 @@ export default function LoginPage() {
                   onChange={handleChange}
                   disabled={loading}
                   required
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="signup-name">Full Name</Label>
+                <Label htmlFor="signup-name" className="text-gray-900 dark:text-white transition-colors duration-300">Full Name</Label>
                 <Input
                   id="signup-name"
                   name="name"
@@ -230,10 +233,11 @@ export default function LoginPage() {
                   value={formData.name}
                   onChange={handleChange}
                   disabled={loading}
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="signup-password">Password</Label>
+                <Label htmlFor="signup-password" className="text-gray-900 dark:text-white transition-colors duration-300">Password</Label>
                 <Input
                   id="signup-password"
                   name="password"
@@ -244,10 +248,11 @@ export default function LoginPage() {
                   disabled={loading}
                   autoComplete="new-password"
                   required
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Label htmlFor="confirm-password" className="text-gray-900 dark:text-white transition-colors duration-300">Confirm Password</Label>
                 <Input
                   id="confirm-password"
                   name="confirmPassword"
@@ -258,9 +263,10 @@ export default function LoginPage() {
                   disabled={loading}
                   autoComplete="new-password"
                   required
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-[#d62e1f] hover:bg-[#b91c1c] text-white transition-colors" disabled={loading}>
                 {loading ? 'Signing Up...' : 'Sign Up'}
               </Button>
             </form>
@@ -269,7 +275,7 @@ export default function LoginPage() {
         <CardFooter className="flex flex-col space-y-2">
           <Button
             variant="link"
-            className="w-full"
+            className="w-full text-gray-600 dark:text-[#a0a0a0] hover:text-[#d62e1f] dark:hover:text-[#d62e1f] transition-colors duration-300"
             onClick={(e) => {
               e.preventDefault();
               setShowSignup(!showSignup);
