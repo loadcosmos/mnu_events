@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 import OrganizerLayout from './OrganizerLayout.jsx';
 import AdminLayout from './AdminLayout.jsx';
+import BottomNavigation from './BottomNavigation';
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -114,29 +115,33 @@ export default function Layout({ children }) {
   const isHomePage = location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0a0a0a]">
       <header
-        className={`fixed top-0 z-50 w-full border-b transition-all duration-500 ease-in-out ${
+        className={`fixed top-0 z-50 w-full border-b transition-all duration-300 ease-in-out ${
           isScrolled
-            ? 'border-gray-800/50 bg-black/90 backdrop-blur-md'
+            ? 'border-white/10 bg-black/80 backdrop-blur-lg'
             : 'border-transparent bg-transparent'
         }`}
       >
-        <div className="container flex h-28 items-center justify-between px-4">
+        <div className="container mx-auto flex h-20 items-center justify-between px-4">
           {/* Left side - Language selector */}
-          <div className="flex items-center flex-1">
+          <div className="flex flex-1 items-center justify-start">
             <div className="relative" ref={langDropdownRef}>
               <Button
                 variant="ghost"
                 size="default"
                 onClick={() => setLangOpen(!langOpen)}
-                className="gap-2 text-white hover:text-white hover:bg-gray-800/50 text-base"
+                className="gap-2 text-white hover:text-white hover:bg-white/10 text-base"
               >
                 {selectedLang}
-                <i className="fa-solid fa-chevron-down text-sm" />
+                <i
+                  className={`fa-solid fa-chevron-down text-xs transition-transform ${
+                    langOpen ? 'rotate-188' : ''
+                  }`}
+                />
               </Button>
               {langOpen && (
-                <div className="absolute left-0 mt-2 w-32 rounded-md border bg-popover p-1 shadow-md z-50">
+                <div className="absolute left-0 top-full mt-2 w-32 rounded-md border border-white/10 bg-[#1a1a1a] p-1 shadow-lg z-50">
                   {['ENG', 'РУС', 'ҚАЗ'].map((lang) => (
                     <button
                       key={lang}
@@ -145,8 +150,8 @@ export default function Layout({ children }) {
                         setLangOpen(false);
                       }}
                       className={cn(
-                        "w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent",
-                        selectedLang === lang && "bg-accent"
+                        'w-full text-left px-3 py-1.5 text-sm rounded-sm text-[#a0a0a0] hover:bg-white/10 hover:text-white transition-colors',
+                        selectedLang === lang && 'bg-white/10 text-white'
                       )}
                     >
                       {lang}
@@ -158,118 +163,116 @@ export default function Layout({ children }) {
           </div>
 
           {/* Center - Logo */}
-          <Link to="/" className="flex items-center absolute left-1/2 transform -translate-x-1/2">
-            <img src="/images/logo.png" alt="MNU Events" className="h-16" />
+          <Link
+            to="/"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          >
+            <img
+              src="/images/logo.png"
+              alt="MNU Events"
+              className="h-12 transition-all duration-300"
+            />
           </Link>
 
           {/* Right side - Navigation and Auth */}
-          <div className="flex items-center space-x-6 flex-1 justify-end">
-            {/* Navigation - показываем только Events и Clubs для неавторизованных */}
-            {!isAuthenticated() && (
-              <nav className="hidden md:flex items-center space-x-8">
-                <Link
-                  to="/events"
-                  className={cn(
-                    "text-base font-medium transition-colors hover:text-gray-300",
-                    location.pathname === '/events'
-                      ? "text-white"
-                      : "text-white"
-                  )}
-                >
-                  Events
-                </Link>
-                <Link
-                  to="/clubs"
-                  className={cn(
-                    "text-base font-medium transition-colors hover:text-gray-300",
-                    location.pathname === '/clubs'
-                      ? "text-white"
-                      : "text-white"
-                  )}
-                >
-                  Clubs
-                </Link>
-              </nav>
-            )}
+          <div className="flex flex-1 items-center justify-end space-x-4">
+            {/* Desktop Only: Navigation */}
+            <nav className="hidden md:flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="default"
+                asChild
+                className="text-white hover:text-white hover:bg-white/10 text-base"
+              >
+                <Link to="/events">Events</Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="default"
+                asChild
+                className="text-white hover:text-white hover:bg-white/10 text-base"
+              >
+                <Link to="/clubs">Clubs</Link>
+              </Button>
+            </nav>
 
             {/* Auth buttons */}
             {isAuthenticated() ? (
-              <div className="flex items-center space-x-4">
-                {/* Показываем ссылки только для студентов (организаторы и админы имеют свои Layout'ы) */}
-                {user?.role === 'STUDENT' && (
-                  <>
-                    <Button variant="ghost" size="default" asChild className="text-white hover:text-white hover:bg-gray-800/50 text-base">
-                      <Link to="/events">Events</Link>
-                    </Button>
-                    <Button variant="ghost" size="default" asChild className="text-white hover:text-white hover:bg-gray-800/50 text-base">
-                      <Link to="/clubs">Clubs</Link>
-                    </Button>
-                  </>
-                )}
-
+              <>
                 {/* Profile dropdown */}
                 <div className="relative" ref={profileDropdownRef}>
                   <Button
                     variant="ghost"
                     size="default"
                     onClick={() => setProfileOpen(!profileOpen)}
-                    className="gap-2 text-white hover:text-white hover:bg-gray-800/50 text-base"
+                    className="gap-2 text-white hover:text-white hover:bg-white/10 text-base"
                   >
-                    <i className="fa-solid fa-user text-sm" />
-                    <span className="text-base text-white">{user?.firstName || user?.email}</span>
-                    <i className="fa-solid fa-chevron-down text-sm" />
+                    <i className="fa-regular fa-circle-user text-lg" />
+                    <span className="hidden sm:inline">
+                      {user?.firstName || user?.email}
+                    </span>
+                    <i
+                      className={`fa-solid fa-chevron-down text-xs transition-transform ${
+                        profileOpen ? 'rotate-180' : ''
+                      }`}
+                    />
                   </Button>
                   {profileOpen && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md border bg-white shadow-lg z-50">
-                      <div className="py-1">
+                    <div className="absolute right-0 top-full mt-2 w-56 rounded-md border border-white/10 bg-[#1a1a1a] shadow-lg z-50">
+                      <div className="p-1">
                         {user?.role === 'STUDENT' && (
                           <Link
                             to="/registrations"
                             onClick={() => setProfileOpen(false)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#a0a0a0] hover:bg-white/10 hover:text-white transition-colors rounded-sm"
                           >
-                            <i className="fa-solid fa-calendar-check mr-2" />
+                            <i className="fa-solid fa-calendar-check w-4 text-center" />
                             My Registrations
                           </Link>
                         )}
                         <Link
                           to="/profile"
                           onClick={() => setProfileOpen(false)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                          className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#a0a0a0] hover:bg-white/10 hover:text-white transition-colors rounded-sm"
                         >
-                          <i className="fa-solid fa-user-edit mr-2" />
+                          <i className="fa-solid fa-user-edit w-4 text-center" />
                           Edit Profile
                         </Link>
+                        <div className="my-1 h-px bg-white/10" />
                         <button
                           onClick={() => {
                             setProfileOpen(false);
                             handleLogout();
                           }}
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-colors"
+                          className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white transition-colors rounded-sm"
                         >
-                          <i className="fa-solid fa-sign-out-alt mr-2" />
+                          <i className="fa-solid fa-sign-out-alt w-4 text-center" />
                           Logout
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
-              </div>
+              </>
             ) : (
-              <Button
-                variant="outline"
-                size="default"
-                asChild
-                className="bg-transparent border-white text-white hover:bg-gray-800/50 hover:text-white rounded-full text-base px-6 py-2"
-              >
-                <Link to="/login">Log In</Link>
-              </Button>
+              <>
+                {/* Desktop Only: Login Button */}
+                <Button
+                  asChild
+                  className="hidden md:inline-flex bg-[#d62e1f] text-white hover:bg-[#b91c1c] rounded-full text-base px-6 font-semibold transition-colors"
+                >
+                  <Link to="/login">Log In</Link>
+                </Button>
+              </>
             )}
           </div>
         </div>
       </header>
 
-      <main className={isHomePage ? '' : 'pt-28'}>{children}</main>
+      <main className="pt-20">{children}</main>
+
+      {/* Bottom Navigation for mobile */}
+      <BottomNavigation />
     </div>
   );
 }

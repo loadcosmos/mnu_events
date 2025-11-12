@@ -1,37 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Badge } from '../components/ui/badge';
 import usersService from '../services/usersService';
+import registrationsService from '../services/registrationsService';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user: currentUser, isAuthenticated, refreshUser } = useAuth();
+  const { user: currentUser, isAuthenticated, logout } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
   const [user, setUser] = useState(null);
+  const [stats, setStats] = useState({
+    eventsAttended: 0,
+    upcomingEvents: 0,
+    clubsJoined: 0,
+  });
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     faculty: '',
     avatar: '',
   });
+  const [saving, setSaving] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('ENG');
 
-  const loadUser = async () => {
+  const loadUserData = async () => {
     if (!currentUser?.id) return;
 
     try {
       setLoading(true);
-      setError('');
 
+      // Load user profile
       const userData = await usersService.getById(currentUser.id);
       setUser(userData);
       setFormData({
@@ -40,8 +44,29 @@ export default function ProfilePage() {
         faculty: userData.faculty || '',
         avatar: userData.avatar || '',
       });
+
+      // Load user stats
+      try {
+        const registrationsResponse = await registrationsService.getMyRegistrations();
+        const registrations = registrationsResponse.data || registrationsResponse || [];
+
+        const today = new Date();
+        const attended = registrations.filter(
+          reg => reg.checkedInAt && new Date(reg.event?.startDate) < today
+        ).length;
+        const upcoming = registrations.filter(
+          reg => reg.status === 'REGISTERED' && new Date(reg.event?.startDate) >= today
+        ).length;
+
+        setStats({
+          eventsAttended: attended,
+          upcomingEvents: upcoming,
+          clubsJoined: 0, // TODO: Implement club memberships count
+        });
+      } catch (err) {
+        console.error('[ProfilePage] Failed to load stats:', err);
+      }
     } catch (err) {
-      setError(err.message || 'Failed to load profile');
       console.error('[ProfilePage] Load user failed:', err);
       toast.error('Failed to load profile', {
         description: err.message || 'Unable to load your profile information.',
@@ -51,14 +76,13 @@ export default function ProfilePage() {
     }
   };
 
-  // Redirect if not authenticated and load user data
   useEffect(() => {
     if (!isAuthenticated()) {
       navigate('/login');
       return;
     }
     if (currentUser?.id) {
-      loadUser();
+      loadUserData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id]);
@@ -71,42 +95,25 @@ export default function ProfilePage() {
     }));
   };
 
-  const validateForm = () => {
-    if (!formData.firstName.trim()) {
-      setError('First name is required');
-      return false;
-    }
-    if (!formData.lastName.trim()) {
-      setError('Last name is required');
-      return false;
-    }
-    return true;
-  };
-
   const handleSave = async () => {
-    if (!validateForm()) {
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
       toast.error('Validation failed', {
-        description: 'Please fill in all required fields.',
+        description: 'First name and last name are required.',
       });
       return;
     }
 
     try {
       setSaving(true);
-      setError('');
 
-      const updatedUser = await usersService.update(currentUser.id, formData);
-      setUser(updatedUser);
-      setIsEditing(false);
-
-      // Update user in auth context
-      await refreshUser();
+      await usersService.update(currentUser.id, formData);
+      await loadUserData();
+      setIsEditModalOpen(false);
 
       toast.success('Profile updated successfully!', {
         description: 'Your profile information has been saved.',
       });
     } catch (err) {
-      setError(err.message || 'Failed to update profile');
       console.error('[ProfilePage] Update failed:', err);
       toast.error('Failed to update profile', {
         description: err.message || 'Unable to save your changes. Please try again.',
@@ -116,40 +123,47 @@ export default function ProfilePage() {
     }
   };
 
-  const handleCancel = () => {
-    if (user) {
-      setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        faculty: user.faculty || '',
-        avatar: user.avatar || '',
+  const handleShareProfile = () => {
+    const profileUrl = `${window.location.origin}/profile`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: 'My MNU Events Profile',
+        text: `Check out ${user?.firstName} ${user?.lastName}'s profile on MNU Events!`,
+        url: profileUrl,
+      }).catch((err) => console.log('Error sharing:', err));
+    } else {
+      navigator.clipboard.writeText(profileUrl);
+      toast.success('Link copied!', {
+        description: 'Profile link copied to clipboard.',
       });
     }
-    setIsEditing(false);
-    setError('');
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   const getRoleBadgeColor = (role) => {
     switch (role) {
       case 'ADMIN':
-        return 'bg-red-600 text-white';
+        return 'bg-[#d62e1f]';
       case 'ORGANIZER':
-        return 'bg-orange-600 text-white';
+        return 'bg-orange-600';
       case 'STUDENT':
-        return 'bg-blue-600 text-white';
+        return 'bg-blue-600';
       default:
-        return 'bg-gray-600 text-white';
+        return 'bg-[#2a2a2a]';
     }
   };
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-            <p className="text-muted-foreground">Loading profile...</p>
-          </div>
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#2a2a2a] border-t-[#d62e1f] mb-4"></div>
+          <p className="text-xl">Loading profile...</p>
         </div>
       </div>
     );
@@ -157,63 +171,268 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-destructive mb-4">{error || 'User not found'}</p>
-              <Button onClick={loadUser} variant="outline">
-                Retry
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-[#d62e1f] mb-4">Failed to load profile</p>
+          <Button onClick={loadUserData} className="bg-[#d62e1f] hover:bg-[#b91c1c]">
+            Retry
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">My Profile</h1>
-        <p className="text-muted-foreground">Manage your profile information</p>
+    <div className="min-h-screen bg-[#0a0a0a] pb-24 md:pb-8">
+      {/* Hero Section with Avatar and User Info */}
+      <div className="bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] py-8 px-4 border-b border-[#2a2a2a]">
+        <div className="max-w-4xl mx-auto">
+          {/* Avatar and Basic Info */}
+          <div className="flex flex-col items-center text-center mb-6">
+            <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-[#2a2a2a] mb-4 ring-4 ring-[#d62e1f]/20">
+              {user.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={`${user.firstName} ${user.lastName}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div
+                className={cn(
+                  'w-full h-full flex items-center justify-center text-3xl md:text-4xl font-bold text-white bg-gradient-to-br from-[#d62e1f] to-[#b91c1c]',
+                  user.avatar && 'hidden'
+                )}
+              >
+                {user.firstName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
+              </div>
+            </div>
+
+            <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
+              {user.firstName} {user.lastName}
+            </h1>
+            <p className="text-[#a0a0a0] text-sm md:text-base mb-3">{user.email}</p>
+
+            <div className="flex items-center gap-3 mb-2">
+              <span className={cn('px-4 py-1.5 rounded-full text-white text-sm font-semibold', getRoleBadgeColor(user.role))}>
+                {user.role}
+              </span>
+              {user.faculty && (
+                <span className="px-4 py-1.5 rounded-full bg-[#2a2a2a] text-white text-sm font-semibold">
+                  {user.faculty}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="px-6 py-3 bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-semibold rounded-lg transition-colors"
+            >
+              <i className="fa-solid fa-pen-to-square mr-2" />
+              Edit Profile
+            </button>
+            <button
+              onClick={handleShareProfile}
+              className="px-6 py-3 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white font-semibold rounded-lg transition-colors"
+            >
+              <i className="fa-solid fa-share-nodes mr-2" />
+              Share Profile
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Profile Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile</CardTitle>
-            <CardDescription>Your account information</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Avatar */}
-            <div className="flex flex-col items-center">
-              <div className="relative w-24 h-24 rounded-full overflow-hidden bg-muted mb-4">
-                {user.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt={`${user.firstName} ${user.lastName}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                ) : null}
-                <div
-                  className={cn(
-                    'w-full h-full flex items-center justify-center text-2xl font-bold text-white',
-                    !user.avatar && 'bg-gradient-to-br from-primary to-primary/80'
-                  )}
-                  style={{ display: user.avatar ? 'none' : 'flex' }}
-                >
-                  {user.firstName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
-                </div>
+      {/* My Stats Section */}
+      <div className="py-8 px-4 bg-[#0a0a0a]">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-extrabold text-white mb-6">
+            My <span className="text-[#d62e1f]">Stats</span>
+          </h2>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-[#1a1a1a] rounded-lg p-6 text-center border border-[#2a2a2a] hover:border-[#d62e1f] transition-colors">
+              <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
+                {stats.eventsAttended}
               </div>
-              {isEditing && (
-                <div className="w-full">
-                  <Label htmlFor="avatar">Avatar URL</Label>
+              <div className="text-xs md:text-sm text-[#a0a0a0] font-semibold">Events Attended</div>
+            </div>
+
+            <div className="bg-[#1a1a1a] rounded-lg p-6 text-center border border-[#2a2a2a] hover:border-[#d62e1f] transition-colors">
+              <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
+                {stats.upcomingEvents}
+              </div>
+              <div className="text-xs md:text-sm text-[#a0a0a0] font-semibold">Upcoming Events</div>
+            </div>
+
+            <div className="bg-[#1a1a1a] rounded-lg p-6 text-center border border-[#2a2a2a] hover:border-[#d62e1f] transition-colors">
+              <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
+                {stats.clubsJoined}
+              </div>
+              <div className="text-xs md:text-sm text-[#a0a0a0] font-semibold">Clubs Joined</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Links Section */}
+      <div className="py-8 px-4 bg-[#0a0a0a]">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-extrabold text-white mb-6">
+            Quick <span className="text-[#d62e1f]">Access</span>
+          </h2>
+
+          <Link
+            to="/registrations"
+            className="flex items-center justify-between p-6 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a] hover:border-[#d62e1f] transition-all group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#d62e1f] rounded-full flex items-center justify-center">
+                <i className="fa-solid fa-calendar-check text-white text-xl" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-lg group-hover:text-[#d62e1f] transition-colors">
+                  My Registrations
+                </h3>
+                <p className="text-[#a0a0a0] text-sm">View and manage your event registrations</p>
+              </div>
+            </div>
+            <i className="fa-solid fa-chevron-right text-[#a0a0a0] group-hover:text-[#d62e1f] transition-colors" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Settings Section */}
+      <div className="py-8 px-4 bg-[#0a0a0a]">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-extrabold text-white mb-6">
+            <span className="text-[#d62e1f]">Settings</span>
+          </h2>
+
+          <div className="bg-[#1a1a1a] rounded-lg border border-[#2a2a2a] divide-y divide-[#2a2a2a]">
+            {/* Language Setting */}
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <i className="fa-solid fa-language text-[#d62e1f] text-xl" />
+                  <div>
+                    <h3 className="text-white font-semibold">Language</h3>
+                    <p className="text-[#a0a0a0] text-sm">Choose your preferred language</p>
+                  </div>
+                </div>
+                <select
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                  className="px-4 py-2 bg-[#2a2a2a] text-white rounded-lg border border-[#3a3a3a] focus:border-[#d62e1f] focus:outline-none"
+                >
+                  <option value="ENG">English</option>
+                  <option value="РУС">Русский</option>
+                  <option value="ҚАЗ">Қазақша</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Notifications Setting */}
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <i className="fa-solid fa-bell text-[#d62e1f] text-xl" />
+                  <div>
+                    <h3 className="text-white font-semibold">Notifications</h3>
+                    <p className="text-[#a0a0a0] text-sm">Manage notification preferences</p>
+                  </div>
+                </div>
+                <button className="px-4 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg transition-colors">
+                  <i className="fa-solid fa-chevron-right" />
+                </button>
+              </div>
+            </div>
+
+            {/* Privacy Settings */}
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <i className="fa-solid fa-shield-halved text-[#d62e1f] text-xl" />
+                  <div>
+                    <h3 className="text-white font-semibold">Privacy & Security</h3>
+                    <p className="text-[#a0a0a0] text-sm">Control your privacy settings</p>
+                  </div>
+                </div>
+                <button className="px-4 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg transition-colors">
+                  <i className="fa-solid fa-chevron-right" />
+                </button>
+              </div>
+            </div>
+
+            {/* About & Help */}
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <i className="fa-solid fa-circle-info text-[#d62e1f] text-xl" />
+                  <div>
+                    <h3 className="text-white font-semibold">About & Help</h3>
+                    <p className="text-[#a0a0a0] text-sm">Get help and learn about the app</p>
+                  </div>
+                </div>
+                <button className="px-4 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg transition-colors">
+                  <i className="fa-solid fa-chevron-right" />
+                </button>
+              </div>
+            </div>
+
+            {/* Logout */}
+            <div className="p-6">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-between group"
+              >
+                <div className="flex items-center gap-4">
+                  <i className="fa-solid fa-right-from-bracket text-[#d62e1f] text-xl" />
+                  <div className="text-left">
+                    <h3 className="text-white font-semibold group-hover:text-[#d62e1f] transition-colors">Logout</h3>
+                    <p className="text-[#a0a0a0] text-sm">Sign out of your account</p>
+                  </div>
+                </div>
+                <i className="fa-solid fa-chevron-right text-[#a0a0a0] group-hover:text-[#d62e1f] transition-colors" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Edit Profile Modal */}
+      {isEditModalOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/80 z-40"
+            onClick={() => setIsEditModalOpen(false)}
+          />
+
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+            <div className="bg-[#1a1a1a] w-full md:max-w-2xl md:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="sticky top-0 bg-[#1a1a1a] border-b border-[#2a2a2a] px-6 py-4 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white">Edit Profile</h2>
+                <button
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="text-[#a0a0a0] hover:text-white transition-colors"
+                >
+                  <i className="fa-solid fa-xmark text-2xl" />
+                </button>
+              </div>
+
+              {/* Form */}
+              <div className="p-6 space-y-6">
+                {/* Avatar */}
+                <div>
+                  <Label htmlFor="avatar" className="text-white">Avatar URL</Label>
                   <Input
                     id="avatar"
                     name="avatar"
@@ -221,156 +440,94 @@ export default function ProfilePage() {
                     value={formData.avatar}
                     onChange={handleChange}
                     placeholder="https://example.com/avatar.jpg"
-                    className="mt-1"
+                    className="mt-2 bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666666] focus:border-[#d62e1f]"
                   />
                 </div>
-              )}
-            </div>
 
-            {/* Role Badge */}
-            <div className="text-center">
-              <Badge className={getRoleBadgeColor(user.role)}>{user.role}</Badge>
-            </div>
-
-            {/* Email (read-only) */}
-            <div>
-              <Label>Email</Label>
-              <Input
-                type="email"
-                value={user.email || ''}
-                disabled
-                className="mt-1 bg-muted"
-              />
-              <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Edit Form Card */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>Update your personal details</CardDescription>
-              </div>
-              {!isEditing && (
-                <Button onClick={() => setIsEditing(true)} variant="outline">
-                  Edit Profile
-                </Button>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {error && (
-              <div className="mb-4 p-3 rounded-md bg-destructive/10 text-destructive text-sm">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+                {/* First Name */}
                 <div>
-                  <Label htmlFor="firstName">
-                    First Name <span className="text-destructive">*</span>
+                  <Label htmlFor="firstName" className="text-white">
+                    First Name <span className="text-[#d62e1f]">*</span>
                   </Label>
                   <Input
                     id="firstName"
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    disabled={!isEditing}
-                    className="mt-1"
+                    className="mt-2 bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666666] focus:border-[#d62e1f]"
                     required
                   />
                 </div>
+
+                {/* Last Name */}
                 <div>
-                  <Label htmlFor="lastName">
-                    Last Name <span className="text-destructive">*</span>
+                  <Label htmlFor="lastName" className="text-white">
+                    Last Name <span className="text-[#d62e1f]">*</span>
                   </Label>
                   <Input
                     id="lastName"
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    disabled={!isEditing}
-                    className="mt-1"
+                    className="mt-2 bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666666] focus:border-[#d62e1f]"
                     required
                   />
                 </div>
-              </div>
 
-              <div>
-                <Label htmlFor="faculty">Faculty</Label>
-                <Input
-                  id="faculty"
-                  name="faculty"
-                  value={formData.faculty}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="mt-1"
-                  placeholder="e.g., Computer Science"
-                />
-              </div>
-
-              {isEditing && (
-                <div className="flex gap-2 pt-4">
-                  <Button onClick={handleSave} disabled={saving}>
-                    {saving ? (
-                      <>
-                        <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      'Save Changes'
-                    )}
-                  </Button>
-                  <Button onClick={handleCancel} variant="outline" disabled={saving}>
-                    Cancel
-                  </Button>
+                {/* Faculty */}
+                <div>
+                  <Label htmlFor="faculty" className="text-white">Faculty</Label>
+                  <Input
+                    id="faculty"
+                    name="faculty"
+                    value={formData.faculty}
+                    onChange={handleChange}
+                    placeholder="e.g., Computer Science"
+                    className="mt-2 bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666666] focus:border-[#d62e1f]"
+                  />
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Additional Info Card */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Account Information</CardTitle>
-          <CardDescription>Additional account details</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label>Account Created</Label>
-              <p className="text-sm text-muted-foreground mt-1">
-                {user.createdAt
-                  ? new Date(user.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : 'N/A'}
-              </p>
-            </div>
-            <div>
-              <Label>Last Updated</Label>
-              <p className="text-sm text-muted-foreground mt-1">
-                {user.updatedAt
-                  ? new Date(user.updatedAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : 'N/A'}
-              </p>
+                {/* Email (read-only) */}
+                <div>
+                  <Label className="text-white">Email</Label>
+                  <Input
+                    type="email"
+                    value={user.email || ''}
+                    disabled
+                    className="mt-2 bg-[#0a0a0a] border-[#3a3a3a] text-[#a0a0a0] cursor-not-allowed"
+                  />
+                  <p className="text-xs text-[#666666] mt-1">Email cannot be changed</p>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="sticky bottom-0 bg-[#1a1a1a] border-t border-[#2a2a2a] p-6 flex gap-3">
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="flex-1 px-6 py-3 bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {saving ? (
+                    <>
+                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </button>
+                <button
+                  onClick={() => setIsEditModalOpen(false)}
+                  disabled={saving}
+                  className="px-6 py-3 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </>
+      )}
     </div>
   );
 }
-

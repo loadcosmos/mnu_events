@@ -82,8 +82,22 @@ export const LANGUAGES = {
   KK: 'kk',
 };
 
-// Brand colors
+// Brand colors - Dark Theme
 export const COLORS = {
-  PRIMARY: '#d62e1f',
+  PRIMARY: '#d62e1f', // MNU Red
   PRIMARY_DARK: '#b91c1c',
+  PRIMARY_LIGHT: '#ff4433',
+
+  // Dark theme backgrounds
+  BG_DARK: '#0a0a0a', // Very dark background
+  BG_CARD: '#1a1a1a', // Card background
+  BG_HOVER: '#252525', // Hover state
+
+  // Text colors
+  TEXT_PRIMARY: '#ffffff',
+  TEXT_SECONDARY: '#a0a0a0',
+  TEXT_MUTED: '#666666',
+
+  // Border
+  BORDER: '#2a2a2a',
 };
