@@ -7,7 +7,6 @@ import { Badge } from '../components/ui/badge';
 import QRScannerModal from '../components/QRScannerModal';
 import eventsService from '../services/eventsService';
 import registrationsService from '../services/registrationsService';
-import checkinService from '../services/checkinService';
 import { cn } from '../lib/utils';
 import { toast } from 'sonner';
 import { Camera, CheckCircle } from 'lucide-react';
@@ -26,7 +25,6 @@ export default function EventDetailsPage() {
   const [hasPaidTicket, setHasPaidTicket] = useState(false);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
-  const [checkInLoading, setCheckInLoading] = useState(false);
 
   useEffect(() => {
     loadEvent();
@@ -160,29 +158,6 @@ export default function EventDetailsPage() {
       console.error('[EventDetailsPage] Cancel registration failed:', err);
     } finally {
       setRegistering(false);
-    }
-  };
-
-  const handleStudentCheckIn = async (qrData) => {
-    try {
-      setCheckInLoading(true);
-      const data = JSON.parse(qrData);
-      const response = await checkinService.validateStudent(data);
-      
-      if (response.success) {
-        setHasCheckedIn(true);
-        toast.success('✅ Check-in successful!', {
-          description: 'Your attendance has been recorded.',
-        });
-      }
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Check-in failed';
-      toast.error('❌ Check-in failed', {
-        description: errorMessage,
-      });
-      throw error; // Re-throw to close modal only on success
-    } finally {
-      setCheckInLoading(false);
     }
   };
 
@@ -632,14 +607,6 @@ export default function EventDetailsPage() {
           />
         )}
       </div>
-
-      {/* QR Scanner Modal */}
-      <QRScannerModal
-        isOpen={showQRScanner}
-        onClose={() => setShowQRScanner(false)}
-        onScan={handleStudentCheckIn}
-        title="Scan Event QR Code"
-      />
     </div>
   );
 }
