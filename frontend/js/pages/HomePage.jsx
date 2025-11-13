@@ -276,23 +276,27 @@ export default function HomePage() {
                     ))}
                   </div>
 
-                  {/* Navigation Arrows */}
+                  {/* Navigation Arrows - Hidden on mobile */}
                   <button
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       setCurrentSlide(
                         (prev) => (prev - 1 + trendingEvents.length) % trendingEvents.length
-                      )
-                    }
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all"
+                      );
+                    }}
+                    className="hidden md:flex absolute left-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all items-center justify-center"
                     aria-label="Previous slide"
                   >
                     <i className="fa-solid fa-chevron-left text-xl" />
                   </button>
                   <button
-                    onClick={() =>
-                      setCurrentSlide((prev) => (prev + 1) % trendingEvents.length)
-                    }
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentSlide((prev) => (prev + 1) % trendingEvents.length);
+                    }}
+                    className="hidden md:flex absolute right-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all items-center justify-center"
                     aria-label="Next slide"
                   >
                     <i className="fa-solid fa-chevron-right text-xl" />

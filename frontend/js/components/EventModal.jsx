@@ -17,6 +17,17 @@ export default function EventModal({ eventId, isOpen, onClose }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Reset state when modal closes or eventId changes
+  useEffect(() => {
+    if (!isOpen || !eventId) {
+      setEvent(null);
+      setError('');
+      setIsRegistered(false);
+      setMyRegistration(null);
+      setRegistering(false);
+    }
+  }, [isOpen, eventId]);
+
   useEffect(() => {
     console.log('[EventModal] State changed:', { isOpen, eventId });
     if (isOpen && eventId) {
