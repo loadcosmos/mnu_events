@@ -11,12 +11,15 @@ import { Toaster } from './components/ui/sonner.jsx';
 
 // Pages
 import LoginPage from './pages/LoginPage.jsx';
-import HomePage from './pages/HomePage.jsx';
+import HomePage from './pages/HomePageNew.jsx'; // Updated to new version with tabs
 import EventsPage from './pages/EventsPage.jsx';
 import EventDetailsPage from './pages/EventDetailsPage.jsx';
 import MyRegistrationsPage from './pages/MyRegistrationsPage.jsx';
 import ClubsPage from './pages/ClubsPage.jsx';
 import ClubDetailsPage from './pages/ClubDetailsPage.jsx';
+import ServicesPage from './pages/ServicesPage.jsx';
+import TutoringPage from './pages/TutoringPage.jsx';
+import ServiceDetailsPage from './pages/ServiceDetailsPage.jsx';
 import OrganizerPage from './pages/OrganizerPage.jsx';
 import AdminLoginPage from './pages/AdminLoginPage.jsx';
 import VerifyEmailPage from './pages/VerifyEmailPage.jsx';
@@ -51,6 +54,11 @@ function App() {
           <Route path="/events/:id" element={<Layout><EventDetailsPage /></Layout>} />
           <Route path="/clubs" element={<Layout><ClubsPage /></Layout>} />
           <Route path="/clubs/:id" element={<Layout><ClubDetailsPage /></Layout>} />
+
+          {/* Services & Tutoring (Phase 3) */}
+          <Route path="/services" element={<Layout><ServicesPage /></Layout>} />
+          <Route path="/tutoring" element={<Layout><TutoringPage /></Layout>} />
+          <Route path="/services/:id" element={<Layout><ServiceDetailsPage /></Layout>} />
 
           {/* Защищенные маршруты для организаторов - требуют роль ORGANIZER */}
           <Route
