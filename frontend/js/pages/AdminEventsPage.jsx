@@ -113,8 +113,8 @@ export default function AdminEventsPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black mb-2">Manage Events</h1>
-          <p className="text-gray-600">Loading events...</p>
+          <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Events</h1>
+          <p className="text-gray-600 dark:text-gray-400">Loading events...</p>
         </div>
       </div>
     );
@@ -123,12 +123,12 @@ export default function AdminEventsPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black mb-2">Manage Events</h1>
-        <p className="text-gray-600">View and manage all platform events</p>
+        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Events</h1>
+        <p className="text-gray-600 dark:text-gray-400">View and manage all platform events</p>
       </div>
 
       {/* Filters */}
-      <Card className="mb-6 bg-white border border-gray-200">
+      <Card className="mb-6 liquid-glass-card rounded-2xl">
         <CardContent className="pt-6">
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -138,7 +138,7 @@ export default function AdminEventsPage() {
                   placeholder="Search events..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full"
+                  className="w-full rounded-xl"
                 />
               </div>
               <div>
@@ -148,7 +148,7 @@ export default function AdminEventsPage() {
                     setSelectedCategory(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-[#1a1a1a] dark:text-white"
                 >
                   {categories.map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -158,7 +158,7 @@ export default function AdminEventsPage() {
                 </select>
               </div>
             </div>
-            <Button type="submit" className="bg-red-600 hover:bg-red-700">
+            <Button type="submit" className="liquid-glass-red-button text-white rounded-2xl">
               Search
             </Button>
           </form>
@@ -167,29 +167,29 @@ export default function AdminEventsPage() {
 
       {/* Error */}
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600">{error}</p>
+        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4">
+          <p className="text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
       {/* Events List */}
       {events.length === 0 ? (
-        <Card className="bg-white border border-gray-200">
+        <Card className="liquid-glass-card rounded-2xl">
           <CardContent className="pt-6 text-center py-12">
-            <p className="text-gray-600">No events found</p>
+            <p className="text-gray-600 dark:text-gray-400">No events found</p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
           {events.map((event) => (
-            <Card key={event.id} className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
+            <Card key={event.id} className="liquid-glass-card rounded-2xl hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-xl font-semibold text-black mb-2">
+                    <CardTitle className="text-xl font-semibold text-black dark:text-white mb-2">
                       {event.title}
                     </CardTitle>
-                    <CardDescription className="text-gray-600 mb-3">
+                    <CardDescription className="text-gray-600 dark:text-gray-400 mb-3">
                       {event.description}
                     </CardDescription>
                     <div className="flex flex-wrap gap-2 mb-3">
@@ -203,7 +203,7 @@ export default function AdminEventsPage() {
                         Capacity: {event.capacity}
                       </Badge>
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
                       <p>Start: {formatDate(event.startDate)}</p>
                       <p>End: {formatDate(event.endDate)}</p>
                       {event.location && <p>Location: {event.location}</p>}
@@ -217,6 +217,7 @@ export default function AdminEventsPage() {
                     variant="outline"
                     size="sm"
                     asChild
+                    className="rounded-xl"
                   >
                     <Link to={`/events/${event.id}`}>View Details</Link>
                   </Button>
@@ -224,6 +225,7 @@ export default function AdminEventsPage() {
                     variant="destructive"
                     size="sm"
                     onClick={() => handleDelete(event.id, event.title)}
+                    className="rounded-xl"
                   >
                     Delete
                   </Button>
@@ -241,16 +243,18 @@ export default function AdminEventsPage() {
             variant="outline"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
+            className="rounded-xl"
           >
             Previous
           </Button>
-          <span className="flex items-center px-4 text-sm text-gray-600">
+          <span className="flex items-center px-4 text-sm text-gray-600 dark:text-gray-400">
             Page {page} of {totalPages}
           </span>
           <Button
             variant="outline"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
+            className="rounded-xl"
           >
             Next
           </Button>

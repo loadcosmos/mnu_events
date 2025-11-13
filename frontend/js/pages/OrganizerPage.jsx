@@ -106,58 +106,58 @@ export default function OrganizerPage() {
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black mb-2">Dashboard</h1>
-        <p className="text-gray-600">
-          Welcome back, <span className="font-semibold text-black">{user?.firstName || user?.email}</span>
+        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Welcome back, <span className="font-semibold text-black dark:text-white">{user?.firstName || user?.email}</span>
         </p>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="mb-6 p-4 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
+        <div className="mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm border border-red-200 dark:border-red-800">
           {error}
         </div>
       )}
 
       {/* KPI Cards - Red/White/Black */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="border border-gray-200 bg-white">
+        <Card className="liquid-glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <CardDescription className="text-gray-600">Total Events</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black">{stats.totalEvents}</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-400">Total Events</CardDescription>
+            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.totalEvents}</CardTitle>
           </CardHeader>
         </Card>
-        <Card className="border border-gray-200 bg-white">
+        <Card className="liquid-glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <CardDescription className="text-gray-600">Upcoming Events</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black">{stats.upcomingEvents}</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-400">Upcoming Events</CardDescription>
+            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.upcomingEvents}</CardTitle>
           </CardHeader>
         </Card>
-        <Card className="border border-gray-200 bg-white">
+        <Card className="liquid-glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <CardDescription className="text-gray-600">Total Registrations</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black">{stats.totalRegistrations}</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-400">Total Registrations</CardDescription>
+            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.totalRegistrations}</CardTitle>
           </CardHeader>
         </Card>
-        <Card className="border border-gray-200 bg-white">
+        <Card className="liquid-glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <CardDescription className="text-gray-600">Active Clubs</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black">{stats.activeClubs}</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-400">Active Clubs</CardDescription>
+            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.activeClubs}</CardTitle>
           </CardHeader>
         </Card>
       </div>
 
       {/* Upcoming Events Table - Admin Style */}
-      <Card className="border border-gray-200 bg-white">
-        <CardHeader className="border-b border-gray-200">
+      <Card className="liquid-glass-card rounded-2xl">
+        <CardHeader className="border-b border-gray-200 dark:border-white/10">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-xl font-bold text-black">Upcoming Events</CardTitle>
-              <CardDescription className="mt-1 text-gray-600">Manage your upcoming events</CardDescription>
+              <CardTitle className="text-xl font-bold text-black dark:text-white">Upcoming Events</CardTitle>
+              <CardDescription className="mt-1 text-gray-600 dark:text-gray-400">Manage your upcoming events</CardDescription>
             </div>
-            <Button 
+            <Button
               asChild
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="liquid-glass-red-button text-white rounded-2xl"
             >
               <Link to="/organizer/create-event">
                 Create Event
@@ -168,12 +168,12 @@ export default function OrganizerPage() {
         <CardContent className="pt-6">
           {upcomingEvents.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-lg font-semibold text-black mb-2">No upcoming events</p>
-              <p className="text-sm text-gray-600 mb-6">Get started by creating your first event</p>
-              <Button 
+              <p className="text-lg font-semibold text-black dark:text-white mb-2">No upcoming events</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Get started by creating your first event</p>
+              <Button
                 asChild
                 size="lg"
-                className="bg-red-600 hover:bg-red-700 text-white"
+                className="liquid-glass-red-button text-white rounded-2xl"
               >
                 <Link to="/organizer/create-event">Create Your First Event</Link>
               </Button>
@@ -190,22 +190,22 @@ export default function OrganizerPage() {
                   return (
                     <div
                       key={event.id}
-                      className="p-4 border border-gray-200 rounded-lg bg-white hover:border-gray-300 transition-colors"
+                      className="p-4 border border-gray-200 dark:border-white/10 rounded-2xl bg-white dark:bg-[#1a1a1a] hover:border-gray-300 dark:hover:border-white/20 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-black">
+                            <h3 className="text-lg font-semibold text-black dark:text-white">
                               {event.title}
                             </h3>
-                            <Badge 
+                            <Badge
                               variant={statusBadge.variant === 'default' ? 'default' : 'secondary'}
-                              className={statusBadge.variant === 'default' ? 'bg-red-600 text-white' : 'bg-gray-200 text-black'}
+                              className={statusBadge.variant === 'default' ? 'bg-red-600 text-white' : 'bg-gray-200 text-black dark:bg-gray-700 dark:text-white'}
                             >
                               {statusBadge.label}
                             </Badge>
                           </div>
-                          <p className="text-sm text-gray-600 mb-3">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                             {formatDate(event.startDate)} · {event.location}
                           </p>
                           <div className="space-y-2">
@@ -228,26 +228,26 @@ export default function OrganizerPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
+                          <Button
+                            variant="outline"
+                            size="sm"
                             asChild
-                            className="border-gray-300 hover:bg-gray-50"
+                            className="border-gray-300 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl"
                           >
                             <Link to={`/events/${event.id}`}>View</Link>
                           </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
+                          <Button
+                            variant="outline"
+                            size="sm"
                             asChild
-                            className="border-gray-300 hover:bg-gray-50"
+                            className="border-gray-300 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl"
                           >
                             <Link to={`/organizer/events/${event.id}/edit`}>Edit</Link>
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             asChild
-                            className="bg-red-600 hover:bg-red-700 text-white"
+                            className="liquid-glass-red-button text-white rounded-xl"
                           >
                             <Link to={`/events/${event.id}`}>Manage</Link>
                           </Button>
@@ -257,8 +257,8 @@ export default function OrganizerPage() {
                   );
                 })}
               </div>
-              <Button 
-                className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white" 
+              <Button
+                className="w-full mt-4 liquid-glass-red-button text-white rounded-2xl"
                 size="lg"
                 asChild
               >

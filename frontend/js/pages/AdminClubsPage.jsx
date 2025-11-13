@@ -102,8 +102,8 @@ export default function AdminClubsPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black mb-2">Manage Clubs</h1>
-          <p className="text-gray-600">Loading clubs...</p>
+          <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Clubs</h1>
+          <p className="text-gray-600 dark:text-gray-400">Loading clubs...</p>
         </div>
       </div>
     );
@@ -112,12 +112,12 @@ export default function AdminClubsPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black mb-2">Manage Clubs</h1>
-        <p className="text-gray-600">View and manage all student clubs</p>
+        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Clubs</h1>
+        <p className="text-gray-600 dark:text-gray-400">View and manage all student clubs</p>
       </div>
 
       {/* Filters */}
-      <Card className="mb-6 bg-white border border-gray-200">
+      <Card className="mb-6 liquid-glass-card rounded-2xl">
         <CardContent className="pt-6">
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -127,7 +127,7 @@ export default function AdminClubsPage() {
                   placeholder="Search clubs..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full"
+                  className="w-full rounded-xl"
                 />
               </div>
               <div>
@@ -137,7 +137,7 @@ export default function AdminClubsPage() {
                     setSelectedCategory(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-[#1a1a1a] dark:text-white"
                 >
                   {categories.map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -147,7 +147,7 @@ export default function AdminClubsPage() {
                 </select>
               </div>
             </div>
-            <Button type="submit" className="bg-red-600 hover:bg-red-700">
+            <Button type="submit" className="liquid-glass-red-button text-white rounded-2xl">
               Search
             </Button>
           </form>
@@ -156,22 +156,22 @@ export default function AdminClubsPage() {
 
       {/* Error */}
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600">{error}</p>
+        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4">
+          <p className="text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
       {/* Clubs List */}
       {clubs.length === 0 ? (
-        <Card className="bg-white border border-gray-200">
+        <Card className="liquid-glass-card rounded-2xl">
           <CardContent className="pt-6 text-center py-12">
-            <p className="text-gray-600">No clubs found</p>
+            <p className="text-gray-600 dark:text-gray-400">No clubs found</p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
           {clubs.map((club) => (
-            <Card key={club.id} className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
+            <Card key={club.id} className="liquid-glass-card rounded-2xl hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -180,21 +180,21 @@ export default function AdminClubsPage() {
                         <img
                           src={club.imageUrl}
                           alt={club.name}
-                          className="w-16 h-16 rounded-lg object-cover"
+                          className="w-16 h-16 rounded-2xl object-cover"
                           onError={(e) => {
                             e.target.style.display = 'none';
                           }}
                         />
                       ) : (
-                        <div className="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center text-gray-400">
+                        <div className="w-16 h-16 rounded-2xl bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400">
                           <i className="fa-solid fa-users text-2xl"></i>
                         </div>
                       )}
                       <div className="flex-1">
-                        <CardTitle className="text-xl font-semibold text-black mb-1">
+                        <CardTitle className="text-xl font-semibold text-black dark:text-white mb-1">
                           {club.name}
                         </CardTitle>
-                        <CardDescription className="text-gray-600">
+                        <CardDescription className="text-gray-600 dark:text-gray-400">
                           {club.description}
                         </CardDescription>
                       </div>
@@ -221,6 +221,7 @@ export default function AdminClubsPage() {
                     variant="outline"
                     size="sm"
                     asChild
+                    className="rounded-xl"
                   >
                     <Link to={`/clubs/${club.id}`}>View Details</Link>
                   </Button>
@@ -228,6 +229,7 @@ export default function AdminClubsPage() {
                     variant="destructive"
                     size="sm"
                     onClick={() => handleDelete(club.id, club.name)}
+                    className="rounded-xl"
                   >
                     Delete
                   </Button>
@@ -245,16 +247,18 @@ export default function AdminClubsPage() {
             variant="outline"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
+            className="rounded-xl"
           >
             Previous
           </Button>
-          <span className="flex items-center px-4 text-sm text-gray-600">
+          <span className="flex items-center px-4 text-sm text-gray-600 dark:text-gray-400">
             Page {page} of {totalPages}
           </span>
           <Button
             variant="outline"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
+            className="rounded-xl"
           >
             Next
           </Button>

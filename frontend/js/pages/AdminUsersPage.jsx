@@ -106,8 +106,8 @@ export default function AdminUsersPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black mb-2">Manage Users</h1>
-          <p className="text-gray-600">Loading users...</p>
+          <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Users</h1>
+          <p className="text-gray-600 dark:text-gray-400">Loading users...</p>
         </div>
       </div>
     );
@@ -116,12 +116,12 @@ export default function AdminUsersPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black mb-2">Manage Users</h1>
-        <p className="text-gray-600">View and manage user accounts</p>
+        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Users</h1>
+        <p className="text-gray-600 dark:text-gray-400">View and manage user accounts</p>
       </div>
 
       {/* Filters */}
-      <Card className="mb-6 bg-white border border-gray-200">
+      <Card className="mb-6 liquid-glass-card rounded-2xl">
         <CardContent className="pt-6">
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -131,7 +131,7 @@ export default function AdminUsersPage() {
                   placeholder="Search users by name or email..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full"
+                  className="w-full rounded-xl"
                 />
               </div>
               <div>
@@ -142,7 +142,7 @@ export default function AdminUsersPage() {
                     setPage(1);
                     loadUsers();
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-[#1a1a1a] dark:text-white"
                 >
                   {roles.map((role) => (
                     <option key={role.value} value={role.value}>
@@ -152,7 +152,7 @@ export default function AdminUsersPage() {
                 </select>
               </div>
             </div>
-            <Button type="submit" className="bg-red-600 hover:bg-red-700">
+            <Button type="submit" className="liquid-glass-red-button text-white rounded-2xl">
               Search
             </Button>
           </form>
@@ -161,34 +161,34 @@ export default function AdminUsersPage() {
 
       {/* Error */}
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600">{error}</p>
+        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4">
+          <p className="text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
       {/* Users List */}
       {users.length === 0 ? (
-        <Card className="bg-white border border-gray-200">
+        <Card className="liquid-glass-card rounded-2xl">
           <CardContent className="pt-6 text-center py-12">
-            <p className="text-gray-600">No users found</p>
+            <p className="text-gray-600 dark:text-gray-400">No users found</p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
           {users.map((user) => (
-            <Card key={user.id} className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
+            <Card key={user.id} className="liquid-glass-card rounded-2xl hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold text-lg">
+                      <div className="w-12 h-12 rounded-full bg-red-600 dark:bg-red-700 flex items-center justify-center text-white font-semibold text-lg">
                         {user.firstName?.[0] || user.email?.[0]?.toUpperCase()}
                       </div>
                       <div>
-                        <CardTitle className="text-xl font-semibold text-black">
+                        <CardTitle className="text-xl font-semibold text-black dark:text-white">
                           {user.firstName} {user.lastName}
                         </CardTitle>
-                        <CardDescription className="text-gray-600">
+                        <CardDescription className="text-gray-600 dark:text-gray-400">
                           {user.email}
                         </CardDescription>
                       </div>
@@ -220,7 +220,7 @@ export default function AdminUsersPage() {
                   <select
                     value={user.role}
                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                    className="px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600 text-sm"
+                    className="px-3 py-1.5 border border-gray-300 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 text-sm dark:bg-[#1a1a1a] dark:text-white"
                   >
                     {roles.filter((r) => r.value).map((role) => (
                       <option key={role.value} value={role.value}>
@@ -232,6 +232,7 @@ export default function AdminUsersPage() {
                     variant="destructive"
                     size="sm"
                     onClick={() => handleDelete(user.id, user.email)}
+                    className="rounded-xl"
                   >
                     Delete
                   </Button>
@@ -249,16 +250,18 @@ export default function AdminUsersPage() {
             variant="outline"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
+            className="rounded-xl"
           >
             Previous
           </Button>
-          <span className="flex items-center px-4 text-sm text-gray-600">
+          <span className="flex items-center px-4 text-sm text-gray-600 dark:text-gray-400">
             Page {page} of {totalPages}
           </span>
           <Button
             variant="outline"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
+            className="rounded-xl"
           >
             Next
           </Button>
