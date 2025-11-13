@@ -115,6 +115,18 @@ export default function Layout({ children }) {
   ];
 
   const isHomePage = location.pathname === '/';
+  
+  // Определяем, должны ли элементы быть белыми (когда hero section виден в светлом режиме)
+  const isHeroVisible = isHomePage && !isScrolled && !isDark;
+  const textColorClass = isHeroVisible 
+    ? 'text-white' 
+    : 'text-gray-800 dark:text-white';
+  const iconColorClass = isHeroVisible 
+    ? 'text-white' 
+    : 'text-gray-800 dark:text-white';
+  const hoverClass = isHeroVisible
+    ? 'hover:bg-white/20'
+    : 'hover:bg-gray-200/50 dark:hover:bg-white/10';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
@@ -133,7 +145,7 @@ export default function Layout({ children }) {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="rounded-xl text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 transition-all"
+              className={`rounded-xl ${iconColorClass} ${hoverClass} transition-all`}
               aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
             >
               {isDark ? (
@@ -149,11 +161,11 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="default"
                 onClick={() => setLangOpen(!langOpen)}
-                className="rounded-xl gap-2 text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 text-base transition-all"
+                className={`rounded-xl gap-2 ${textColorClass} ${hoverClass} text-base transition-all`}
               >
                 {selectedLang}
                 <i
-                  className={`fa-solid fa-chevron-down text-xs transition-transform ${
+                  className={`fa-solid fa-chevron-down text-xs transition-transform ${iconColorClass} ${
                     langOpen ? 'rotate-180' : ''
                   }`}
                 />
@@ -185,7 +197,7 @@ export default function Layout({ children }) {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="rounded-xl text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 transition-all"
+              className={`rounded-xl ${iconColorClass} ${hoverClass} transition-all`}
               aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
             >
               {isDark ? (
@@ -216,7 +228,7 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="default"
                 asChild
-                className="rounded-xl text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 text-base transition-all"
+                className={`rounded-xl ${textColorClass} ${hoverClass} text-base transition-all`}
               >
                 <Link to="/events">Events</Link>
               </Button>
@@ -224,7 +236,7 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="default"
                 asChild
-                className="rounded-xl text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 text-base transition-all"
+                className={`rounded-xl ${textColorClass} ${hoverClass} text-base transition-all`}
               >
                 <Link to="/clubs">Clubs</Link>
               </Button>
@@ -240,14 +252,14 @@ export default function Layout({ children }) {
                       variant="ghost"
                       size="default"
                       onClick={() => setProfileOpen(!profileOpen)}
-                      className="rounded-xl gap-2 text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 text-base transition-all"
+                      className={`rounded-xl gap-2 ${textColorClass} ${hoverClass} text-base transition-all`}
                     >
-                      <i className="fa-regular fa-circle-user text-lg" />
+                      <i className={`fa-regular fa-circle-user text-lg ${iconColorClass}`} />
                       <span className="hidden sm:inline">
                         {user?.firstName || user?.email}
                       </span>
                       <i
-                        className={`fa-solid fa-chevron-down text-xs transition-transform ${
+                        className={`fa-solid fa-chevron-down text-xs transition-transform ${iconColorClass} ${
                           profileOpen ? 'rotate-180' : ''
                         }`}
                       />
