@@ -5,7 +5,6 @@ import eventsService from '../services/eventsService';
 import clubsService from '../services/clubsService';
 import TabNavigation from '../components/TabNavigation';
 import AdBanner from '../components/AdBanner';
-import HeroCarousel from '../components/HeroCarousel';
 import ServiceCard from '../components/ServiceCard';
 import NativeAd from '../components/NativeAd';
 import EventModal from '../components/EventModal';
@@ -98,6 +97,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [modalEventId, setModalEventId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Redirect organizers and admins
   useEffect(() => {
@@ -114,6 +114,17 @@ export default function HomePage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Auto-advance slides every 5 seconds
+  useEffect(() => {
+    if (events.length === 0) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % Math.min(events.length, 6));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [events.length]);
 
   const loadData = async () => {
     try {
@@ -154,33 +165,6 @@ export default function HomePage() {
       setLoading(false);
     }
   };
-
-  // Prepare hero carousel slides
-  const heroSlides = events.slice(0, 5).map((event) => ({
-    id: event.id,
-    title: event.title,
-    description: event.description?.substring(0, 150) + '...',
-    imageUrl: event.imageUrl || 'https://via.placeholder.com/1200x500?text=Event',
-    buttonText: 'Узнать больше',
-    onClick: () => openEventModal(event.id),
-  }));
-
-  // Insert ad slide every 3rd position
-  if (mockAds.find((ad) => ad.position === 'HERO_SLIDE')) {
-    heroSlides.splice(
-      2,
-      0,
-      {
-        id: 'ad-hero',
-        title: 'Специальное предложение',
-        description: 'Размещайте рекламу на MNU Events',
-        imageUrl: 'https://via.placeholder.com/1200x500?text=Advertisement',
-        buttonText: 'Узнать больше',
-        isAd: true,
-        onClick: () => window.open('https://kazguu.kz', '_blank'),
-      }
-    );
-  }
 
   const openEventModal = (eventId) => {
     setModalEventId(eventId);
@@ -261,16 +245,125 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
+      {/* Hero Section - Event Slider */}
+      <section className="relative h-screen -mt-20 pt-20 bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 dark:from-[#0a0a0a] dark:via-[#1a1a1a] dark:to-[#0a0a0a] transition-colors duration-300">
+        {loading ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center text-gray-900 dark:text-white">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#d62e1f] mb-4"></div>
+              <p className="text-xl">Loading events...</p>
+            </div>
+          </div>
+        ) : events.length === 0 ? (
+          <>
+            <div className="absolute inset-0 bg-[url('/images/backg.jpg')] bg-cover bg-center opacity-20 dark:opacity-20" />
+            <div className="relative z-10 flex flex-col items-center justify-center h-full px-4">
+              <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white mb-6 text-center">
+                Discover <span className="text-[#d62e1f]">Events</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-600 dark:text-[#a0a0a0] mb-8 max-w-2xl text-center">
+                Join the best university events at MNU
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            {events.slice(0, 6).map((event, index) => {
+              const isActive = index === currentSlide;
+              const imageUrl = event.imageUrl || '/images/backg.jpg';
+
+              return (
+                <div
+                  key={event.id}
+                  className={`absolute inset-0 transition-opacity duration-1000 ${
+                    isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  }`}
+                >
+                  <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${imageUrl})` }}
+                  >
+                    <div className="absolute inset-0 bg-black/50" />
+                  </div>
+
+                  <div className="relative z-10 flex flex-col items-center justify-center h-full px-4">
+                    <div className="max-w-4xl text-center space-y-6">
+                      <span className="inline-block bg-[#d62e1f] text-white px-4 py-2 rounded-full text-sm font-bold uppercase">
+                        {event.category}
+                      </span>
+                      <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight">
+                        {event.title}
+                      </h1>
+                      <p className="text-lg md:text-xl text-[#e0e0e0] max-w-2xl mx-auto line-clamp-2">
+                        {event.description || 'Join us for an amazing event!'}
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-6 text-sm md:text-base text-white">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-5 h-5" />
+                          <span>{formatDate(event.startDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-5 h-5" />
+                          <span>{event.location}</span>
+                        </div>
+                      </div>
+                      <div className="hidden md:flex justify-center pt-4">
+                        <button
+                          type="button"
+                          onClick={() => openEventModal(event.id)}
+                          className="liquid-glass-red-button px-8 py-4 text-white rounded-2xl font-bold text-base"
+                        >
+                          Learn More
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+                    {events.slice(0, 6).map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentSlide(idx)}
+                        className={`h-3 rounded-full transition-all ${
+                          idx === currentSlide
+                            ? 'bg-[#d62e1f] w-8'
+                            : 'liquid-glass-subtle hover:liquid-glass w-3'
+                        }`}
+                        aria-label={`Go to slide ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      setCurrentSlide((prev) => (prev - 1 + 6) % Math.min(events.length, 6))
+                    }
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all"
+                    aria-label="Previous slide"
+                  >
+                    <i className="fa-solid fa-chevron-left text-xl" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentSlide((prev) => (prev + 1) % Math.min(events.length, 6))}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all"
+                    aria-label="Next slide"
+                  >
+                    <i className="fa-solid fa-chevron-right text-xl" />
+                  </button>
+                </div>
+              );
+            })}
+          </>
+        )}
+      </section>
+
       {/* Top Banner Ad */}
       {mockAds.find((ad) => ad.position === 'TOP_BANNER') && (
-        <AdBanner ad={mockAds.find((ad) => ad.position === 'TOP_BANNER')} position="TOP_BANNER" />
+        <div className="bg-gray-100 dark:bg-[#0a0a0a] py-4">
+          <AdBanner ad={mockAds.find((ad) => ad.position === 'TOP_BANNER')} position="TOP_BANNER" />
+        </div>
       )}
-
-      {/* Hero Carousel */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <HeroCarousel slides={heroSlides} />
-      </div>
 
       {/* Tab Navigation */}
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
@@ -305,10 +398,10 @@ function EventCard({ event, onClick }) {
       onClick={onClick}
       className="
         group cursor-pointer
-        bg-white/80 dark:bg-gray-800/80
+        bg-white/80 dark:bg-[#1a1a1a]/80
         backdrop-blur-xl rounded-2xl overflow-hidden
-        border border-gray-200/50 dark:border-gray-700/50
-        hover:border-purple-500/50 dark:hover:border-purple-500/50
+        border border-gray-200/50 dark:border-[#2a2a2a]/50
+        hover:border-[#d62e1f]/50 dark:hover:border-[#d62e1f]/50
         shadow-lg hover:shadow-xl
         transform hover:-translate-y-1
         transition-all duration-300
@@ -364,10 +457,10 @@ function ClubCard({ club, onClick }) {
       onClick={onClick}
       className="
         group cursor-pointer
-        bg-white/80 dark:bg-gray-800/80
+        bg-white/80 dark:bg-[#1a1a1a]/80
         backdrop-blur-xl rounded-2xl overflow-hidden
-        border border-gray-200/50 dark:border-gray-700/50
-        hover:border-purple-500/50 dark:hover:border-purple-500/50
+        border border-gray-200/50 dark:border-[#2a2a2a]/50
+        hover:border-[#d62e1f]/50 dark:hover:border-[#d62e1f]/50
         shadow-lg hover:shadow-xl
         transform hover:-translate-y-1
         transition-all duration-300
