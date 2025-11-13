@@ -20,6 +20,7 @@ export default function EventDetailsPage() {
   const [registering, setRegistering] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [myRegistration, setMyRegistration] = useState(null);
+  const [hasPaidTicket, setHasPaidTicket] = useState(false);
 
   useEffect(() => {
     loadEvent();
@@ -90,6 +91,45 @@ export default function EventDetailsPage() {
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Registration failed');
       console.error('[EventDetailsPage] Register failed:', err);
+    } finally {
+      setRegistering(false);
+    }
+  };
+
+  const handleBuyTicket = async () => {
+    if (!isAuthenticated()) {
+      navigate('/login', { state: { from: { pathname: `/events/${id}` } } });
+      return;
+    }
+
+    try {
+      setRegistering(true);
+
+      toast.info('Redirecting to payment gateway...', {
+        description: 'You will be redirected to complete your purchase.',
+      });
+
+      // Generate a unique transaction ID (in real implementation, this would come from backend)
+      const transactionId = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+      // TODO Phase 4 Backend: Call backend to create payment
+      // const { transactionId, paymentUrl } = await paymentsService.createPayment(id, event.price);
+      // window.location.href = paymentUrl; // For real payment providers (Kaspi)
+
+      // For now, navigate to our mock payment page
+      const paymentParams = new URLSearchParams({
+        eventTitle: event.title,
+        eventDate: event.startDate,
+        amount: event.price.toString(),
+        eventId: event.id,
+      });
+
+      navigate(`/mock-payment/${transactionId}?${paymentParams.toString()}`);
+    } catch (err) {
+      toast.error('Failed to initiate payment', {
+        description: err.message || 'Unable to process your request. Please try again.',
+      });
+      console.error('[EventDetailsPage] Buy ticket failed:', err);
     } finally {
       setRegistering(false);
     }
@@ -336,53 +376,133 @@ export default function EventDetailsPage() {
                   )}
                 </div>
 
+                {/* Price Section for Paid Events */}
+                {event.isPaid && (
+                  <div className="space-y-4">
+                    <div className="p-6 rounded-2xl bg-gradient-to-br from-[#d62e1f]/5 to-[#d62e1f]/10 border-2 border-[#d62e1f]/20 transition-all duration-300">
+                      <div className="flex items-baseline justify-between mb-4">
+                        <div>
+                          <p className="text-sm text-gray-600 dark:text-[#a0a0a0] mb-1 transition-colors duration-300">Ticket Price</p>
+                          <p className="text-4xl font-bold text-gray-900 dark:text-white transition-colors duration-300">{event.price}₸</p>
+                        </div>
+                        <Badge className="bg-[#d62e1f] text-white border-none hover:bg-[#d62e1f]/90 transition-colors duration-300">
+                          Paid Event
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Charity donation</span>
+                          <span className="font-medium text-gray-900 dark:text-white transition-colors duration-300">{(event.price - (event.platformFee || 0))}₸</span>
+                        </div>
+                        {event.platformFee > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Platform fee</span>
+                            <span className="font-medium text-gray-900 dark:text-white transition-colors duration-300">{event.platformFee}₸</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                          <i className="fa-solid fa-users" />
+                          <span>{isFull ? 'Sold out' : `${event.availableSeats} tickets left`}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Registration Status */}
-                {isRegistered && myRegistration && (
-                  <div className="p-4 rounded-md bg-green-50 border border-green-200">
-                    <p className="text-base md:text-lg font-semibold text-green-800">
+                {!event.isPaid && isRegistered && myRegistration && (
+                  <div className="p-4 rounded-md bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 transition-colors duration-300">
+                    <p className="text-base md:text-lg font-semibold text-green-800 dark:text-green-400 transition-colors duration-300">
                       ✓ You are registered
                     </p>
                     {myRegistration.status === 'WAITLIST' && (
-                      <p className="text-sm md:text-base text-green-600 mt-1">
+                      <p className="text-sm md:text-base text-green-600 dark:text-green-500 mt-1 transition-colors duration-300">
                         You are on the waitlist
                       </p>
                     )}
                   </div>
                 )}
 
+                {/* Ticket Status for Paid Events */}
+                {event.isPaid && hasPaidTicket && (
+                  <div className="p-4 rounded-md bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 transition-colors duration-300">
+                    <p className="text-base md:text-lg font-semibold text-green-800 dark:text-green-400 transition-colors duration-300">
+                      ✓ Ticket purchased
+                    </p>
+                    <Link
+                      to="/registrations"
+                      className="text-sm md:text-base text-green-600 dark:text-green-500 hover:underline mt-1 inline-block transition-colors duration-300"
+                    >
+                      View your ticket →
+                    </Link>
+                  </div>
+                )}
+
                 {/* Action Buttons - только для студентов */}
                 {!isPast && user?.role === 'STUDENT' && (
                   <div className="space-y-3 pt-4">
-                    {isRegistered ? (
-                      <Button
-                        variant="outline"
-                        className="w-full text-base md:text-lg py-6"
-                        onClick={handleCancelRegistration}
-                        disabled={registering}
-                      >
-                        {registering ? 'Cancelling...' : 'Cancel Registration'}
-                      </Button>
+                    {event.isPaid ? (
+                      /* Paid Event Actions */
+                      hasPaidTicket ? (
+                        <Button
+                          variant="outline"
+                          className="w-full text-base md:text-lg py-6 transition-all duration-300"
+                          onClick={() => navigate('/registrations')}
+                        >
+                          View My Ticket
+                        </Button>
+                      ) : (
+                        <Button
+                          className="w-full text-base md:text-lg py-6 liquid-glass-red-button text-white transition-all duration-300"
+                          onClick={handleBuyTicket}
+                          disabled={registering || isFull || !isAuthenticated()}
+                        >
+                          {registering
+                            ? 'Processing...'
+                            : !isAuthenticated()
+                            ? 'Login to Buy Ticket'
+                            : isFull
+                            ? 'Sold Out'
+                            : 'Buy Ticket'}
+                        </Button>
+                      )
                     ) : (
-                      <Button
-                        className="w-full text-base md:text-lg py-6"
-                        onClick={handleRegister}
-                        disabled={registering || isFull || !isAuthenticated()}
-                      >
-                        {registering
-                          ? 'Registering...'
-                          : !isAuthenticated()
-                          ? 'Login to Register'
-                          : isFull
-                          ? 'Event Full'
-                          : 'Register for Event'}
-                      </Button>
+                      /* Free Event Actions */
+                      isRegistered ? (
+                        <Button
+                          variant="outline"
+                          className="w-full text-base md:text-lg py-6 transition-all duration-300"
+                          onClick={handleCancelRegistration}
+                          disabled={registering}
+                        >
+                          {registering ? 'Cancelling...' : 'Cancel Registration'}
+                        </Button>
+                      ) : (
+                        <Button
+                          className="w-full text-base md:text-lg py-6 liquid-glass-red-button text-white transition-all duration-300"
+                          onClick={handleRegister}
+                          disabled={registering || isFull || !isAuthenticated()}
+                        >
+                          {registering
+                            ? 'Registering...'
+                            : !isAuthenticated()
+                            ? 'Login to Register'
+                            : isFull
+                            ? 'Event Full'
+                            : 'Register for Event'}
+                        </Button>
+                      )
                     )}
                     {!isAuthenticated() && (
-                      <p className="text-sm md:text-base text-center text-muted-foreground">
-                        <Link to="/login" className="text-primary hover:underline font-medium">
+                      <p className="text-sm md:text-base text-center text-muted-foreground transition-colors duration-300">
+                        <Link to="/login" className="text-[#d62e1f] hover:underline font-medium transition-colors duration-300">
                           Sign in
                         </Link>{' '}
-                        to register for this event
+                        to {event.isPaid ? 'buy a ticket' : 'register'} for this event
                       </p>
                     )}
                   </div>

@@ -2,17 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/ui/input';
+import { Badge } from '../components/ui/badge';
 import registrationsService from '../services/registrationsService';
+import paymentsService from '../services/paymentsService';
 import EventModal from '../components/EventModal';
 import FilterSheet from '../components/FilterSheet';
+import TicketView from '../components/TicketView';
 import { formatDate } from '../utils/dateFormatters';
 import { toast } from 'sonner';
+import { cn } from '../lib/utils';
 
 export default function MyRegistrationsPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
+  const [activeTab, setActiveTab] = useState('registrations'); // 'registrations' or 'tickets'
   const [registrations, setRegistrations] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('ALL');
@@ -30,9 +36,13 @@ export default function MyRegistrationsPage() {
       navigate('/login', { state: { from: { pathname: '/registrations' } } });
       return;
     }
-    loadRegistrations();
+    loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
+
+  const loadData = async () => {
+    await Promise.all([loadRegistrations(), loadTickets()]);
+  };
 
   const loadRegistrations = async () => {
     try {
@@ -46,6 +56,20 @@ export default function MyRegistrationsPage() {
       console.error('[MyRegistrationsPage] Load registrations failed:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadTickets = async () => {
+    try {
+      // TODO Phase 4: Implement backend API
+      // For now, use mock data or skip
+      // const response = await paymentsService.getMyTickets();
+      // const data = Array.isArray(response) ? response : (response.data || response.tickets || []);
+      // setTickets(data);
+      setTickets([]); // Mock empty for now
+    } catch (err) {
+      console.error('[MyRegistrationsPage] Load tickets failed:', err);
+      setTickets([]);
     }
   };
 
@@ -133,13 +157,49 @@ export default function MyRegistrationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
-      {/* Hero Section (Not Sticky) */}
+      {/* Hero Section with Tabs (Not Sticky) */}
       <div className="py-12 px-4 border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
-            My <span className="text-[#d62e1f]">Registrations</span>
+            My <span className="text-[#d62e1f]">{activeTab === 'registrations' ? 'Registrations' : 'Tickets'}</span>
           </h1>
-          <p className="text-xl text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">View and manage your event registrations</p>
+          <p className="text-xl text-gray-600 dark:text-[#a0a0a0] mb-6 transition-colors duration-300">
+            {activeTab === 'registrations' ? 'View and manage your event registrations' : 'View your purchased tickets'}
+          </p>
+
+          {/* Tabs */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab('registrations')}
+              className={cn(
+                "px-6 py-3 rounded-xl font-medium transition-all duration-300",
+                activeTab === 'registrations'
+                  ? "liquid-glass-red-button text-white"
+                  : "bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-[#a0a0a0] hover:bg-gray-100 dark:hover:bg-[#2a2a2a] border border-gray-200 dark:border-[#2a2a2a]"
+              )}
+            >
+              <i className="fa-regular fa-calendar-check mr-2" />
+              Registrations
+              <Badge className="ml-2 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white border-none">
+                {registrations.length}
+              </Badge>
+            </button>
+            <button
+              onClick={() => setActiveTab('tickets')}
+              className={cn(
+                "px-6 py-3 rounded-xl font-medium transition-all duration-300",
+                activeTab === 'tickets'
+                  ? "liquid-glass-red-button text-white"
+                  : "bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-[#a0a0a0] hover:bg-gray-100 dark:hover:bg-[#2a2a2a] border border-gray-200 dark:border-[#2a2a2a]"
+              )}
+            >
+              <i className="fa-solid fa-ticket mr-2" />
+              My Tickets
+              <Badge className="ml-2 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white border-none">
+                {tickets.length}
+              </Badge>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -203,28 +263,30 @@ export default function MyRegistrationsPage() {
         )}
       </div>
 
-      {/* Desktop: Non-Sticky Filter Buttons */}
-      <div className="hidden md:block py-6 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap gap-2">
-            {filters.map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setSelectedFilter(filter)}
-                className={`px-4 py-2 rounded-full font-semibold transition-colors ${
-                  selectedFilter === filter
-                    ? 'liquid-glass-red-button text-white'
-                    : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
+      {/* Desktop: Non-Sticky Filter Buttons - Only show for registrations tab */}
+      {activeTab === 'registrations' && (
+        <div className="hidden md:block py-6 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-wrap gap-2">
+              {filters.map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setSelectedFilter(filter)}
+                  className={`px-4 py-2 rounded-full font-semibold transition-colors ${
+                    selectedFilter === filter
+                      ? 'liquid-glass-red-button text-white'
+                      : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Registrations Grid */}
+      {/* Content Grid */}
       <div className="py-8 px-4">
         <div className="max-w-7xl mx-auto">
           {error && (
@@ -240,6 +302,39 @@ export default function MyRegistrationsPage() {
             <div className="flex items-center justify-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 dark:border-[#2a2a2a] border-t-[#d62e1f]"></div>
             </div>
+          ) : activeTab === 'tickets' ? (
+            /* Tickets Tab */
+            tickets.length === 0 ? (
+              <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+                <i className="fa-solid fa-ticket text-5xl text-gray-400 dark:text-[#666666] mb-6 transition-colors duration-300"></i>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">No tickets found</h3>
+                <p className="text-gray-600 dark:text-[#a0a0a0] mb-6 transition-colors duration-300">
+                  You haven't purchased any tickets yet
+                </p>
+                <Link
+                  to="/events"
+                  className="inline-flex items-center gap-2 px-6 py-3 liquid-glass-red-button text-white font-semibold rounded-2xl"
+                >
+                  Browse Paid Events
+                  <i className="fa-solid fa-arrow-right" />
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                    Showing <span className="font-semibold text-gray-900 dark:text-white transition-colors duration-300">{tickets.length}</span>{' '}
+                    {tickets.length === 1 ? 'ticket' : 'tickets'}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {tickets.map((ticket) => (
+                    <TicketView key={ticket.id} ticket={ticket} />
+                  ))}
+                </div>
+              </>
+            )
           ) : sortedRegistrations.length === 0 ? (
             <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
               <i className="fa-regular fa-calendar-xmark text-5xl text-gray-400 dark:text-[#666666] mb-6 transition-colors duration-300"></i>
