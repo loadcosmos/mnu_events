@@ -30,6 +30,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
 import AdminEventsPage from './pages/AdminEventsPage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import AdminClubsPage from './pages/AdminClubsPage.jsx';
+import MockPaymentPage from './pages/MockPaymentPage.jsx';
 
 /**
  * Главный компонент приложения
@@ -47,6 +48,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/mock-payment/:transactionId" element={<MockPaymentPage />} />
           
           {/* Публичные маршруты с Layout */}
           <Route path="/" element={<Layout><HomePage /></Layout>} />
