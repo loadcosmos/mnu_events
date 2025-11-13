@@ -237,19 +237,11 @@ export default function OrganizerPage() {
                             <Link to={`/events/${event.id}`}>View</Link>
                           </Button>
                           <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                            className="border-gray-300 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl"
-                          >
-                            <Link to={`/organizer/events/${event.id}/edit`}>Edit</Link>
-                          </Button>
-                          <Button
                             size="sm"
                             asChild
                             className="liquid-glass-red-button text-white rounded-xl"
                           >
-                            <Link to={`/events/${event.id}`}>Manage</Link>
+                            <Link to={`/organizer/events/${event.id}/edit`}>Manage</Link>
                           </Button>
                         </div>
                       </div>

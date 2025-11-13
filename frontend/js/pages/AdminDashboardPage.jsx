@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import eventsService from '../services/eventsService';
@@ -158,18 +159,18 @@ export default function AdminDashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300">
+            <Link to="/admin/events" className="p-4 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 hover:border-[#d62e1f] transition-all duration-300 cursor-pointer">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-300">Manage Events</h3>
               <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">View and manage all platform events</p>
-            </div>
-            <div className="p-4 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300">
+            </Link>
+            <Link to="/admin/users" className="p-4 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 hover:border-[#d62e1f] transition-all duration-300 cursor-pointer">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-300">Manage Users</h3>
               <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">View and manage user accounts</p>
-            </div>
-            <div className="p-4 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300">
+            </Link>
+            <Link to="/admin/clubs" className="p-4 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 hover:border-[#d62e1f] transition-all duration-300 cursor-pointer">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-300">Manage Clubs</h3>
               <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">View and manage student clubs</p>
-            </div>
+            </Link>
           </div>
         </CardContent>
       </Card>
