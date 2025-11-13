@@ -9,6 +9,10 @@ import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
 import { RegistrationsModule } from './registrations/registrations.module';
 import { ClubsModule } from './clubs/clubs.module';
+import { PaymentsModule } from './payments/payments.module';
+import { CheckinModule } from './checkin/checkin.module';
+import { ServicesModule } from './services/services.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -32,6 +36,10 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     EventsModule,
     RegistrationsModule,
     ClubsModule,
+    PaymentsModule,
+    CheckinModule,
+    ServicesModule,
+    AnalyticsModule,
   ],
   providers: [
     {

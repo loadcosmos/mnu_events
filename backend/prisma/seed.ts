@@ -1,4 +1,16 @@
-import { PrismaClient, Role, Category, EventStatus, ClubCategory } from '@prisma/client';
+import {
+  PrismaClient,
+  Role,
+  Category,
+  EventStatus,
+  ClubCategory,
+  ServiceType,
+  ServiceCategory,
+  PriceType,
+  AdPosition,
+  TicketStatus,
+  CheckInMode,
+} from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -7,8 +19,14 @@ async function main() {
   console.log('🌱 Starting database seed...');
 
   // Clean database
+  await prisma.checkIn.deleteMany({});
+  await prisma.ticket.deleteMany({});
+  await prisma.advertisement.deleteMany({});
+  await prisma.service.deleteMany({});
   await prisma.registration.deleteMany({});
   await prisma.event.deleteMany({});
+  await prisma.clubMembership.deleteMany({});
+  await prisma.club.deleteMany({});
   await prisma.user.deleteMany({});
 
   console.log('✅ Database cleaned');
@@ -255,7 +273,71 @@ async function main() {
   });
   events.push(event10);
 
-  console.log('✅ Events created');
+  // Create paid events
+  const paidEvent1 = await prisma.event.create({
+    data: {
+      title: 'Premium Networking Gala',
+      description:
+        'Exclusive networking event with industry leaders and successful entrepreneurs. Ticket includes dinner and drinks.',
+      category: Category.CAREER,
+      location: 'Grand Ballroom, Rixos Hotel',
+      startDate: new Date(`${eventYear}-12-25T19:00:00`),
+      endDate: new Date(`${eventYear}-12-25T23:00:00`),
+      capacity: 50,
+      status: EventStatus.UPCOMING,
+      imageUrl: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622',
+      creatorId: organizer.id,
+      isPaid: true,
+      price: 5000,
+      platformFee: 500,
+      checkInMode: CheckInMode.ORGANIZER_SCANS,
+    },
+  });
+  events.push(paidEvent1);
+
+  const paidEvent2 = await prisma.event.create({
+    data: {
+      title: 'Advanced Python Bootcamp',
+      description:
+        '3-hour intensive Python programming course with certification. Materials and laptop provided.',
+      category: Category.TECH,
+      location: 'IT Lab, Building C',
+      startDate: new Date(`${eventYear}-12-19T10:00:00`),
+      endDate: new Date(`${eventYear}-12-19T13:00:00`),
+      capacity: 30,
+      status: EventStatus.UPCOMING,
+      imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
+      creatorId: organizer.id,
+      isPaid: true,
+      price: 3000,
+      platformFee: 300,
+      checkInMode: CheckInMode.ORGANIZER_SCANS,
+    },
+  });
+  events.push(paidEvent2);
+
+  const freeLecture = await prisma.event.create({
+    data: {
+      title: 'Introduction to AI - Open Lecture',
+      description:
+        'Free educational lecture on Artificial Intelligence basics. Open to all students.',
+      category: Category.ACADEMIC,
+      location: 'Lecture Hall 1, Building B',
+      startDate: new Date(`${eventYear}-12-11T14:00:00`),
+      endDate: new Date(`${eventYear}-12-11T16:00:00`),
+      capacity: 200,
+      status: EventStatus.UPCOMING,
+      imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780ecad995',
+      creatorId: admin.id,
+      isPaid: false,
+      checkInMode: CheckInMode.STUDENTS_SCAN,
+      eventQRCode: 'EVENT_QR_' + Date.now(),
+      qrCodeExpiry: new Date(`${eventYear}-12-11T17:00:00`),
+    },
+  });
+  events.push(freeLecture);
+
+  console.log('✅ Events created (including paid and free lecture events)');
 
   // Create registrations
   await prisma.registration.create({
@@ -320,9 +402,235 @@ async function main() {
 
   console.log('✅ Registrations created');
 
-  // Clean clubs data
-  await prisma.clubMembership.deleteMany({});
-  await prisma.club.deleteMany({});
+  // Create paid tickets
+  const ticket1 = await prisma.ticket.create({
+    data: {
+      eventId: paidEvent1.id,
+      userId: student1.id,
+      price: 5000,
+      platformFee: 500,
+      status: TicketStatus.PAID,
+      paymentMethod: 'mock',
+      transactionId: 'MOCK_TXN_' + Date.now() + '_1',
+      qrCode: 'data:image/png;base64,MOCK_QR_CODE_1',
+      purchasedAt: new Date(),
+    },
+  });
+
+  const ticket2 = await prisma.ticket.create({
+    data: {
+      eventId: paidEvent1.id,
+      userId: student2.id,
+      price: 5000,
+      platformFee: 500,
+      status: TicketStatus.PAID,
+      paymentMethod: 'mock',
+      transactionId: 'MOCK_TXN_' + Date.now() + '_2',
+      qrCode: 'data:image/png;base64,MOCK_QR_CODE_2',
+      purchasedAt: new Date(),
+    },
+  });
+
+  const ticket3 = await prisma.ticket.create({
+    data: {
+      eventId: paidEvent2.id,
+      userId: student3.id,
+      price: 3000,
+      platformFee: 300,
+      status: TicketStatus.PAID,
+      paymentMethod: 'mock',
+      transactionId: 'MOCK_TXN_' + Date.now() + '_3',
+      qrCode: 'data:image/png;base64,MOCK_QR_CODE_3',
+      purchasedAt: new Date(),
+    },
+  });
+
+  console.log('✅ Tickets created');
+
+  // Create check-ins
+  await prisma.checkIn.create({
+    data: {
+      eventId: freeLecture.id,
+      userId: student1.id,
+      scanMode: CheckInMode.STUDENTS_SCAN,
+      checkedInAt: new Date(),
+    },
+  });
+
+  await prisma.checkIn.create({
+    data: {
+      eventId: freeLecture.id,
+      userId: student2.id,
+      scanMode: CheckInMode.STUDENTS_SCAN,
+      checkedInAt: new Date(),
+    },
+  });
+
+  console.log('✅ Check-ins created');
+
+  // Create services
+  const service1 = await prisma.service.create({
+    data: {
+      providerId: student1.id,
+      type: ServiceType.GENERAL,
+      title: 'Professional Logo Design',
+      description:
+        'Custom logo design for your business or personal brand. Includes 3 concepts and unlimited revisions.',
+      category: ServiceCategory.DESIGN,
+      price: 15000,
+      priceType: PriceType.FIXED,
+      imageUrl: 'https://images.unsplash.com/photo-1626785774625-0b1c2c4eab67',
+      rating: 4.8,
+      reviewCount: 12,
+      isActive: true,
+    },
+  });
+
+  const service2 = await prisma.service.create({
+    data: {
+      providerId: student2.id,
+      type: ServiceType.GENERAL,
+      title: 'Event Photography & Videography',
+      description:
+        'Professional photography and video services for events, parties, and special occasions.',
+      category: ServiceCategory.PHOTO_VIDEO,
+      price: 25000,
+      priceType: PriceType.PER_SESSION,
+      imageUrl: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d',
+      rating: 4.9,
+      reviewCount: 18,
+      isActive: true,
+    },
+  });
+
+  const service3 = await prisma.service.create({
+    data: {
+      providerId: student3.id,
+      type: ServiceType.GENERAL,
+      title: 'Web Development & IT Consulting',
+      description:
+        'Full-stack web development, app development, and IT consulting services.',
+      category: ServiceCategory.IT,
+      price: 8000,
+      priceType: PriceType.HOURLY,
+      imageUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085',
+      rating: 4.7,
+      reviewCount: 9,
+      isActive: true,
+    },
+  });
+
+  const tutoring1 = await prisma.service.create({
+    data: {
+      providerId: organizer.id,
+      type: ServiceType.TUTORING,
+      title: 'Math Tutoring - Calculus & Algebra',
+      description:
+        'Expert math tutoring for university students. Specializing in Calculus I, II, Linear Algebra.',
+      category: ServiceCategory.MATH,
+      price: 5000,
+      priceType: PriceType.HOURLY,
+      imageUrl: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb',
+      rating: 5.0,
+      reviewCount: 24,
+      isActive: true,
+    },
+  });
+
+  const tutoring2 = await prisma.service.create({
+    data: {
+      providerId: student1.id,
+      type: ServiceType.TUTORING,
+      title: 'English Language Tutoring - IELTS Prep',
+      description:
+        'IELTS preparation and general English language tutoring. Native-level fluency.',
+      category: ServiceCategory.ENGLISH,
+      price: 4000,
+      priceType: PriceType.HOURLY,
+      imageUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d',
+      rating: 4.9,
+      reviewCount: 15,
+      isActive: true,
+    },
+  });
+
+  const tutoring3 = await prisma.service.create({
+    data: {
+      providerId: student2.id,
+      type: ServiceType.TUTORING,
+      title: 'Programming Tutoring - Python, JavaScript',
+      description:
+        'Learn programming from scratch or advance your skills. Python, JavaScript, React, Node.js.',
+      category: ServiceCategory.PROGRAMMING,
+      price: 6000,
+      priceType: PriceType.HOURLY,
+      imageUrl: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6',
+      rating: 4.8,
+      reviewCount: 20,
+      isActive: true,
+    },
+  });
+
+  console.log('✅ Services created');
+
+  // Create advertisements
+  const ad1 = await prisma.advertisement.create({
+    data: {
+      title: 'Kaspi Bank Student Card',
+      imageUrl: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3',
+      linkUrl: 'https://kaspi.kz',
+      position: AdPosition.TOP_BANNER,
+      isActive: true,
+      startDate: new Date(`${eventYear}-12-01T00:00:00`),
+      endDate: new Date(`${eventYear}-12-31T23:59:59`),
+      impressions: 1250,
+      clicks: 85,
+    },
+  });
+
+  const ad2 = await prisma.advertisement.create({
+    data: {
+      title: 'Tech Internship Program',
+      imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c',
+      linkUrl: null,
+      position: AdPosition.HERO_SLIDE,
+      isActive: true,
+      startDate: new Date(`${eventYear}-12-01T00:00:00`),
+      endDate: new Date(`${eventYear}-12-31T23:59:59`),
+      impressions: 3200,
+      clicks: 240,
+    },
+  });
+
+  const ad3 = await prisma.advertisement.create({
+    data: {
+      title: 'Coffee Shop - Student Discount',
+      imageUrl: 'https://images.unsplash.com/photo-1511920170033-f8396924c348',
+      linkUrl: null,
+      position: AdPosition.NATIVE_FEED,
+      isActive: true,
+      startDate: new Date(`${eventYear}-12-01T00:00:00`),
+      endDate: new Date(`${eventYear}-12-31T23:59:59`),
+      impressions: 950,
+      clicks: 67,
+    },
+  });
+
+  const ad4 = await prisma.advertisement.create({
+    data: {
+      title: 'Language Center - 20% Off',
+      imageUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d',
+      linkUrl: null,
+      position: AdPosition.BOTTOM_BANNER,
+      isActive: true,
+      startDate: new Date(`${eventYear}-12-01T00:00:00`),
+      endDate: new Date(`${eventYear}-12-31T23:59:59`),
+      impressions: 820,
+      clicks: 45,
+    },
+  });
+
+  console.log('✅ Advertisements created');
 
   // Create clubs
   const club1 = await prisma.club.create({
@@ -445,28 +753,38 @@ async function main() {
   console.log('✅ Clubs created');
 
   console.log(`
-  ╔══════════════════════════════════════════════════════════╗
-  ║                                                          ║
-  ║   🌱 Database seeded successfully!                       ║
-  ║                                                          ║
-  ║   Test Accounts:                                         ║
-  ║   ──────────────────────────────────────────────────     ║
-  ║   Admin:      admin@kazguu.kz                            ║
-  ║   Organizer:  organizer@kazguu.kz                        ║
-  ║   Student 1:  student1@kazguu.kz                         ║
-  ║   Student 2:  student2@kazguu.kz                         ║
-  ║   Student 3:  student3@kazguu.kz                         ║
-  ║                                                          ║
-  ║   Password for all: Password123!                         ║
-  ║                                                          ║
-  ║   Created:                                               ║
-  ║   - 5 Users (1 Admin, 1 Organizer, 3 Students)           ║
-  ║   - 10 Events (various categories)                       ║
-  ║   - 7 Registrations (some with check-ins)                ║
-  ║   - 6 Clubs (various categories)                          ║
-  ║   - 7 Club Memberships                                   ║
-  ║                                                          ║
-  ╚══════════════════════════════════════════════════════════╝
+  ╔══════════════════════════════════════════════════════════════╗
+  ║                                                              ║
+  ║   🌱 Database seeded successfully!                           ║
+  ║                                                              ║
+  ║   Test Accounts:                                             ║
+  ║   ────────────────────────────────────────────────────────   ║
+  ║   Admin:      admin@kazguu.kz                                ║
+  ║   Organizer:  organizer@kazguu.kz                            ║
+  ║   Student 1:  student1@kazguu.kz                             ║
+  ║   Student 2:  student2@kazguu.kz                             ║
+  ║   Student 3:  student3@kazguu.kz                             ║
+  ║                                                              ║
+  ║   Password for all: Password123!                             ║
+  ║                                                              ║
+  ║   Created:                                                   ║
+  ║   - 5 Users (1 Admin, 1 Organizer, 3 Students)               ║
+  ║   - 13 Events (10 free + 2 paid + 1 lecture)                 ║
+  ║   - 7 Free Registrations                                     ║
+  ║   - 3 Paid Tickets (with QR codes)                           ║
+  ║   - 2 Check-ins (student scan mode)                          ║
+  ║   - 6 Services (3 general + 3 tutoring)                      ║
+  ║   - 4 Advertisements (various positions)                     ║
+  ║   - 6 Clubs (various categories)                             ║
+  ║   - 7 Club Memberships                                       ║
+  ║                                                              ║
+  ║   💰 Monetization Features Ready:                            ║
+  ║   - Paid events with tickets                                 ║
+  ║   - QR check-in (2 modes)                                    ║
+  ║   - Services marketplace                                     ║
+  ║   - Advertisement system                                     ║
+  ║                                                              ║
+  ╚══════════════════════════════════════════════════════════════╝
   `);
 }
 
