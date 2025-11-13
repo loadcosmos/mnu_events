@@ -216,7 +216,7 @@ export default function HomePage() {
                     className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: `url(${imageUrl})` }}
                   >
-                    <div className="absolute inset-0 bg-black/70" />
+                    <div className="absolute inset-0 liquid-glass-overlay" />
                   </div>
 
                   {/* Content */}
@@ -252,7 +252,7 @@ export default function HomePage() {
                         <Button
                           size="lg"
                           variant="outline"
-                          className="border-2 border-white/20 bg-white/10 text-white hover:bg-white/20 rounded-lg px-8"
+                          className="liquid-glass-button text-white rounded-lg px-8"
                           asChild
                         >
                           <Link to="/events">View All Events</Link>
@@ -270,7 +270,7 @@ export default function HomePage() {
                         className={`h-3 rounded-full transition-all ${
                           idx === currentSlide
                             ? 'bg-[#d62e1f] w-8'
-                            : 'bg-white/50 hover:bg-white/75 w-3'
+                            : 'liquid-glass-subtle hover:liquid-glass w-3'
                         }`}
                         aria-label={`Go to slide ${idx + 1}`}
                       />
@@ -284,7 +284,7 @@ export default function HomePage() {
                         (prev) => (prev - 1 + trendingEvents.length) % trendingEvents.length
                       )
                     }
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/10 hover:bg-white/20 text-white p-4 rounded-full transition-all backdrop-blur-sm"
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-full transition-all"
                     aria-label="Previous slide"
                   >
                     <i className="fa-solid fa-chevron-left text-xl" />
@@ -293,7 +293,7 @@ export default function HomePage() {
                     onClick={() =>
                       setCurrentSlide((prev) => (prev + 1) % trendingEvents.length)
                     }
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/10 hover:bg-white/20 text-white p-4 rounded-full transition-all backdrop-blur-sm"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-full transition-all"
                     aria-label="Next slide"
                   >
                     <i className="fa-solid fa-chevron-right text-xl" />
@@ -345,7 +345,7 @@ export default function HomePage() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 liquid-glass-overlay opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     {/* Enhanced Content */}
                     <div className="p-5 md:p-6 space-y-3">
@@ -425,7 +425,7 @@ export default function HomePage() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 liquid-glass-overlay opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     {/* Enhanced Content */}
                     <div className="p-4 md:p-5 lg:p-6 space-y-3 overflow-hidden">
@@ -542,7 +542,7 @@ export default function HomePage() {
                           }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 liquid-glass-overlay opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                       {/* Enhanced Content */}
                       <div className="p-4 md:p-5 lg:p-6 space-y-3 overflow-hidden">

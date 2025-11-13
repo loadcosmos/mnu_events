@@ -148,13 +148,13 @@ export default function LoginPage() {
             setLoginType(loginType === 'student' ? 'admin' : 'student');
             setError('');
           }}
-          className="fixed top-4 right-4 z-50 bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-md border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white hover:bg-white dark:hover:bg-[#2a2a2a] transition-all duration-300 shadow-lg"
+          className="fixed top-4 right-4 z-50 liquid-glass-button border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white hover:bg-white dark:hover:bg-[#2a2a2a] transition-all duration-300 shadow-lg"
         >
           {loginType === 'student' ? 'Admin' : 'Student'}
         </Button>
       )}
 
-      <Card className="w-full max-w-md shadow-2xl bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-lg border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+      <Card className="w-full max-w-md shadow-2xl liquid-glass-strong border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
             {showSignup ? 'Create Account' : 'Welcome Back'}

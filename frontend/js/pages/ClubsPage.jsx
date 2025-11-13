@@ -95,7 +95,7 @@ export default function ClubsPage() {
       </div>
 
       {/* Desktop: Sticky Search Bar and Filters */}
-      <div className="hidden md:block sticky top-20 z-30 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+      <div className="hidden md:block sticky top-20 z-30 liquid-glass-strong border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-2xl">
@@ -131,7 +131,7 @@ export default function ClubsPage() {
       </div>
 
       {/* Mobile: Compact Sticky Bar with Icons */}
-      <div className="md:hidden sticky top-20 z-30 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+      <div className="md:hidden sticky top-20 z-30 liquid-glass-strong border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="flex items-center gap-2 px-4 py-3">
           <button
             onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
@@ -227,7 +227,7 @@ export default function ClubsPage() {
                             e.target.src = '/images/event-placeholder.jpg';
                           }}
                         />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 liquid-glass-overlay opacity-0 group-hover:opacity-100 transition-opacity" />
                         <div className="absolute top-3 right-3 px-3 py-1.5 bg-[#d62e1f] text-white rounded text-xs font-bold uppercase">
                           {club.category}
                         </div>

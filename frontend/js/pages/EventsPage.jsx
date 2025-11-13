@@ -125,7 +125,7 @@ export default function EventsPage() {
       </div>
 
       {/* Desktop: Sticky Search Bar and Filters */}
-      <div className="hidden md:block sticky top-20 z-30 bg-white/90 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+      <div className="hidden md:block sticky top-20 z-30 liquid-glass-strong border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-2xl">
@@ -161,7 +161,7 @@ export default function EventsPage() {
       </div>
 
       {/* Mobile: Compact Sticky Bar with Icons */}
-      <div className="md:hidden sticky top-20 z-30 bg-white/90 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+      <div className="md:hidden sticky top-20 z-30 liquid-glass-strong border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="flex items-center gap-2 px-4 py-3">
           {/* Search Icon */}
           <button

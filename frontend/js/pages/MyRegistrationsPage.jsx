@@ -144,7 +144,7 @@ export default function MyRegistrationsPage() {
       </div>
 
       {/* Desktop: Sticky Search Bar Only */}
-      <div className="hidden md:block sticky top-28 z-30 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] py-4 transition-colors duration-300">
+      <div className="hidden md:block sticky top-28 z-30 liquid-glass-strong border-b border-gray-200 dark:border-[#2a2a2a] py-4 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4">
           <div className="relative max-w-2xl">
             <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#a0a0a0] text-lg transition-colors duration-300" />
@@ -160,7 +160,7 @@ export default function MyRegistrationsPage() {
       </div>
 
       {/* Mobile: Compact Sticky Bar with Icons */}
-      <div className="md:hidden sticky top-28 z-30 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+      <div className="md:hidden sticky top-28 z-30 liquid-glass-strong border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="flex items-center gap-2 px-4 py-3">
           <button
             onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
@@ -290,7 +290,7 @@ export default function MyRegistrationsPage() {
                             e.target.src = '/images/event-placeholder.jpg';
                           }}
                         />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 liquid-glass-overlay opacity-0 group-hover:opacity-100 transition-opacity" />
 
                         {/* Category Badge */}
                         <div className="absolute top-3 right-3 px-3 py-1.5 bg-[#d62e1f] text-white rounded text-xs font-bold uppercase shadow-lg">

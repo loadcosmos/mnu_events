@@ -410,7 +410,7 @@ export default function ProfilePage() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+            className="fixed inset-0 liquid-glass-overlay z-40"
             onClick={() => setIsEditModalOpen(false)}
           />
 

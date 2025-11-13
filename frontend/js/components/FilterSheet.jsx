@@ -36,14 +36,14 @@ const FilterSheet = ({ isOpen, onClose, children, title = 'Filters' }) => {
     <>
       {/* Backdrop with blur */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
+        className="fixed inset-0 liquid-glass-overlay z-40 md:hidden transition-opacity duration-300"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Bottom Sheet with Liquid Glass Effect */}
       <div
-        className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-lg rounded-t-2xl z-50 md:hidden max-h-[80vh] overflow-y-auto border-t border-gray-200 dark:border-[#2a2a2a] shadow-2xl transition-colors duration-300"
+        className="fixed bottom-0 left-0 right-0 liquid-glass-strong rounded-t-2xl z-50 md:hidden max-h-[80vh] overflow-y-auto shadow-2xl transition-colors duration-300"
         role="dialog"
         aria-modal="true"
         aria-labelledby="filter-sheet-title"
@@ -75,7 +75,7 @@ const FilterSheet = ({ isOpen, onClose, children, title = 'Filters' }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-lg border-t border-gray-200 dark:border-[#2a2a2a] p-4 pb-safe transition-colors duration-300">
+        <div className="sticky bottom-0 liquid-glass-strong border-t-0 p-4 pb-safe transition-colors duration-300">
           <button
             onClick={onClose}
             className="w-full bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-lg"
