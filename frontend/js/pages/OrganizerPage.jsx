@@ -249,6 +249,17 @@ export default function OrganizerPage() {
                             <Link to={`/events/${event.id}`}>View</Link>
                           </Button>
                           <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                            className="border-[#d62e1f] text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white rounded-xl transition-all"
+                          >
+                            <Link to={`/organizer/scanner/${event.id}`}>
+                              <i className="fa-solid fa-qrcode mr-1" />
+                              Scan
+                            </Link>
+                          </Button>
+                          <Button
                             size="sm"
                             asChild
                             className="liquid-glass-red-button text-white rounded-xl"

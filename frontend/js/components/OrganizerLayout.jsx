@@ -43,6 +43,7 @@ export default function OrganizerLayout({ children }) {
   const navItems = [
     { path: '/organizer', label: 'Dashboard', icon: '📊' },
     { path: '/organizer/create-event', label: 'Create Event', icon: '➕' },
+    { path: '/organizer/analytics', label: 'Analytics', icon: '📈' },
   ];
 
   return (

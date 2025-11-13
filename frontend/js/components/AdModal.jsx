@@ -16,11 +16,11 @@ export default function AdModal({ ad, isOpen, onClose }) {
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 liquid-glass-overlay" />
 
       {/* Modal Content */}
       <div
-        className="relative w-full max-w-2xl bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-2xl liquid-glass-strong rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -70,10 +70,9 @@ export default function AdModal({ ad, isOpen, onClose }) {
               onClick={handleExternalClick}
               className="
                 w-full px-6 py-4 rounded-xl
-                bg-gradient-to-r from-[#d62e1f] to-[#b91c1c]
-                hover:from-[#b91c1c] hover:to-[#991b1b]
+                liquid-glass-red-button
                 text-white font-bold text-lg
-                transform hover:scale-105 transition-all
+                transform hover:scale-105 transition-all duration-300
                 shadow-lg hover:shadow-xl
                 flex items-center justify-center gap-3
               "

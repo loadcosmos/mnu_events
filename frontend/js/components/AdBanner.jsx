@@ -32,12 +32,11 @@ export default function AdBanner({
   if (!ad) return null;
 
   const handleClick = () => {
+    // Trigger parent onClick handler to open modal
     if (onClick) {
-      onClick(ad.id);
+      onClick(ad);
     }
-    if (ad.linkUrl) {
-      window.open(ad.linkUrl, '_blank', 'noopener,noreferrer');
-    }
+    // Note: External link opening is now handled by AdModal's "Learn More" button
   };
 
   const sizeClass = adSizes[position] || adSizes.TOP_BANNER;
@@ -49,11 +48,14 @@ export default function AdBanner({
     <div className={`w-full ${isFullWidth ? '' : 'px-4 sm:px-6 lg:px-8'} my-4`}>
       <div
         className={`
-          ${isFullWidth ? 'w-full' : 'max-w-7xl mx-auto'} ${isFullWidth ? '' : 'rounded-lg'} overflow-hidden
-          bg-gradient-to-r from-red-50 to-red-100 dark:from-gray-800 dark:to-gray-900
+          ${isFullWidth ? 'w-full' : 'max-w-7xl mx-auto rounded-2xl'}
+          overflow-hidden
+          liquid-glass-card
           ${sizeClass.desktop} ${sizeClass.mobile}
-          cursor-pointer hover:opacity-90 transition-opacity
+          cursor-pointer hover:scale-[1.01] transition-all duration-300
           relative group
+          border border-gray-200 dark:border-[#2a2a2a]
+          shadow-lg hover:shadow-2xl
         `}
         onClick={handleClick}
         role="button"

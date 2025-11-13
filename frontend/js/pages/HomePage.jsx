@@ -4,7 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import eventsService from '../services/eventsService';
 import registrationsService from '../services/registrationsService';
+import adsService from '../services/adsService';
 import EventModal from '../components/EventModal';
+import AdBanner from '../components/AdBanner';
+import AdModal from '../components/AdModal';
 import { formatDate } from '../utils/dateFormatters';
 import { COLORS } from '../utils/constants';
 
@@ -32,6 +35,15 @@ export default function HomePage() {
   const [modalEventId, setModalEventId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Ad state management
+  const [ads, setAds] = useState({
+    topBanner: null,
+    nativeFeed: null,
+    bottomBanner: null,
+  });
+  const [selectedAd, setSelectedAd] = useState(null);
+  const [isAdModalOpen, setIsAdModalOpen] = useState(false);
+
   const openEventModal = (eventId) => {
     setModalEventId(eventId);
     setIsModalOpen(true);
@@ -42,10 +54,61 @@ export default function HomePage() {
     setTimeout(() => setModalEventId(null), 300);
   };
 
+  const openAdModal = (ad) => {
+    setSelectedAd(ad);
+    setIsAdModalOpen(true);
+  };
+
+  const closeAdModal = () => {
+    setIsAdModalOpen(false);
+    setTimeout(() => setSelectedAd(null), 300);
+  };
+
+  const handleAdImpression = async (adId) => {
+    try {
+      await adsService.trackImpression(adId);
+    } catch (err) {
+      console.error('[HomePage] Failed to track ad impression:', err);
+    }
+  };
+
+  const handleAdClick = async (adId) => {
+    try {
+      await adsService.trackClick(adId);
+    } catch (err) {
+      console.error('[HomePage] Failed to track ad click:', err);
+    }
+  };
+
   // Load events on mount
   useEffect(() => {
     loadEvents();
   }, []);
+
+  // Load ads on mount
+  useEffect(() => {
+    loadAds();
+  }, []);
+
+  const loadAds = async () => {
+    try {
+      // Load ads for different positions
+      const [topBannerAds, nativeFeedAds, bottomBannerAds] = await Promise.all([
+        adsService.getActive('TOP_BANNER'),
+        adsService.getActive('NATIVE_FEED'),
+        adsService.getActive('BOTTOM_BANNER'),
+      ]);
+
+      setAds({
+        topBanner: topBannerAds?.[0] || null,
+        nativeFeed: nativeFeedAds?.[0] || null,
+        bottomBanner: bottomBannerAds?.[0] || null,
+      });
+    } catch (err) {
+      console.error('[HomePage] Failed to load ads:', err);
+      // Don't show error to user, just don't display ads
+    }
+  };
 
   // Auto-advance slides every 5 seconds
   useEffect(() => {
@@ -308,6 +371,16 @@ export default function HomePage() {
         )}
       </section>
 
+      {/* Top Banner Ad */}
+      {ads.topBanner && (
+        <AdBanner
+          ad={ads.topBanner}
+          position="TOP_BANNER"
+          onImpression={handleAdImpression}
+          onClick={openAdModal}
+        />
+      )}
+
       {/* My Upcoming Events - Horizontal Scroll (Only for authenticated users) */}
       {isAuthenticated() && myUpcomingEvents.length > 0 && (
         <section className="py-16 px-4 bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
@@ -488,6 +561,16 @@ export default function HomePage() {
         </section>
       )}
 
+      {/* Native Feed Ad */}
+      {ads.nativeFeed && (
+        <AdBanner
+          ad={ads.nativeFeed}
+          position="NATIVE_FEED"
+          onImpression={handleAdImpression}
+          onClick={openAdModal}
+        />
+      )}
+
       {/* Trending This Week - Horizontal Scroll */}
       <section className="py-16 px-4 bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
@@ -606,8 +689,21 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Bottom Banner Ad */}
+      {ads.bottomBanner && (
+        <AdBanner
+          ad={ads.bottomBanner}
+          position="BOTTOM_BANNER"
+          onImpression={handleAdImpression}
+          onClick={openAdModal}
+        />
+      )}
+
       {/* Event Modal */}
       <EventModal eventId={modalEventId} isOpen={isModalOpen} onClose={closeEventModal} />
+
+      {/* Ad Modal */}
+      <AdModal ad={selectedAd} isOpen={isAdModalOpen} onClose={closeAdModal} />
 
       {/* Custom Scrollbar Hide Style */}
       <style>{`
