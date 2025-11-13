@@ -42,12 +42,15 @@ export default function AdBanner({
 
   const sizeClass = adSizes[position] || adSizes.TOP_BANNER;
 
+  // For banners below hero section, make them full width
+  const isFullWidth = position === 'TOP_BANNER' || position === 'BOTTOM_BANNER';
+  
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 my-4">
+    <div className={`w-full ${isFullWidth ? '' : 'px-4 sm:px-6 lg:px-8'} my-4`}>
       <div
         className={`
-          max-w-7xl mx-auto rounded-lg overflow-hidden
-          bg-gradient-to-r from-purple-50 to-blue-50 dark:from-gray-800 dark:to-gray-900
+          ${isFullWidth ? 'w-full' : 'max-w-7xl mx-auto'} ${isFullWidth ? '' : 'rounded-lg'} overflow-hidden
+          bg-gradient-to-r from-red-50 to-red-100 dark:from-gray-800 dark:to-gray-900
           ${sizeClass.desktop} ${sizeClass.mobile}
           cursor-pointer hover:opacity-90 transition-opacity
           relative group
@@ -63,10 +66,22 @@ export default function AdBanner({
       >
         {/* Ad Image */}
         <img
-          src={ad.imageUrl}
+          src={ad.imageUrl || '/images/backg.jpg'}
           alt={ad.title}
           className="w-full h-full object-cover"
           loading="lazy"
+          onError={(e) => {
+            console.error('Failed to load ad image:', ad.imageUrl);
+            // Try different fallback paths
+            if (e.target.src !== '/images/backg.jpg') {
+              e.target.src = '/images/backg.jpg';
+            } else if (e.target.src !== '/images/event1.jpg') {
+              e.target.src = '/images/event1.jpg';
+            } else {
+              e.target.style.display = 'none';
+              e.target.parentElement.classList.add('bg-gradient-to-br', 'from-red-200', 'to-red-300');
+            }
+          }}
         />
 
         {/* Ad Label */}

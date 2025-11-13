@@ -17,14 +17,14 @@ const mockAds = [
   {
     id: 1,
     position: 'TOP_BANNER',
-    imageUrl: 'https://via.placeholder.com/728x90?text=Top+Banner+Ad',
+    imageUrl: '/images/backg.jpg', // Local image from public/images
     linkUrl: 'https://kazguu.kz',
     title: 'Образование будущего',
   },
   {
     id: 2,
     position: 'NATIVE_FEED',
-    imageUrl: 'https://via.placeholder.com/400x300?text=Native+Ad',
+    imageUrl: '/images/event1.jpg', // Local image from public/images
     linkUrl: 'https://kaspi.kz',
     title: 'Специальное предложение',
     description: 'Получите скидку 20% на все товары!',
@@ -42,7 +42,7 @@ const mockServices = [
     priceType: 'FIXED',
     rating: 4.8,
     reviewCount: 24,
-    imageUrl: 'https://via.placeholder.com/400x300?text=Logo+Design',
+    imageUrl: '/images/creativity.jpg', // Local image from public/images
     provider: {
       firstName: 'Айдар',
       lastName: 'Султанов',
@@ -59,7 +59,7 @@ const mockServices = [
     priceType: 'HOURLY',
     rating: 5.0,
     reviewCount: 18,
-    imageUrl: 'https://via.placeholder.com/400x300?text=Math+Tutoring',
+    imageUrl: '/images/intelligence.jpg', // Local image from public/images
     provider: {
       firstName: 'Алия',
       lastName: 'Нурмуханова',
@@ -76,7 +76,7 @@ const mockServices = [
     priceType: 'FIXED',
     rating: 4.9,
     reviewCount: 31,
-    imageUrl: 'https://via.placeholder.com/400x300?text=Web+Development',
+    imageUrl: '/images/service.jpg', // Local image from public/images
     provider: {
       firstName: 'Ерлан',
       lastName: 'Бекназаров',
@@ -90,7 +90,7 @@ export default function HomePage() {
   const { isAuthenticated, user } = useAuth();
 
   // State
-  const [activeTab, setActiveTab] = useState('events');
+  const [activeTab, setActiveTab] = useState('services');
   const [events, setEvents] = useState([]);
   const [clubs, setClubs] = useState([]);
   const [services] = useState(mockServices); // Will be loaded from API later
@@ -98,6 +98,7 @@ export default function HomePage() {
   const [modalEventId, setModalEventId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+
 
   // Redirect organizers and admins
   useEffect(() => {
@@ -179,16 +180,12 @@ export default function HomePage() {
   // Render content based on active tab
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'events':
-        return renderEventsTab();
-      case 'clubs':
-        return renderClubsTab();
       case 'services':
         return renderServicesTab('GENERAL');
       case 'tutoring':
         return renderServicesTab('TUTORING');
       default:
-        return renderEventsTab();
+        return renderServicesTab('GENERAL');
     }
   };
 
@@ -197,23 +194,12 @@ export default function HomePage() {
       return <div className="text-center py-12">Загрузка событий...</div>;
     }
 
-    // Insert native ads every 5-6 cards
-    const contentWithAds = [];
-    events.forEach((event, index) => {
-      contentWithAds.push(
-        <EventCard key={event.id} event={event} onClick={() => openEventModal(event.id)} />
-      );
-
-      // Insert native ad after every 5 events
-      if ((index + 1) % 5 === 0 && mockAds.find((ad) => ad.position === 'NATIVE_FEED')) {
-        const nativeAd = mockAds.find((ad) => ad.position === 'NATIVE_FEED');
-        contentWithAds.push(<NativeAd key={`ad-${index}`} ad={nativeAd} />);
-      }
-    });
-
+    // No native ads here - they're on the /events page
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contentWithAds}
+        {events.map((event) => (
+          <EventCard key={event.id} event={event} onClick={() => openEventModal(event.id)} />
+        ))}
       </div>
     );
   };
@@ -358,9 +344,9 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* Top Banner Ad */}
+      {/* Top Banner Ad - Full Width */}
       {mockAds.find((ad) => ad.position === 'TOP_BANNER') && (
-        <div className="bg-gray-100 dark:bg-[#0a0a0a] py-4">
+        <div className="w-full bg-gray-100 dark:bg-[#0a0a0a] py-4">
           <AdBanner ad={mockAds.find((ad) => ad.position === 'TOP_BANNER')} position="TOP_BANNER" />
         </div>
       )}
@@ -409,7 +395,7 @@ function EventCard({ event, onClick }) {
     >
       <div className="relative h-48 overflow-hidden">
         <img
-          src={event.imageUrl || 'https://via.placeholder.com/400x300?text=Event'}
+          src={event.imageUrl || '/images/backg.jpg'}
           alt={event.title}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
         />
@@ -468,7 +454,7 @@ function ClubCard({ club, onClick }) {
     >
       <div className="relative h-48 overflow-hidden">
         <img
-          src={club.imageUrl || 'https://via.placeholder.com/400x300?text=Club'}
+          src={club.imageUrl || '/images/backg.jpg'}
           alt={club.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
         />

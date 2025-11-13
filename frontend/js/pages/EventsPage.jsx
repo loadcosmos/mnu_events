@@ -3,8 +3,21 @@ import { Input } from '../components/ui/input';
 import eventsService from '../services/eventsService';
 import EventModal from '../components/EventModal';
 import FilterSheet from '../components/FilterSheet';
+import NativeAd from '../components/NativeAd';
 import { formatDate } from '../utils/dateFormatters';
 import { EVENT_CATEGORIES } from '../utils/constants';
+
+// Mock ads data (will be loaded from API later)
+const mockAds = [
+  {
+    id: 2,
+    position: 'NATIVE_FEED',
+    imageUrl: '/images/event1.jpg', // Local image from public/images
+    linkUrl: 'https://kaspi.kz',
+    title: 'Специальное предложение',
+    description: 'Получите скидку 20% на все товары!',
+  },
+];
 
 export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -239,15 +252,19 @@ export default function EventsPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sortedEvents.map((event) => {
-                  const imageUrl = event.imageUrl || '/images/event-placeholder.jpg';
-
-                  return (
-                    <div
-                      key={event.id}
-                      className="bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl flex flex-col"
-                      onClick={() => openEventModal(event.id)}
-                    >
+                {(() => {
+                  const contentWithAds = [];
+                  const nativeAd = mockAds.find((ad) => ad.position === 'NATIVE_FEED');
+                  
+                  sortedEvents.forEach((event, index) => {
+                    const imageUrl = event.imageUrl || '/images/backg.jpg';
+                    
+                    contentWithAds.push(
+                      <div
+                        key={event.id}
+                        className="bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl flex flex-col"
+                        onClick={() => openEventModal(event.id)}
+                      >
                       {/* Image Section - Fixed Height, No Scroll */}
                       <div className="relative h-48 md:h-52 flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
                         <img
@@ -304,8 +321,16 @@ export default function EventsPage() {
                         </div>
                       </div>
                     </div>
-                  );
-                })}
+                    );
+                    
+                    // Insert native ad after every 3 events
+                    if ((index + 1) % 3 === 0 && nativeAd) {
+                      contentWithAds.push(<NativeAd key={`ad-${index}`} ad={nativeAd} />);
+                    }
+                  });
+                  
+                  return contentWithAds;
+                })()}
               </div>
             </>
           )}

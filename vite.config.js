@@ -4,6 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   root: './frontend', // Указываем, что frontend - это корень проекта для Vite
+  publicDir: 'public', // Папка public относительно root (frontend/public)
   plugins: [react()],
   server: {
     port: 5173, // Стандартный порт Vite
