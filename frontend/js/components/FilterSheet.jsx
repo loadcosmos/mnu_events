@@ -78,7 +78,7 @@ const FilterSheet = ({ isOpen, onClose, children, title = 'Filters' }) => {
         <div className="sticky bottom-0 liquid-glass-strong border-t-0 p-4 pb-safe transition-colors duration-300">
           <button
             onClick={onClose}
-            className="w-full bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-lg"
+            className="w-full liquid-glass-red-button text-white font-semibold py-3 px-6 rounded-2xl shadow-lg"
           >
             Apply Filters
           </button>

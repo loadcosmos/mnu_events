@@ -254,6 +254,51 @@
     @apply liquid-glass-button-light dark:liquid-glass-button-dark;
   }
 
+  /* Red Liquid Glass Button - Primary CTA */
+  .liquid-glass-red-button-light {
+    background: linear-gradient(135deg, rgba(214, 46, 31, 0.95), rgba(185, 28, 28, 0.95));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow:
+      0 4px 20px 0 rgba(214, 46, 31, 0.4),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .liquid-glass-red-button-light:hover {
+    background: linear-gradient(135deg, rgba(185, 28, 28, 0.95), rgba(153, 27, 27, 0.95));
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow:
+      0 6px 28px 0 rgba(214, 46, 31, 0.6),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .liquid-glass-red-button-dark {
+    background: linear-gradient(135deg, rgba(214, 46, 31, 0.9), rgba(185, 28, 28, 0.9));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 4px 20px 0 rgba(214, 46, 31, 0.5),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .liquid-glass-red-button-dark:hover {
+    background: linear-gradient(135deg, rgba(185, 28, 28, 0.95), rgba(153, 27, 27, 0.95));
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow:
+      0 6px 28px 0 rgba(214, 46, 31, 0.7),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .liquid-glass-red-button {
+    @apply liquid-glass-red-button-light dark:liquid-glass-red-button-dark;
+  }
+
   /* ========================================
      LIQUID GLASS CARDS - Content containers
      ======================================== */

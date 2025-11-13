@@ -174,7 +174,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex items-center justify-center px-4 transition-colors duration-300">
         <div className="text-center">
           <p className="text-[#d62e1f] mb-4">Failed to load profile</p>
-          <Button onClick={loadUserData} className="bg-[#d62e1f] hover:bg-[#b91c1c]">
+          <Button onClick={loadUserData} className="liquid-glass-red-button text-white rounded-2xl">
             Retry
           </Button>
         </div>
@@ -232,7 +232,7 @@ export default function ProfilePage() {
           <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="px-6 py-3 bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-semibold rounded-lg transition-colors"
+              className="px-6 py-3 liquid-glass-red-button text-white font-semibold rounded-2xl"
             >
               <i className="fa-solid fa-pen-to-square mr-2" />
               Edit Profile
@@ -505,7 +505,7 @@ export default function ProfilePage() {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex-1 px-6 py-3 bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-3 liquid-glass-red-button text-white font-semibold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? (
                     <>

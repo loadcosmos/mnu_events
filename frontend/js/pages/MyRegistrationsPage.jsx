@@ -172,7 +172,7 @@ export default function MyRegistrationsPage() {
 
           <button
             onClick={() => setFilterSheetOpen(true)}
-            className="bg-[#d62e1f] hover:bg-[#b91c1c] p-3 rounded-lg transition-colors"
+            className="liquid-glass-red-button text-white p-3 rounded-2xl"
             aria-label="Open filters"
           >
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,7 +213,7 @@ export default function MyRegistrationsPage() {
                 onClick={() => setSelectedFilter(filter)}
                 className={`px-4 py-2 rounded-full font-semibold transition-colors ${
                   selectedFilter === filter
-                    ? 'bg-[#d62e1f] text-white'
+                    ? 'liquid-glass-red-button text-white'
                     : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
@@ -251,7 +251,7 @@ export default function MyRegistrationsPage() {
               </p>
               <Link
                 to="/events"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#d62e1f] hover:bg-[#b91c1c] text-white font-semibold rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 liquid-glass-red-button text-white font-semibold rounded-2xl"
               >
                 Browse Events
                 <i className="fa-solid fa-arrow-right" />
@@ -381,9 +381,9 @@ export default function MyRegistrationsPage() {
               {filters.map((filter) => (
                 <label
                   key={filter}
-                  className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+                  className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-colors ${
                     selectedFilter === filter
-                      ? 'bg-[#d62e1f] text-white'
+                      ? 'liquid-glass-red-button text-white'
                       : 'bg-[#2a2a2a] text-[#a0a0a0] hover:bg-[#3a3a3a] hover:text-white'
                   }`}
                 >
