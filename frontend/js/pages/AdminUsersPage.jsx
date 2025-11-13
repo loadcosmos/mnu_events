@@ -106,7 +106,7 @@ export default function AdminUsersPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Users</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300 mb-2">Manage Users</h1>
           <p className="text-gray-600 dark:text-gray-400">Loading users...</p>
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function AdminUsersPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Users</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300 mb-2">Manage Users</h1>
         <p className="text-gray-600 dark:text-gray-400">View and manage user accounts</p>
       </div>
 
@@ -142,7 +142,7 @@ export default function AdminUsersPage() {
                     setPage(1);
                     loadUsers();
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-[#1a1a1a] dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-[#2a2a2a] rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-[#1a1a1a] dark:text-white"
                 >
                   {roles.map((role) => (
                     <option key={role.value} value={role.value}>
@@ -185,7 +185,7 @@ export default function AdminUsersPage() {
                         {user.firstName?.[0] || user.email?.[0]?.toUpperCase()}
                       </div>
                       <div>
-                        <CardTitle className="text-xl font-semibold text-black dark:text-white">
+                        <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white transition-colors duration-300">
                           {user.firstName} {user.lastName}
                         </CardTitle>
                         <CardDescription className="text-gray-600 dark:text-gray-400">
@@ -220,7 +220,7 @@ export default function AdminUsersPage() {
                   <select
                     value={user.role}
                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                    className="px-3 py-1.5 border border-gray-300 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 text-sm dark:bg-[#1a1a1a] dark:text-white"
+                    className="px-3 py-1.5 border border-gray-300 dark:border-[#2a2a2a] rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 text-sm dark:bg-[#1a1a1a] dark:text-white"
                   >
                     {roles.filter((r) => r.value).map((role) => (
                       <option key={role.value} value={role.value}>

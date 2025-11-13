@@ -162,15 +162,15 @@ export default function CreateEventPage() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Create New Event</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300 mb-2">Create New Event</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Fill in the details to create a new event
         </p>
       </div>
 
       <Card className="liquid-glass-card rounded-2xl">
-        <CardHeader className="border-b border-gray-200 dark:border-white/10">
-          <CardTitle className="text-xl font-bold text-black dark:text-white">
+        <CardHeader className="border-b border-gray-200 dark:border-[#2a2a2a]">
+          <CardTitle className="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
             Event Details
           </CardTitle>
           <CardDescription className="mt-1 text-gray-600 dark:text-gray-400">Enter all required information about your event</CardDescription>
@@ -329,7 +329,7 @@ export default function CreateEventPage() {
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-4 pt-6 border-t border-gray-200 dark:border-white/10">
+            <div className="flex gap-4 pt-6 border-t border-gray-200 dark:border-[#2a2a2a]">
               <Button
                 type="submit"
                 disabled={loading}
@@ -344,7 +344,7 @@ export default function CreateEventPage() {
                 size="lg"
                 onClick={() => navigate('/organizer')}
                 disabled={loading}
-                className="border-gray-300 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl"
+                className="border-gray-300 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl"
               >
                 Cancel
               </Button>

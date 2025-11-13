@@ -440,7 +440,7 @@ export default function ProfilePage() {
                     value={formData.avatar}
                     onChange={handleChange}
                     placeholder="https://example.com/avatar.jpg"
-                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
+                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
                   />
                 </div>
 
@@ -454,7 +454,7 @@ export default function ProfilePage() {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
+                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
                     required
                   />
                 </div>
@@ -469,7 +469,7 @@ export default function ProfilePage() {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
+                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
                     required
                   />
                 </div>
@@ -483,7 +483,7 @@ export default function ProfilePage() {
                     value={formData.faculty}
                     onChange={handleChange}
                     placeholder="e.g., Computer Science"
-                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
+                    className="mt-2 bg-gray-100 dark:bg-[#2a2a2a] border-gray-300 dark:border-[#3a3a3a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] transition-colors duration-300"
                   />
                 </div>
 

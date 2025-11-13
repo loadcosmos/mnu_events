@@ -62,8 +62,8 @@ export default function AdminDashboardPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400">Loading statistics...</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">Admin Dashboard</h1>
+          <p className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Loading statistics...</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
@@ -83,9 +83,9 @@ export default function AdminDashboardPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Admin Dashboard</h1>
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4">
-            <p className="text-red-600 dark:text-red-400">{error}</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">Admin Dashboard</h1>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 transition-colors duration-300">
+            <p className="text-red-600 dark:text-red-400 transition-colors duration-300">{error}</p>
           </div>
         </div>
       </div>
@@ -95,55 +95,55 @@ export default function AdminDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-400">Platform statistics and overview</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">Admin Dashboard</h1>
+        <p className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Platform statistics and overview</p>
       </div>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-shadow">
+        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-all duration-300">
           <CardHeader className="pb-3">
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">Total Users</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.totalUsers}</CardTitle>
+            <CardDescription className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Total Users</CardDescription>
+            <CardTitle className="text-4xl font-bold text-gray-900 dark:text-white transition-colors duration-300">{stats.totalUsers}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge variant="outline" className="text-xs dark:border-white/20">
+            <Badge variant="outline" className="text-xs border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
               All registered users
             </Badge>
           </CardContent>
         </Card>
 
-        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-shadow">
+        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-all duration-300">
           <CardHeader className="pb-3">
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">Total Events</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.totalEvents}</CardTitle>
+            <CardDescription className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Total Events</CardDescription>
+            <CardTitle className="text-4xl font-bold text-gray-900 dark:text-white transition-colors duration-300">{stats.totalEvents}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge variant="outline" className="text-xs dark:border-white/20">
+            <Badge variant="outline" className="text-xs border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
               All platform events
             </Badge>
           </CardContent>
         </Card>
 
-        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-shadow">
+        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-all duration-300">
           <CardHeader className="pb-3">
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">Total Registrations</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.totalRegistrations}</CardTitle>
+            <CardDescription className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Total Registrations</CardDescription>
+            <CardTitle className="text-4xl font-bold text-gray-900 dark:text-white transition-colors duration-300">{stats.totalRegistrations}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge variant="outline" className="text-xs dark:border-white/20">
+            <Badge variant="outline" className="text-xs border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
               Event registrations
             </Badge>
           </CardContent>
         </Card>
 
-        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-shadow">
+        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-all duration-300">
           <CardHeader className="pb-3">
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">Active Clubs</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.activeClubs}</CardTitle>
+            <CardDescription className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Active Clubs</CardDescription>
+            <CardTitle className="text-4xl font-bold text-gray-900 dark:text-white transition-colors duration-300">{stats.activeClubs}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge variant="outline" className="text-xs dark:border-white/20">
+            <Badge variant="outline" className="text-xs border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
               Student clubs
             </Badge>
           </CardContent>
@@ -151,24 +151,24 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <Card className="liquid-glass-card rounded-2xl">
+      <Card className="liquid-glass-card rounded-2xl transition-all duration-300">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-black dark:text-white">Quick Actions</CardTitle>
-          <CardDescription className="dark:text-gray-400">Manage platform content</CardDescription>
+          <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white transition-colors duration-300">Quick Actions</CardTitle>
+          <CardDescription className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Manage platform content</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-              <h3 className="font-semibold text-black dark:text-white mb-1">Manage Events</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">View and manage all platform events</p>
+            <div className="p-4 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-300">Manage Events</h3>
+              <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">View and manage all platform events</p>
             </div>
-            <div className="p-4 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-              <h3 className="font-semibold text-black dark:text-white mb-1">Manage Users</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">View and manage user accounts</p>
+            <div className="p-4 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-300">Manage Users</h3>
+              <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">View and manage user accounts</p>
             </div>
-            <div className="p-4 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-              <h3 className="font-semibold text-black dark:text-white mb-1">Manage Clubs</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">View and manage student clubs</p>
+            <div className="p-4 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-300">Manage Clubs</h3>
+              <p className="text-sm text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">View and manage student clubs</p>
             </div>
           </div>
         </CardContent>

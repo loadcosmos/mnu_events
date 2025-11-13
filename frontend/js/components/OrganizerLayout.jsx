@@ -46,7 +46,7 @@ export default function OrganizerLayout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex transition-colors duration-300">
       {/* Left Sidebar */}
       <aside className={cn(
         "fixed left-0 top-0 liquid-glass-strong text-white transition-all duration-300 z-40 m-4 rounded-3xl h-[calc(100vh-2rem)]",
@@ -154,7 +154,7 @@ export default function OrganizerLayout({ children }) {
             >
               {sidebarOpen ? '☰' : '☰'}
             </Button>
-            <h1 className="text-xl font-semibold text-black dark:text-white">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white transition-colors duration-300">
               {navItems.find(item => item.path === location.pathname)?.label || 'Dashboard'}
             </h1>
           </div>
@@ -185,7 +185,7 @@ export default function OrganizerLayout({ children }) {
                         "w-full text-left px-2 py-1.5 text-sm rounded-xl transition-colors",
                         selectedLang === lang
                           ? "liquid-glass-red-button text-white"
-                          : "hover:bg-gray-200/50 dark:hover:bg-white/10 text-black dark:text-white"
+                          : "hover:bg-gray-200/50 dark:hover:bg-white/10 text-gray-900 dark:text-white"
                       )}
                     >
                       {lang}
