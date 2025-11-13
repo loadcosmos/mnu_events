@@ -322,17 +322,23 @@ export default function HomePage() {
                   </div>
 
                   <button
-                    onClick={() =>
-                      setCurrentSlide((prev) => (prev - 1 + 6) % Math.min(events.length, 6))
-                    }
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentSlide((prev) => (prev - 1 + 6) % Math.min(events.length, 6));
+                    }}
+                    className="hidden md:block absolute left-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all hover:scale-110"
                     aria-label="Previous slide"
                   >
                     <i className="fa-solid fa-chevron-left text-xl" />
                   </button>
                   <button
-                    onClick={() => setCurrentSlide((prev) => (prev + 1) % Math.min(events.length, 6))}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentSlide((prev) => (prev + 1) % Math.min(events.length, 6));
+                    }}
+                    className="hidden md:block absolute right-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all hover:scale-110"
                     aria-label="Next slide"
                   >
                     <i className="fa-solid fa-chevron-right text-xl" />
