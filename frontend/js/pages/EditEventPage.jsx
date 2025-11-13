@@ -238,32 +238,32 @@ export default function EditEventPage() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black mb-2">Edit Event</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Edit Event</h1>
+        <p className="text-gray-600 dark:text-gray-400">
           Update the details of your event
         </p>
       </div>
 
-      <Card className="border border-gray-200 bg-white">
-        <CardHeader className="border-b border-gray-200">
-          <CardTitle className="text-xl font-bold text-black">
+      <Card className="liquid-glass-card rounded-2xl">
+        <CardHeader className="border-b border-gray-200 dark:border-white/10">
+          <CardTitle className="text-xl font-bold text-black dark:text-white">
             Event Details
           </CardTitle>
-          <CardDescription className="mt-1 text-gray-600">
+          <CardDescription className="mt-1 text-gray-600 dark:text-gray-400">
             Update the information about your event
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="p-4 rounded-md bg-destructive/10 text-destructive text-sm border border-destructive/20">
+              <div className="p-4 rounded-2xl bg-destructive/10 text-destructive text-sm border border-destructive/20">
                 {error}
               </div>
             )}
 
             {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
+              <Label htmlFor="title" className="dark:text-white">Title *</Label>
               <Input
                 id="title"
                 type="text"
@@ -271,12 +271,13 @@ export default function EditEventPage() {
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
                 required
+                className="rounded-xl"
               />
             </div>
 
             {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description" className="dark:text-white">Description *</Label>
               <Textarea
                 id="description"
                 placeholder="Describe your event..."
@@ -284,18 +285,19 @@ export default function EditEventPage() {
                 onChange={(e) => handleChange('description', e.target.value)}
                 rows={5}
                 required
+                className="rounded-xl"
               />
             </div>
 
             {/* Category */}
             <div className="space-y-2">
-              <Label htmlFor="category">Category *</Label>
+              <Label htmlFor="category" className="dark:text-white">Category *</Label>
               <Select
                 value={formData.category}
                 onValueChange={(value) => handleChange('category', value)}
                 required
               >
-                <SelectTrigger id="category">
+                <SelectTrigger id="category" className="rounded-xl">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -310,7 +312,7 @@ export default function EditEventPage() {
 
             {/* Location */}
             <div className="space-y-2">
-              <Label htmlFor="location">Location *</Label>
+              <Label htmlFor="location" className="dark:text-white">Location *</Label>
               <Input
                 id="location"
                 type="text"
@@ -318,13 +320,14 @@ export default function EditEventPage() {
                 value={formData.location}
                 onChange={(e) => handleChange('location', e.target.value)}
                 required
+                className="rounded-xl"
               />
             </div>
 
             {/* Start Date & Time */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date *</Label>
+                <Label htmlFor="startDate" className="dark:text-white">Start Date *</Label>
                 <Input
                   id="startDate"
                   type="date"
@@ -332,16 +335,18 @@ export default function EditEventPage() {
                   value={formData.startDate}
                   onChange={(e) => handleChange('startDate', e.target.value)}
                   required
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="startTime">Start Time *</Label>
+                <Label htmlFor="startTime" className="dark:text-white">Start Time *</Label>
                 <Input
                   id="startTime"
                   type="time"
                   value={formData.startTime}
                   onChange={(e) => handleChange('startTime', e.target.value)}
                   required
+                  className="rounded-xl"
                 />
               </div>
             </div>
@@ -349,7 +354,7 @@ export default function EditEventPage() {
             {/* End Date & Time */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="endDate">End Date *</Label>
+                <Label htmlFor="endDate" className="dark:text-white">End Date *</Label>
                 <Input
                   id="endDate"
                   type="date"
@@ -357,23 +362,25 @@ export default function EditEventPage() {
                   value={formData.endDate}
                   onChange={(e) => handleChange('endDate', e.target.value)}
                   required
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endTime">End Time *</Label>
+                <Label htmlFor="endTime" className="dark:text-white">End Time *</Label>
                 <Input
                   id="endTime"
                   type="time"
                   value={formData.endTime}
                   onChange={(e) => handleChange('endTime', e.target.value)}
                   required
+                  className="rounded-xl"
                 />
               </div>
             </div>
 
             {/* Capacity */}
             <div className="space-y-2">
-              <Label htmlFor="capacity">Capacity *</Label>
+              <Label htmlFor="capacity" className="dark:text-white">Capacity *</Label>
               <Input
                 id="capacity"
                 type="number"
@@ -382,28 +389,30 @@ export default function EditEventPage() {
                 value={formData.capacity}
                 onChange={(e) => handleChange('capacity', e.target.value)}
                 required
+                className="rounded-xl"
               />
             </div>
 
             {/* Image URL */}
             <div className="space-y-2">
-              <Label htmlFor="imageUrl">Image URL (optional)</Label>
+              <Label htmlFor="imageUrl" className="dark:text-white">Image URL (optional)</Label>
               <Input
                 id="imageUrl"
                 type="url"
                 placeholder="https://example.com/image.jpg"
                 value={formData.imageUrl}
                 onChange={(e) => handleChange('imageUrl', e.target.value)}
+                className="rounded-xl"
               />
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-4 pt-6 border-t border-gray-200">
+            <div className="flex gap-4 pt-6 border-t border-gray-200 dark:border-white/10">
               <Button
                 type="submit"
                 disabled={saving}
                 size="lg"
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                className="flex-1 liquid-glass-red-button text-white rounded-2xl"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </Button>
@@ -413,7 +422,7 @@ export default function EditEventPage() {
                 size="lg"
                 onClick={() => navigate(`/events/${id}`)}
                 disabled={saving}
-                className="border-gray-300 hover:bg-gray-50"
+                className="border-gray-300 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl"
               >
                 Cancel
               </Button>

@@ -195,30 +195,30 @@ export default function ClubDetailsPage() {
       <Button
         variant="ghost"
         onClick={() => navigate('/clubs')}
-        className="mb-4"
+        className="mb-4 rounded-xl"
       >
         ← Back to Clubs
       </Button>
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+        <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-2xl">
           <p className="text-destructive text-sm">{error}</p>
         </div>
       )}
 
       {/* Club Header */}
-      <Card className="mb-6">
+      <Card className="mb-6 liquid-glass-card rounded-2xl">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <CardTitle className="text-3xl">{club.name}</CardTitle>
+                <CardTitle className="text-3xl dark:text-white">{club.name}</CardTitle>
                 <Badge className={cn('text-white', getCategoryColor(club.category))}>
                   {mapCategoryToUI(club.category)}
                 </Badge>
               </div>
-              <CardDescription className="text-base mt-2">
+              <CardDescription className="text-base mt-2 dark:text-gray-400">
                 {club.description || 'No description available'}
               </CardDescription>
             </div>
@@ -226,7 +226,7 @@ export default function ClubDetailsPage() {
               <img
                 src={club.imageUrl}
                 alt={club.name}
-                className="w-32 h-32 object-cover rounded-lg ml-4"
+                className="w-32 h-32 object-cover rounded-2xl ml-4"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
@@ -235,7 +235,7 @@ export default function ClubDetailsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground dark:text-gray-400">
             <div className="flex items-center gap-2">
               <i className="fa-solid fa-users"></i>
               <span>{memberCount} {memberCount === 1 ? 'member' : 'members'}</span>
@@ -269,7 +269,7 @@ export default function ClubDetailsPage() {
               variant="destructive"
               onClick={handleLeave}
               disabled={leaving}
-              className="flex-1"
+              className="flex-1 rounded-2xl"
             >
               {leaving ? (
                 <>
@@ -287,7 +287,7 @@ export default function ClubDetailsPage() {
             <Button
               onClick={handleJoin}
               disabled={joining}
-              className="flex-1"
+              className="flex-1 rounded-2xl"
             >
               {joining ? (
                 <>
@@ -307,14 +307,14 @@ export default function ClubDetailsPage() {
 
       {!isAuthenticated() && (
         <div className="mb-6">
-          <Card className="bg-muted/50">
+          <Card className="liquid-glass-card rounded-2xl">
             <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground mb-4">
+              <p className="text-center text-muted-foreground dark:text-gray-400 mb-4">
                 Sign in to join this club
               </p>
               <Button
                 onClick={() => navigate('/login')}
-                className="w-full"
+                className="w-full rounded-2xl"
               >
                 Sign In to Join
               </Button>
@@ -326,9 +326,9 @@ export default function ClubDetailsPage() {
       {/* Сообщение для организаторов и админов */}
       {isAuthenticated() && user?.role !== 'STUDENT' && (
         <div className="mb-6">
-          <Card className="bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
+          <Card className="liquid-glass-card rounded-2xl">
             <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground text-center">
+              <p className="text-sm text-muted-foreground dark:text-gray-400 text-center">
                 {user?.role === 'ORGANIZER'
                   ? 'Organizers cannot join clubs. Manage your clubs from the dashboard.'
                   : 'Only students can join clubs.'}
@@ -342,9 +342,9 @@ export default function ClubDetailsPage() {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Organizer Card */}
         {club.organizer && (
-          <Card>
+          <Card className="liquid-glass-card rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-lg">Organizer</CardTitle>
+              <CardTitle className="text-lg dark:text-white">Organizer</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-3">
@@ -368,10 +368,10 @@ export default function ClubDetailsPage() {
                   {club.organizer.firstName?.[0] || club.organizer.email?.[0] || 'U'}
                 </div>
                 <div>
-                  <p className="font-semibold">
+                  <p className="font-semibold dark:text-white">
                     {club.organizer.firstName} {club.organizer.lastName}
                   </p>
-                  <p className="text-sm text-muted-foreground">{club.organizer.email}</p>
+                  <p className="text-sm text-muted-foreground dark:text-gray-400">{club.organizer.email}</p>
                 </div>
               </div>
             </CardContent>
@@ -379,25 +379,25 @@ export default function ClubDetailsPage() {
         )}
 
         {/* Club Stats */}
-        <Card>
+        <Card className="liquid-glass-card rounded-2xl">
           <CardHeader>
-            <CardTitle className="text-lg">Club Statistics</CardTitle>
+            <CardTitle className="text-lg dark:text-white">Club Statistics</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Members</span>
-                <span className="font-semibold">{memberCount}</span>
+                <span className="text-muted-foreground dark:text-gray-400">Members</span>
+                <span className="font-semibold dark:text-white">{memberCount}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Category</span>
+                <span className="text-muted-foreground dark:text-gray-400">Category</span>
                 <Badge className={cn('text-white', getCategoryColor(club.category))}>
                   {mapCategoryToUI(club.category)}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Created</span>
-                <span className="font-semibold">
+                <span className="text-muted-foreground dark:text-gray-400">Created</span>
+                <span className="font-semibold dark:text-white">
                   {new Date(club.createdAt).toLocaleDateString()}
                 </span>
               </div>

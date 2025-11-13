@@ -62,15 +62,15 @@ export default function AdminDashboardPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Loading statistics...</p>
+          <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Admin Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">Loading statistics...</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i} className="animate-pulse liquid-glass-card rounded-2xl">
               <CardHeader>
-                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded w-16"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2"></div>
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
               </CardHeader>
             </Card>
           ))}
@@ -83,9 +83,9 @@ export default function AdminDashboardPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black mb-2">Admin Dashboard</h1>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-600">{error}</p>
+          <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Admin Dashboard</h1>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
           </div>
         </div>
       </div>
@@ -95,55 +95,55 @@ export default function AdminDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600">Platform statistics and overview</p>
+        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Admin Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400">Platform statistics and overview</p>
       </div>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-white border border-gray-200 hover:shadow-lg transition-shadow">
+        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-shadow">
           <CardHeader className="pb-3">
-            <CardDescription className="text-sm text-gray-600">Total Users</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black">{stats.totalUsers}</CardTitle>
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">Total Users</CardDescription>
+            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.totalUsers}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs dark:border-white/20">
               All registered users
             </Badge>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border border-gray-200 hover:shadow-lg transition-shadow">
+        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-shadow">
           <CardHeader className="pb-3">
-            <CardDescription className="text-sm text-gray-600">Total Events</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black">{stats.totalEvents}</CardTitle>
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">Total Events</CardDescription>
+            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.totalEvents}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs dark:border-white/20">
               All platform events
             </Badge>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border border-gray-200 hover:shadow-lg transition-shadow">
+        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-shadow">
           <CardHeader className="pb-3">
-            <CardDescription className="text-sm text-gray-600">Total Registrations</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black">{stats.totalRegistrations}</CardTitle>
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">Total Registrations</CardDescription>
+            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.totalRegistrations}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs dark:border-white/20">
               Event registrations
             </Badge>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border border-gray-200 hover:shadow-lg transition-shadow">
+        <Card className="liquid-glass-card rounded-2xl hover:shadow-lg transition-shadow">
           <CardHeader className="pb-3">
-            <CardDescription className="text-sm text-gray-600">Active Clubs</CardDescription>
-            <CardTitle className="text-4xl font-bold text-black">{stats.activeClubs}</CardTitle>
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">Active Clubs</CardDescription>
+            <CardTitle className="text-4xl font-bold text-black dark:text-white">{stats.activeClubs}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs dark:border-white/20">
               Student clubs
             </Badge>
           </CardContent>
@@ -151,24 +151,24 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <Card className="bg-white border border-gray-200">
+      <Card className="liquid-glass-card rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-black">Quick Actions</CardTitle>
-          <CardDescription>Manage platform content</CardDescription>
+          <CardTitle className="text-xl font-semibold text-black dark:text-white">Quick Actions</CardTitle>
+          <CardDescription className="dark:text-gray-400">Manage platform content</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <h3 className="font-semibold text-black mb-1">Manage Events</h3>
-              <p className="text-sm text-gray-600">View and manage all platform events</p>
+            <div className="p-4 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+              <h3 className="font-semibold text-black dark:text-white mb-1">Manage Events</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">View and manage all platform events</p>
             </div>
-            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <h3 className="font-semibold text-black mb-1">Manage Users</h3>
-              <p className="text-sm text-gray-600">View and manage user accounts</p>
+            <div className="p-4 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+              <h3 className="font-semibold text-black dark:text-white mb-1">Manage Users</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">View and manage user accounts</p>
             </div>
-            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <h3 className="font-semibold text-black mb-1">Manage Clubs</h3>
-              <p className="text-sm text-gray-600">View and manage student clubs</p>
+            <div className="p-4 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+              <h3 className="font-semibold text-black dark:text-white mb-1">Manage Clubs</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">View and manage student clubs</p>
             </div>
           </div>
         </CardContent>
