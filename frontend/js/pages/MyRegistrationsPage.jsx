@@ -61,12 +61,9 @@ export default function MyRegistrationsPage() {
 
   const loadTickets = async () => {
     try {
-      // TODO Phase 4: Implement backend API
-      // For now, use mock data or skip
-      // const response = await paymentsService.getMyTickets();
-      // const data = Array.isArray(response) ? response : (response.data || response.tickets || []);
-      // setTickets(data);
-      setTickets([]); // Mock empty for now
+      const response = await paymentsService.getMyTickets();
+      const data = Array.isArray(response) ? response : (response.data || response.tickets || []);
+      setTickets(data);
     } catch (err) {
       console.error('[MyRegistrationsPage] Load tickets failed:', err);
       setTickets([]);

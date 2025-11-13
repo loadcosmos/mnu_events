@@ -9,6 +9,9 @@ import eventsService from '../services/eventsService';
 import registrationsService from '../services/registrationsService';
 import { cn } from '../lib/utils';
 import { toast } from 'sonner';
+import QRScannerModal from '../components/QRScannerModal';
+import checkinService from '../services/checkinService';
+import { Camera, CheckCircle } from 'lucide-react';
 
 export default function EventDetailsPage() {
   const { id } = useParams();
@@ -24,6 +27,7 @@ export default function EventDetailsPage() {
   const [hasPaidTicket, setHasPaidTicket] = useState(false);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
+  const [checkInLoading, setCheckInLoading] = useState(false);
 
   useEffect(() => {
     loadEvent();
@@ -157,6 +161,29 @@ export default function EventDetailsPage() {
       console.error('[EventDetailsPage] Cancel registration failed:', err);
     } finally {
       setRegistering(false);
+    }
+  };
+
+  const handleStudentCheckIn = async (qrData) => {
+    try {
+      setCheckInLoading(true);
+      const data = JSON.parse(qrData);
+      const response = await checkinService.validateStudent(data);
+      
+      if (response.success) {
+        setHasCheckedIn(true);
+        toast.success('✅ Check-in successful!', {
+          description: 'Your attendance has been recorded.',
+        });
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Check-in failed';
+      toast.error('❌ Check-in failed', {
+        description: errorMessage,
+      });
+      throw error; // Re-throw to close modal only on success
+    } finally {
+      setCheckInLoading(false);
     }
   };
 
@@ -546,6 +573,28 @@ export default function EventDetailsPage() {
                         to {event.isPaid ? 'buy a ticket' : 'register'} for this event
                       </p>
                     )}
+
+                    {/* Check-in button for STUDENTS_SCAN mode */}
+                    {event.checkInMode === 'STUDENTS_SCAN' && isRegistered && !hasCheckedIn && (
+                      <Button
+                        className="w-full text-base md:text-lg py-6 liquid-glass-red-button text-white transition-all duration-300"
+                        onClick={() => setShowQRScanner(true)}
+                        disabled={checkInLoading}
+                      >
+                        <Camera className="mr-2 h-5 w-5" />
+                        {checkInLoading ? 'Processing...' : 'Check In to Event'}
+                      </Button>
+                    )}
+
+                    {/* Check-in success message */}
+                    {hasCheckedIn && (
+                      <div className="p-4 rounded-md bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 transition-colors duration-300 flex items-center gap-3">
+                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        <p className="text-base font-semibold text-green-800 dark:text-green-400 transition-colors duration-300">
+                          You have checked in to this event
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -584,6 +633,14 @@ export default function EventDetailsPage() {
           />
         )}
       </div>
+
+      {/* QR Scanner Modal */}
+      <QRScannerModal
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+        onScan={handleStudentCheckIn}
+        title="Scan Event QR Code"
+      />
     </div>
   );
 }

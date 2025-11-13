@@ -21,6 +21,8 @@ import ServicesPage from './pages/ServicesPage.jsx';
 import TutoringPage from './pages/TutoringPage.jsx';
 import ServiceDetailsPage from './pages/ServiceDetailsPage.jsx';
 import OrganizerPage from './pages/OrganizerPage.jsx';
+import OrganizerScannerPage from './pages/OrganizerScannerPage.jsx';
+import OrganizerAnalyticsPage from './pages/OrganizerAnalyticsPage.jsx';
 import AdminLoginPage from './pages/AdminLoginPage.jsx';
 import VerifyEmailPage from './pages/VerifyEmailPage.jsx';
 import CreateEventPage from './pages/CreateEventPage.jsx';
@@ -87,7 +89,23 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+          <Route
+            path="/organizer/scanner/:eventId"
+            element={
+              <ProtectedRoute roles={['ORGANIZER']}>
+                <OrganizerScannerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/organizer/analytics"
+            element={
+              <ProtectedRoute roles={['ORGANIZER']}>
+                <OrganizerLayout><OrganizerAnalyticsPage /></OrganizerLayout>
+              </ProtectedRoute>
+            }
+          />
+
           {/* Защищенные маршруты для студентов - требуют роль STUDENT */}
           <Route
             path="/registrations"

@@ -6,6 +6,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import usersService from '../services/usersService';
 import registrationsService from '../services/registrationsService';
+import analyticsService from '../services/analyticsService';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 
@@ -45,26 +46,39 @@ export default function ProfilePage() {
         avatar: userData.avatar || '',
       });
 
-      // Load user stats
+      // Load user stats from analytics service
       try {
-        const registrationsResponse = await registrationsService.getMyRegistrations();
-        const registrations = registrationsResponse.data || registrationsResponse || [];
-
-        const today = new Date();
-        const attended = registrations.filter(
-          reg => reg.checkedInAt && new Date(reg.event?.startDate) < today
-        ).length;
-        const upcoming = registrations.filter(
-          reg => reg.status === 'REGISTERED' && new Date(reg.event?.startDate) >= today
-        ).length;
+        const analyticsData = await analyticsService.getStudentStats(currentUser.id);
 
         setStats({
-          eventsAttended: attended,
-          upcomingEvents: upcoming,
-          clubsJoined: 0, // TODO: Implement club memberships count
+          eventsAttended: analyticsData.eventsAttended || 0,
+          upcomingEvents: analyticsData.upcomingEvents || 0,
+          clubsJoined: analyticsData.clubsJoined || 0,
         });
       } catch (err) {
-        console.error('[ProfilePage] Failed to load stats:', err);
+        console.error('[ProfilePage] Failed to load analytics:', err);
+
+        // Fallback to manual calculation if analytics service fails
+        try {
+          const registrationsResponse = await registrationsService.getMyRegistrations();
+          const registrations = registrationsResponse.data || registrationsResponse || [];
+
+          const today = new Date();
+          const attended = registrations.filter(
+            reg => reg.checkedInAt && new Date(reg.event?.startDate) < today
+          ).length;
+          const upcoming = registrations.filter(
+            reg => reg.status === 'REGISTERED' && new Date(reg.event?.startDate) >= today
+          ).length;
+
+          setStats({
+            eventsAttended: attended,
+            upcomingEvents: upcoming,
+            clubsJoined: 0,
+          });
+        } catch (fallbackErr) {
+          console.error('[ProfilePage] Fallback stats calculation failed:', fallbackErr);
+        }
       }
     } catch (err) {
       console.error('[ProfilePage] Load user failed:', err);
