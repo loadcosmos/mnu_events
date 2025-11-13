@@ -113,7 +113,7 @@ export default function AdminEventsPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Events</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300 mb-2">Manage Events</h1>
           <p className="text-gray-600 dark:text-gray-400">Loading events...</p>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function AdminEventsPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Manage Events</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300 mb-2">Manage Events</h1>
         <p className="text-gray-600 dark:text-gray-400">View and manage all platform events</p>
       </div>
 
@@ -148,7 +148,7 @@ export default function AdminEventsPage() {
                     setSelectedCategory(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-[#1a1a1a] dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-[#2a2a2a] rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-[#1a1a1a] dark:text-white"
                 >
                   {categories.map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -186,7 +186,7 @@ export default function AdminEventsPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-xl font-semibold text-black dark:text-white mb-2">
+                    <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white transition-colors duration-300 mb-2">
                       {event.title}
                     </CardTitle>
                     <CardDescription className="text-gray-600 dark:text-gray-400 mb-3">

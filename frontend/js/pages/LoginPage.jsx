@@ -185,7 +185,7 @@ export default function LoginPage() {
                   onChange={handleChange}
                   disabled={loading}
                   required
-                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <div className="space-y-2">
@@ -200,7 +200,7 @@ export default function LoginPage() {
                   disabled={loading}
                   autoComplete="current-password"
                   required
-                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <Button type="submit" className="w-full liquid-glass-red-button text-white rounded-2xl" disabled={loading}>
@@ -220,7 +220,7 @@ export default function LoginPage() {
                   onChange={handleChange}
                   disabled={loading}
                   required
-                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <div className="space-y-2">
@@ -233,7 +233,7 @@ export default function LoginPage() {
                   value={formData.name}
                   onChange={handleChange}
                   disabled={loading}
-                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <div className="space-y-2">
@@ -248,7 +248,7 @@ export default function LoginPage() {
                   disabled={loading}
                   autoComplete="new-password"
                   required
-                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <div className="space-y-2">
@@ -263,7 +263,7 @@ export default function LoginPage() {
                   disabled={loading}
                   autoComplete="new-password"
                   required
-                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
+                  className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
               <Button type="submit" className="w-full liquid-glass-red-button text-white rounded-2xl" disabled={loading}>
