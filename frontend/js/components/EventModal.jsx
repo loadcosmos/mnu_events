@@ -260,7 +260,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                 <button
                   onClick={handleRegister}
                   disabled={registering || !user}
-                  className="w-full px-6 py-4 bg-[#d62e1f] hover:bg-[#b91c1c] text-white rounded-xl text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center shadow-lg"
+                  className="w-full px-6 py-4 liquid-glass-red-button text-white rounded-2xl text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
                 >
                   {registering ? (
                     <>

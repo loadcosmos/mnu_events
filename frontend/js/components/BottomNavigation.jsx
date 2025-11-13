@@ -58,29 +58,31 @@ const BottomNavigation = () => {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 liquid-glass-strong border-t-0 z-50 transition-colors duration-300"
+      className="md:hidden fixed bottom-4 left-4 right-4 z-50"
       role="navigation"
       aria-label="Mobile bottom navigation"
     >
-      <div className="flex justify-around items-center h-16 px-2">
-        {navItems.map((item) => {
-          const active = isActive(item.path);
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
-                active
-                  ? 'text-[#d62e1f]'
-                  : 'text-gray-600 dark:text-[#a0a0a0] hover:text-gray-900 dark:hover:text-white'
-              }`}
-              aria-current={active ? 'page' : undefined}
-            >
-              <div className="mb-1">{item.icon}</div>
-              <span className="text-xs font-medium">{item.label}</span>
-            </Link>
-          );
-        })}
+      <div className="liquid-glass-strong rounded-3xl shadow-2xl px-2 py-2">
+        <div className="flex justify-around items-center">
+          {navItems.map((item) => {
+            const active = isActive(item.path);
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`relative flex flex-col items-center justify-center px-4 py-2 rounded-2xl transition-all duration-300 ${
+                  active
+                    ? 'liquid-glass text-[#d62e1f] scale-105'
+                    : 'text-gray-600 dark:text-[#a0a0a0] hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/30 dark:hover:bg-white/5'
+                }`}
+                aria-current={active ? 'page' : undefined}
+              >
+                <div className="mb-1">{item.icon}</div>
+                <span className="text-xs font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );

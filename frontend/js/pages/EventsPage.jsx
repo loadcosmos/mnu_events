@@ -149,7 +149,7 @@ export default function EventsPage() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300 ${
                   selectedCategory === cat
-                    ? 'bg-[#d62e1f] text-white'
+                    ? 'liquid-glass-red-button text-white'
                     : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
@@ -175,7 +175,7 @@ export default function EventsPage() {
           {/* Filter Icon */}
           <button
             onClick={() => setFilterSheetOpen(true)}
-            className="bg-[#d62e1f] hover:bg-[#b91c1c] p-3 rounded-lg transition-colors"
+            className="liquid-glass-red-button text-white p-3 rounded-2xl"
             aria-label="Open filters"
           >
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -337,9 +337,9 @@ export default function EventsPage() {
                 {categories.map((category) => (
                   <label
                     key={category}
-                    className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-colors ${
                       selectedCategory === category
-                        ? 'bg-[#d62e1f] text-white'
+                        ? 'liquid-glass-red-button text-white'
                         : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
@@ -375,9 +375,9 @@ export default function EventsPage() {
                 {statuses.map((status) => (
                   <label
                     key={status}
-                    className={`flex items-center px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-colors ${
                       selectedStatus === status
-                        ? 'bg-[#d62e1f] text-white'
+                        ? 'liquid-glass-red-button text-white'
                         : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >

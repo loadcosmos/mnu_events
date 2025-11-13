@@ -133,7 +133,7 @@ export default function Layout({ children }) {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="liquid-glass-button text-gray-800 dark:text-white transition-colors"
+              className="rounded-xl text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 transition-all"
               aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
             >
               {isDark ? (
@@ -149,7 +149,7 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="default"
                 onClick={() => setLangOpen(!langOpen)}
-                className="liquid-glass-button gap-2 text-gray-800 dark:text-white text-base transition-colors"
+                className="rounded-xl gap-2 text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 text-base transition-all"
               >
                 {selectedLang}
                 <i
@@ -159,7 +159,7 @@ export default function Layout({ children }) {
                 />
               </Button>
               {langOpen && (
-                <div className="absolute left-0 top-full mt-2 w-32 rounded-lg liquid-glass-strong p-1 shadow-xl z-50">
+                <div className="absolute left-0 top-full mt-2 w-32 rounded-2xl liquid-glass-strong p-1 shadow-xl z-50">
                   {['ENG', 'РУС', 'ҚАЗ'].map((lang) => (
                     <button
                       key={lang}
@@ -168,8 +168,8 @@ export default function Layout({ children }) {
                         setLangOpen(false);
                       }}
                       className={cn(
-                        'w-full text-left px-3 py-1.5 text-sm rounded-sm text-gray-600 dark:text-[#a0a0a0] hover:liquid-glass-button hover:text-gray-900 dark:hover:text-white transition-all',
-                        selectedLang === lang && 'liquid-glass-button text-gray-900 dark:text-white'
+                        'w-full text-left px-3 py-1.5 text-sm rounded-xl text-gray-600 dark:text-[#a0a0a0] hover:bg-gray-200/50 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all',
+                        selectedLang === lang && 'bg-gray-200/70 dark:bg-white/15 text-gray-900 dark:text-white'
                       )}
                     >
                       {lang}
@@ -185,7 +185,7 @@ export default function Layout({ children }) {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="liquid-glass-button text-gray-800 dark:text-white"
+              className="rounded-xl text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 transition-all"
               aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
             >
               {isDark ? (
@@ -202,7 +202,7 @@ export default function Layout({ children }) {
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           >
             <img
-              src="/images/logo.png"
+              src={isDark ? "/images/logo.png" : "/images/logoblack.png"}
               alt="MNU Events"
               className="h-12 transition-all duration-300"
             />
@@ -216,7 +216,7 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="default"
                 asChild
-                className="liquid-glass-button text-gray-800 dark:text-white text-base transition-colors"
+                className="rounded-xl text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 text-base transition-all"
               >
                 <Link to="/events">Events</Link>
               </Button>
@@ -224,7 +224,7 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="default"
                 asChild
-                className="liquid-glass-button text-gray-800 dark:text-white text-base transition-colors"
+                className="rounded-xl text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 text-base transition-all"
               >
                 <Link to="/clubs">Clubs</Link>
               </Button>
@@ -240,7 +240,7 @@ export default function Layout({ children }) {
                       variant="ghost"
                       size="default"
                       onClick={() => setProfileOpen(!profileOpen)}
-                      className="liquid-glass-button gap-2 text-gray-800 dark:text-white text-base transition-colors"
+                      className="rounded-xl gap-2 text-gray-800 dark:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 text-base transition-all"
                     >
                       <i className="fa-regular fa-circle-user text-lg" />
                       <span className="hidden sm:inline">
@@ -253,13 +253,13 @@ export default function Layout({ children }) {
                       />
                     </Button>
                     {profileOpen && (
-                      <div className="absolute right-0 top-full mt-2 w-56 rounded-lg liquid-glass-strong shadow-xl z-50">
+                      <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl liquid-glass-strong shadow-xl z-50">
                         <div className="p-1">
                           {user?.role === 'STUDENT' && (
                             <Link
                               to="/registrations"
                               onClick={() => setProfileOpen(false)}
-                              className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:liquid-glass-button hover:text-gray-900 dark:hover:text-white transition-all rounded-sm"
+                              className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:bg-gray-200/50 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all rounded-xl"
                             >
                               <i className="fa-solid fa-calendar-check w-4 text-center" />
                               My Registrations
@@ -268,18 +268,18 @@ export default function Layout({ children }) {
                           <Link
                             to="/profile"
                             onClick={() => setProfileOpen(false)}
-                            className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:liquid-glass-button hover:text-gray-900 dark:hover:text-white transition-all rounded-sm"
+                            className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:bg-gray-200/50 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all rounded-xl"
                           >
                             <i className="fa-solid fa-user-edit w-4 text-center" />
                             Edit Profile
                           </Link>
-                          <div className="my-1 h-px liquid-glass-button" />
+                          <div className="my-1 h-px bg-gray-300/30 dark:bg-white/10" />
                           <button
                             onClick={() => {
                               setProfileOpen(false);
                               handleLogout();
                             }}
-                            className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white transition-colors rounded-sm"
+                            className="flex w-full items-center gap-3 px-3 py-2 text-sm text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white transition-colors rounded-xl"
                           >
                             <i className="fa-solid fa-sign-out-alt w-4 text-center" />
                             Logout
@@ -294,7 +294,7 @@ export default function Layout({ children }) {
                   {/* Desktop Only: Login Button */}
                   <Button
                     asChild
-                    className="bg-[#d62e1f] text-white hover:bg-[#b91c1c] rounded-full text-base px-6 font-semibold transition-colors shadow-md"
+                    className="liquid-glass-red-button text-white rounded-2xl text-base px-6 font-semibold shadow-lg"
                   >
                     <Link to="/login">Log In</Link>
                   </Button>

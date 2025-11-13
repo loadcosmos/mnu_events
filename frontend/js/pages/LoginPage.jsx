@@ -203,7 +203,7 @@ export default function LoginPage() {
                   className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
-              <Button type="submit" className="w-full bg-[#d62e1f] hover:bg-[#b91c1c] text-white transition-colors" disabled={loading}>
+              <Button type="submit" className="w-full liquid-glass-red-button text-white rounded-2xl" disabled={loading}>
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
@@ -266,7 +266,7 @@ export default function LoginPage() {
                   className="bg-gray-50 dark:bg-[#0a0a0a] border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-[#d62e1f] transition-colors duration-300"
                 />
               </div>
-              <Button type="submit" className="w-full bg-[#d62e1f] hover:bg-[#b91c1c] text-white transition-colors" disabled={loading}>
+              <Button type="submit" className="w-full liquid-glass-red-button text-white rounded-2xl" disabled={loading}>
                 {loading ? 'Signing Up...' : 'Sign Up'}
               </Button>
             </form>
