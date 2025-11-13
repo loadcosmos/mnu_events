@@ -7,10 +7,9 @@ import { Badge } from '../components/ui/badge';
 import QRScannerModal from '../components/QRScannerModal';
 import eventsService from '../services/eventsService';
 import registrationsService from '../services/registrationsService';
+import checkinService from '../services/checkinService';
 import { cn } from '../lib/utils';
 import { toast } from 'sonner';
-import QRScannerModal from '../components/QRScannerModal';
-import checkinService from '../services/checkinService';
 import { Camera, CheckCircle } from 'lucide-react';
 
 export default function EventDetailsPage() {
