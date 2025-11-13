@@ -58,7 +58,7 @@ const BottomNavigation = () => {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-xl border-t border-black/10 dark:border-white/10 z-50 transition-colors duration-300"
+      className="md:hidden fixed bottom-0 left-0 right-0 liquid-glass-strong border-t-0 z-50 transition-colors duration-300"
       role="navigation"
       aria-label="Mobile bottom navigation"
     >

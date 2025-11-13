@@ -119,12 +119,12 @@ export default function EventModal({ eventId, isOpen, onClose }) {
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Dark Backdrop with blur */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300"
+        className="absolute inset-0 liquid-glass-overlay transition-opacity duration-300"
         onClick={onClose}
       />
 
       {/* Modern Modal Content - Single Column Layout with Liquid Glass */}
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200 dark:border-[#2a2a2a] transform transition-all duration-300 scale-100">
+      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto liquid-glass-strong rounded-2xl shadow-2xl transform transition-all duration-300 scale-100">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 dark:border-[#2a2a2a] border-t-[#d62e1f]"></div>
@@ -162,7 +162,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     {/* Date */}
-                    <div className="flex items-center gap-2.5 bg-white/10 dark:bg-black/50 backdrop-blur-md px-3 py-2.5 rounded-lg border border-white/20 shadow-lg transition-colors duration-300">
+                    <div className="flex items-center gap-2.5 liquid-glass px-3 py-2.5 rounded-lg shadow-lg transition-colors duration-300">
                       <i className="fa-regular fa-calendar text-[#d62e1f] text-lg flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-white/80 font-semibold mb-0.5">Date</p>
@@ -173,7 +173,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                     </div>
 
                     {/* Time */}
-                    <div className="flex items-center gap-2.5 bg-white/10 dark:bg-black/50 backdrop-blur-md px-3 py-2.5 rounded-lg border border-white/20 shadow-lg transition-colors duration-300">
+                    <div className="flex items-center gap-2.5 liquid-glass px-3 py-2.5 rounded-lg shadow-lg transition-colors duration-300">
                       <i className="fa-solid fa-clock text-[#d62e1f] text-lg flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-white/80 font-semibold mb-0.5">Time</p>
@@ -184,7 +184,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                     </div>
 
                     {/* Location */}
-                    <div className="flex items-center gap-2.5 bg-white/10 dark:bg-black/50 backdrop-blur-md px-3 py-2.5 rounded-lg border border-white/20 shadow-lg transition-colors duration-300">
+                    <div className="flex items-center gap-2.5 liquid-glass px-3 py-2.5 rounded-lg shadow-lg transition-colors duration-300">
                       <i className="fa-solid fa-location-dot text-[#d62e1f] text-lg flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-white/80 font-semibold mb-0.5">Location</p>
@@ -195,7 +195,7 @@ export default function EventModal({ eventId, isOpen, onClose }) {
                     </div>
 
                     {/* Capacity */}
-                    <div className="flex items-center gap-2.5 bg-white/10 dark:bg-black/50 backdrop-blur-md px-3 py-2.5 rounded-lg border border-white/20 shadow-lg transition-colors duration-300">
+                    <div className="flex items-center gap-2.5 liquid-glass px-3 py-2.5 rounded-lg shadow-lg transition-colors duration-300">
                       <i className="fa-solid fa-users text-[#d62e1f] text-lg flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-white/80 font-semibold mb-0.5">Capacity</p>
