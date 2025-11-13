@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
+import QRScannerModal from '../components/QRScannerModal';
 import eventsService from '../services/eventsService';
 import registrationsService from '../services/registrationsService';
 import { cn } from '../lib/utils';
@@ -21,6 +22,8 @@ export default function EventDetailsPage() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [myRegistration, setMyRegistration] = useState(null);
   const [hasPaidTicket, setHasPaidTicket] = useState(false);
+  const [hasCheckedIn, setHasCheckedIn] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
 
   useEffect(() => {
     loadEvent();
@@ -461,13 +464,27 @@ export default function EventDetailsPage() {
                           onClick={handleBuyTicket}
                           disabled={registering || isFull || !isAuthenticated()}
                         >
-                          {registering
-                            ? 'Processing...'
-                            : !isAuthenticated()
-                            ? 'Login to Buy Ticket'
-                            : isFull
-                            ? 'Sold Out'
-                            : 'Buy Ticket'}
+                          {registering ? (
+                            <>
+                              <i className="fa-solid fa-spinner fa-spin mr-2" />
+                              Processing...
+                            </>
+                          ) : !isAuthenticated() ? (
+                            <>
+                              <i className="fa-solid fa-sign-in mr-2" />
+                              Login to Buy Ticket
+                            </>
+                          ) : isFull ? (
+                            <>
+                              <i className="fa-solid fa-ban mr-2" />
+                              Sold Out
+                            </>
+                          ) : (
+                            <>
+                              <i className="fa-solid fa-credit-card mr-2" />
+                              Buy Ticket - {event.price}₸
+                            </>
+                          )}
                         </Button>
                       )
                     ) : (
@@ -497,6 +514,30 @@ export default function EventDetailsPage() {
                         </Button>
                       )
                     )}
+
+                    {/* QR Check-in Button for Free Events */}
+                    {!event.isPaid && isRegistered && event.checkInMode === 'STUDENTS_SCAN' && (
+                      <div className="pt-4 border-t border-gray-200 dark:border-[#2a2a2a]">
+                        {!hasCheckedIn ? (
+                          <Button
+                            variant="outline"
+                            className="w-full text-base md:text-lg py-6 border-2 border-[#d62e1f] text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white transition-all duration-300"
+                            onClick={() => setShowQRScanner(true)}
+                          >
+                            <i className="fa-solid fa-qrcode mr-2" />
+                            Check In with QR Code
+                          </Button>
+                        ) : (
+                          <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50">
+                            <p className="text-base font-semibold text-green-800 dark:text-green-400 text-center">
+                              <i className="fa-solid fa-check-circle mr-2" />
+                              You have checked in
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {!isAuthenticated() && (
                       <p className="text-sm md:text-base text-center text-muted-foreground transition-colors duration-300">
                         <Link to="/login" className="text-[#d62e1f] hover:underline font-medium transition-colors duration-300">
@@ -530,6 +571,18 @@ export default function EventDetailsPage() {
             </Card>
           </div>
         </div>
+
+        {/* QR Scanner Modal */}
+        {showQRScanner && (
+          <QRScannerModal
+            eventId={id}
+            onSuccess={(response) => {
+              setHasCheckedIn(true);
+              toast.success('Check-in successful!');
+            }}
+            onClose={() => setShowQRScanner(false)}
+          />
+        )}
       </div>
     </div>
   );
