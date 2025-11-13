@@ -1,9 +1,13 @@
 import apiClient from './apiClient';
 
+/**
+ * Check-in Service
+ * Handles QR code validation and event check-ins
+ */
 const checkinService = {
   /**
-   * Validate ticket QR code (Mode 1: Organizer scans student ticket)
-   * @param {Object} qrData - QR code data from ticket
+   * MODE 1: Organizer scans student ticket QR code (for paid events)
+   * @param {Object} qrData - Decoded QR data from ticket
    * @returns {Promise} Validation response
    */
   validateTicket: async (qrData) => {
@@ -12,8 +16,8 @@ const checkinService = {
   },
 
   /**
-   * Validate student check-in (Mode 2: Student scans event QR code)
-   * @param {string} qrData - QR code data from event
+   * MODE 2: Student scans event QR code (for free events/lectures)
+   * @param {Object} qrData - Decoded QR data from event
    * @returns {Promise} Validation response
    */
   validateStudent: async (qrData) => {
@@ -32,7 +36,7 @@ const checkinService = {
   },
 
   /**
-   * Generate QR code for an event
+   * Generate QR code for event (MODE 2: students scan)
    * @param {string} eventId - Event ID
    * @returns {Promise} QR code data
    */
@@ -46,11 +50,10 @@ const checkinService = {
    * @param {string} eventId - Event ID
    * @returns {Promise} List of check-ins
    */
-  getEventCheckIns: async (eventId) => {
+  getCheckInList: async (eventId) => {
     const response = await apiClient.get(`/checkin/event/${eventId}/list`);
     return response.data;
   },
 };
 
 export default checkinService;
-
