@@ -24,7 +24,7 @@ const clubsService = {
       if (params.search) queryParams.append('search', params.search);
 
       const queryString = queryParams.toString();
-      const url = `/clubs${queryString ? `?${queryString}` : ''}`;
+      const url = `/api/clubs${queryString ? `?${queryString}` : ''}`;
       
       const response = await api.get(url);
       return response;
@@ -41,7 +41,7 @@ const clubsService = {
    */
   async getById(id) {
     try {
-      const response = await api.get(`/clubs/${id}`);
+      const response = await api.get(`/api/clubs/${id}`);
       return response;
     } catch (error) {
       console.error('[clubsService] getById error:', error);
@@ -56,7 +56,7 @@ const clubsService = {
    */
   async create(clubData) {
     try {
-      const response = await api.post('/clubs', clubData);
+      const response = await api.post('/api/clubs', clubData);
       return response;
     } catch (error) {
       console.error('[clubsService] create error:', error);
@@ -72,7 +72,7 @@ const clubsService = {
    */
   async update(id, clubData) {
     try {
-      const response = await api.patch(`/clubs/${id}`, clubData);
+      const response = await api.patch(`/api/clubs/${id}`, clubData);
       return response;
     } catch (error) {
       console.error('[clubsService] update error:', error);
@@ -87,7 +87,7 @@ const clubsService = {
    */
   async delete(id) {
     try {
-      const response = await api.delete(`/clubs/${id}`);
+      const response = await api.delete(`/api/clubs/${id}`);
       return response;
     } catch (error) {
       console.error('[clubsService] delete error:', error);
@@ -101,7 +101,7 @@ const clubsService = {
    */
   async getMyClubs() {
     try {
-      const response = await api.get('/clubs/my');
+      const response = await api.get('/api/clubs/my');
       return response;
     } catch (error) {
       console.error('[clubsService] getMyClubs error:', error);
@@ -116,7 +116,7 @@ const clubsService = {
    */
   async join(id) {
     try {
-      const response = await api.post(`/clubs/${id}/join`);
+      const response = await api.post(`/api/clubs/${id}/join`);
       return response;
     } catch (error) {
       console.error('[clubsService] join error:', error);
@@ -131,7 +131,7 @@ const clubsService = {
    */
   async leave(id) {
     try {
-      const response = await api.post(`/clubs/${id}/leave`);
+      const response = await api.post(`/api/clubs/${id}/leave`);
       return response;
     } catch (error) {
       console.error('[clubsService] leave error:', error);

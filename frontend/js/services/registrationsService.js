@@ -12,7 +12,7 @@ const registrationsService = {
    */
   async register(eventId) {
     try {
-      const response = await api.post('/registrations', { eventId });
+      const response = await api.post('/api/registrations', { eventId });
       return response;
     } catch (error) {
       console.error('[RegistrationsService] Register failed:', error);
@@ -30,7 +30,7 @@ const registrationsService = {
       const queryParams = new URLSearchParams();
       if (params.status) queryParams.append('status', params.status);
 
-      const response = await api.get(`/registrations/my?${queryParams.toString()}`);
+      const response = await api.get(`/api/registrations/my?${queryParams.toString()}`);
       return response;
     } catch (error) {
       console.error('[RegistrationsService] Get my registrations failed:', error);
@@ -45,7 +45,7 @@ const registrationsService = {
    */
   async cancel(registrationId) {
     try {
-      await api.delete(`/registrations/${registrationId}`);
+      await api.delete(`/api/registrations/${registrationId}`);
     } catch (error) {
       console.error('[RegistrationsService] Cancel registration failed:', error);
       throw error;
@@ -59,7 +59,7 @@ const registrationsService = {
    */
   async getByEvent(eventId) {
     try {
-      const response = await api.get(`/registrations/event/${eventId}`);
+      const response = await api.get(`/api/registrations/event/${eventId}`);
       return response;
     } catch (error) {
       console.error('[RegistrationsService] Get registrations by event failed:', error);

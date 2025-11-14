@@ -13,8 +13,10 @@ async function bootstrap() {
     app.setGlobalPrefix('api');
 
     // CORS
+    const corsOrigin = configService.get('cors.origin');
+    console.log(`[Bootstrap] CORS Origin: ${corsOrigin}`);
     app.enableCors({
-      origin: configService.get('cors.origin'),
+      origin: corsOrigin,
       credentials: true,
     });
 

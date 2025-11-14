@@ -10,7 +10,7 @@ const servicesService = {
    * @param {Object} filters - Filter parameters
    */
   getAll: async (filters = {}) => {
-    const response = await apiClient.get('/services', { params: filters });
+    const response = await apiClient.get('/api/services', { params: filters });
     return response.data;
   },
 
@@ -19,7 +19,7 @@ const servicesService = {
    * @param {string} id - Service ID
    */
   getById: async (id) => {
-    const response = await apiClient.get(`/services/${id}`);
+    const response = await apiClient.get(`/api/services/${id}`);
     return response.data;
   },
 
@@ -28,7 +28,7 @@ const servicesService = {
    * @param {Object} data - Service data
    */
   create: async (data) => {
-    const response = await apiClient.post('/services', data);
+    const response = await apiClient.post('/api/services', data);
     return response.data;
   },
 
@@ -38,7 +38,7 @@ const servicesService = {
    * @param {Object} data - Updated service data
    */
   update: async (id, data) => {
-    const response = await apiClient.put(`/services/${id}`, data);
+    const response = await apiClient.put(`/api/services/${id}`, data);
     return response.data;
   },
 
@@ -47,7 +47,7 @@ const servicesService = {
    * @param {string} id - Service ID
    */
   delete: async (id) => {
-    const response = await apiClient.delete(`/services/${id}`);
+    const response = await apiClient.delete(`/api/services/${id}`);
     return response.data;
   },
 
@@ -55,7 +55,7 @@ const servicesService = {
    * Get current user's services
    */
   getMyServices: async () => {
-    const response = await apiClient.get('/services/my-services');
+    const response = await apiClient.get('/api/services/my-services');
     return response.data;
   },
 
@@ -64,7 +64,7 @@ const servicesService = {
    * @param {string} providerId - Provider user ID
    */
   getByProvider: async (providerId) => {
-    const response = await apiClient.get(`/services/provider/${providerId}`);
+    const response = await apiClient.get(`/api/services/provider/${providerId}`);
     return response.data;
   },
 };

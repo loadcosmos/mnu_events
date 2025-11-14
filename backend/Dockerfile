@@ -1,6 +1,7 @@
 # Base stage
 FROM node:20-alpine AS base
 WORKDIR /app
+RUN apk add --no-cache openssl libc6-compat
 COPY package*.json ./
 COPY prisma ./prisma/
 
@@ -22,6 +23,9 @@ RUN npm prune --production
 # Production stage
 FROM node:20-alpine AS production
 WORKDIR /app
+
+# Install openssl and libc6-compat before npm packages
+RUN apk add --no-cache openssl libc6-compat
 
 # Copy necessary files
 COPY --from=build /app/node_modules ./node_modules

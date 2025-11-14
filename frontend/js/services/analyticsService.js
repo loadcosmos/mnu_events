@@ -9,7 +9,7 @@ const analyticsService = {
    * Get dashboard statistics (ADMIN only)
    */
   getDashboard: async () => {
-    const response = await apiClient.get('/analytics/dashboard');
+    const response = await apiClient.get('/api/analytics/dashboard');
     return response.data;
   },
 
@@ -18,7 +18,7 @@ const analyticsService = {
    * @param {string} userId - User ID (optional, defaults to current user)
    */
   getOrganizerStats: async (userId) => {
-    const response = await apiClient.get(`/analytics/organizer/${userId}`);
+    const response = await apiClient.get(`/api/analytics/organizer/${userId}`);
     return response.data;
   },
 
@@ -27,7 +27,7 @@ const analyticsService = {
    * @param {string} userId - User ID (optional, defaults to current user)
    */
   getStudentStats: async (userId) => {
-    const response = await apiClient.get(`/analytics/student/${userId}`);
+    const response = await apiClient.get(`/api/analytics/student/${userId}`);
     return response.data;
   },
 
@@ -35,7 +35,7 @@ const analyticsService = {
    * Get revenue statistics (ADMIN only)
    */
   getRevenue: async () => {
-    const response = await apiClient.get('/analytics/revenue');
+    const response = await apiClient.get('/api/analytics/revenue');
     return response.data;
   },
 
@@ -44,7 +44,7 @@ const analyticsService = {
    * @param {string} eventId - Event ID
    */
   getEventStats: async (eventId) => {
-    const response = await apiClient.get(`/analytics/event/${eventId}`);
+    const response = await apiClient.get(`/api/analytics/event/${eventId}`);
     return response.data;
   },
 };

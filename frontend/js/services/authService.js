@@ -15,7 +15,7 @@ const authService = {
    */
   async register(userData) {
     try {
-      const response = await api.post('/auth/register', {
+      const response = await api.post('/api/auth/register', {
         email: userData.email,
         password: userData.password,
         firstName: userData.name?.split(' ')[0] || '',
@@ -40,7 +40,7 @@ const authService = {
    */
   async login(credentials) {
     try {
-      const response = await api.post('/auth/login', {
+      const response = await api.post('/api/auth/login', {
         email: credentials.email,
         password: credentials.password,
       });
@@ -64,7 +64,7 @@ const authService = {
   async logout() {
     try {
       // Опционально: отправляем запрос на сервер для инвалидации токена
-      await api.post('/auth/logout');
+      await api.post('/api/auth/logout');
     } catch (error) {
       console.error('[AuthService] Logout request failed:', error);
       // Продолжаем выход даже если запрос не удался
@@ -80,7 +80,7 @@ const authService = {
    */
   async getCurrentUser() {
     try {
-      const response = await api.get('/auth/profile');
+      const response = await api.get('/api/auth/profile');
 
       // Обновляем сохраненные данные пользователя
       if (response) {
@@ -103,7 +103,7 @@ const authService = {
    */
   async updateProfile(userData) {
     try {
-      const response = await api.put('/auth/profile', userData);
+      const response = await api.put('/api/auth/profile', userData);
 
       if (response.user) {
         this.saveUser(response.user);
@@ -125,7 +125,7 @@ const authService = {
    */
   async changePassword(passwordData) {
     try {
-      const response = await api.post('/auth/change-password', {
+      const response = await api.post('/api/auth/change-password', {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       });
@@ -144,7 +144,7 @@ const authService = {
    */
   async forgotPassword(email) {
     try {
-      const response = await api.post('/auth/forgot-password', { email });
+      const response = await api.post('/api/auth/forgot-password', { email });
       return response;
     } catch (error) {
       console.error('[AuthService] Forgot password failed:', error);
@@ -161,7 +161,7 @@ const authService = {
    */
   async resetPassword(resetData) {
     try {
-      const response = await api.post('/auth/reset-password', {
+      const response = await api.post('/api/auth/reset-password', {
         token: resetData.token,
         password: resetData.password,
       });
@@ -181,7 +181,7 @@ const authService = {
   async verifyEmail(verifyData) {
     try {
       // Бэкенд ожидает { email, code }, а не { token }
-      const response = await api.post('/auth/verify-email', verifyData);
+      const response = await api.post('/api/auth/verify-email', verifyData);
       
       // После верификации email получаем токены
       if (response.accessToken) {
@@ -202,7 +202,7 @@ const authService = {
    */
   async resendVerificationCode(email) {
     try {
-      const response = await api.post('/auth/resend-code', { email });
+      const response = await api.post('/api/auth/resend-code', { email });
       return response;
     } catch (error) {
       console.error('[AuthService] Resend verification code failed:', error);

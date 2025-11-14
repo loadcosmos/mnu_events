@@ -12,7 +12,7 @@ const usersService = {
    */
   async getById(id) {
     try {
-      const response = await api.get(`/users/${id}`);
+      const response = await api.get(`/api/users/${id}`);
       return response;
     } catch (error) {
       console.error('[UsersService] Get user by ID failed:', error);
@@ -28,7 +28,7 @@ const usersService = {
    */
   async update(id, userData) {
     try {
-      const response = await api.patch(`/users/${id}`, userData);
+      const response = await api.patch(`/api/users/${id}`, userData);
       return response;
     } catch (error) {
       console.error('[UsersService] Update user failed:', error);
@@ -52,7 +52,7 @@ const usersService = {
       if (params.search) queryParams.append('search', params.search);
 
       const queryString = queryParams.toString();
-      const url = queryString ? `/users?${queryString}` : '/users';
+      const url = queryString ? `/api/users?${queryString}` : '/api/users';
       const response = await api.get(url);
       return response;
     } catch (error) {
@@ -69,7 +69,7 @@ const usersService = {
    */
   async updateRole(id, roleData) {
     try {
-      const response = await api.patch(`/users/${id}/role`, roleData);
+      const response = await api.patch(`/api/users/${id}/role`, roleData);
       return response;
     } catch (error) {
       console.error('[UsersService] Update role failed:', error);
@@ -84,7 +84,7 @@ const usersService = {
    */
   async delete(id) {
     try {
-      await api.delete(`/users/${id}`);
+      await api.delete(`/api/users/${id}`);
     } catch (error) {
       console.error('[UsersService] Delete user failed:', error);
       throw error;

@@ -9,7 +9,13 @@
       "Bash(npx prisma migrate dev:*)",
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(ss:*)",
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(find:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

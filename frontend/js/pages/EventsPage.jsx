@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '../components/ui/input';
 import eventsService from '../services/eventsService';
 import EventModal from '../components/EventModal';
@@ -20,6 +21,7 @@ const mockAds = [
 ];
 
 export default function EventsPage() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
@@ -130,10 +132,20 @@ export default function EventsPage() {
       {/* Hero Section (Not Sticky) */}
       <div className="py-12 px-4 border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
-            Discover <span className="text-[#d62e1f]">Events</span>
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Find your next adventure</p>
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white transition-colors duration-300">
+                Discover <span className="text-[#d62e1f]">Events</span>
+              </h1>
+              <p className="text-xl text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Find your next adventure</p>
+            </div>
+            <button
+              onClick={() => navigate('/my-registrations')}
+              className="liquid-glass-red-button text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-lg"
+            >
+              My Registrations
+            </button>
+          </div>
         </div>
       </div>
 

@@ -8,7 +8,7 @@ const paymentsService = {
    * @returns {Promise} Payment response with transaction ID and payment URL
    */
   createPayment: async (eventId, amount) => {
-    const response = await apiClient.post('/payments/create', { eventId, amount });
+    const response = await apiClient.post('/api/payments/create', { eventId, amount });
     return response.data;
   },
 
@@ -19,7 +19,7 @@ const paymentsService = {
    * @returns {Promise} Confirmation response
    */
   confirmPayment: async (transactionId, status = 'success') => {
-    const response = await apiClient.post('/payments/webhook', { transactionId, status });
+    const response = await apiClient.post('/api/payments/webhook', { transactionId, status });
     return response.data;
   },
 
@@ -28,7 +28,7 @@ const paymentsService = {
    * @returns {Promise} List of tickets
    */
   getMyTickets: async () => {
-    const response = await apiClient.get('/payments/my-tickets');
+    const response = await apiClient.get('/api/payments/my-tickets');
     return response.data;
   },
 
@@ -38,7 +38,7 @@ const paymentsService = {
    * @returns {Promise} Ticket details
    */
   getTicketById: async (ticketId) => {
-    const response = await apiClient.get(`/payments/ticket/${ticketId}`);
+    const response = await apiClient.get(`/api/payments/ticket/${ticketId}`);
     return response.data;
   },
 
@@ -48,7 +48,7 @@ const paymentsService = {
    * @returns {Promise} Refund response
    */
   refundTicket: async (ticketId) => {
-    const response = await apiClient.post(`/payments/refund/${ticketId}`);
+    const response = await apiClient.post(`/api/payments/refund/${ticketId}`);
     return response.data;
   },
 
@@ -58,7 +58,7 @@ const paymentsService = {
    * @returns {Promise} Transaction details
    */
   getTransactionStatus: async (transactionId) => {
-    const response = await apiClient.get(`/payments/transaction/${transactionId}`);
+    const response = await apiClient.get(`/api/payments/transaction/${transactionId}`);
     return response.data;
   },
 };

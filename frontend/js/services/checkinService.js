@@ -11,7 +11,7 @@ const checkinService = {
    * @returns {Promise} Validation response
    */
   validateTicket: async (qrData) => {
-    const response = await apiClient.post('/checkin/validate-ticket', { qrData });
+    const response = await apiClient.post('/api/checkin/validate-ticket', { qrData });
     return response.data;
   },
 
@@ -21,7 +21,7 @@ const checkinService = {
    * @returns {Promise} Validation response
    */
   validateStudent: async (qrData) => {
-    const response = await apiClient.post('/checkin/validate-student', { qrData });
+    const response = await apiClient.post('/api/checkin/validate-student', { qrData });
     return response.data;
   },
 
@@ -31,7 +31,7 @@ const checkinService = {
    * @returns {Promise} Check-in stats
    */
   getEventStats: async (eventId) => {
-    const response = await apiClient.get(`/checkin/event/${eventId}/stats`);
+    const response = await apiClient.get(`/api/checkin/event/${eventId}/stats`);
     return response.data;
   },
 
@@ -41,7 +41,7 @@ const checkinService = {
    * @returns {Promise} QR code data
    */
   generateEventQR: async (eventId) => {
-    const response = await apiClient.post('/checkin/generate-event-qr', { eventId });
+    const response = await apiClient.post('/api/checkin/generate-event-qr', { eventId });
     return response.data;
   },
 
@@ -51,7 +51,7 @@ const checkinService = {
    * @returns {Promise} List of check-ins
    */
   getCheckInList: async (eventId) => {
-    const response = await apiClient.get(`/checkin/event/${eventId}/list`);
+    const response = await apiClient.get(`/api/checkin/event/${eventId}/list`);
     return response.data;
   },
 };

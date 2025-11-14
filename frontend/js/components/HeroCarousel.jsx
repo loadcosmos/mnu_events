@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function HeroCarousel({ slides = [], autoRotate = true, interval = 5000 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  
+  const carouselRef = useRef(null);
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
@@ -15,6 +19,30 @@ export default function HeroCarousel({ slides = [], autoRotate = true, interval 
 
   const goToSlide = (index) => {
     setCurrentIndex(index);
+  };
+
+  // Handle swipe functionality
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
   };
 
   useEffect(() => {
@@ -36,16 +64,24 @@ export default function HeroCarousel({ slides = [], autoRotate = true, interval 
       className="relative w-full h-[400px] md:h-[500px] overflow-hidden rounded-2xl"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      ref={carouselRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
-      {/* Slides */}
-      <div className="relative w-full h-full">
+      {/* Slides Container with Transform Animation */}
+      <div
+        className="relative w-full h-full"
+        style={{
+          transform: `translateX(-${currentIndex * 100}%)`,
+          transition: 'transform 0.5s ease-in-out',
+          display: 'flex'
+        }}
+      >
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`
-              absolute inset-0 transition-opacity duration-700
-              ${index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}
-            `}
+            className="w-full h-full flex-shrink-0 relative"
           >
             {/* Background Image */}
             <img
@@ -103,8 +139,9 @@ export default function HeroCarousel({ slides = [], autoRotate = true, interval 
             className="
               absolute left-4 top-1/2 -translate-y-1/2 z-20
               w-12 h-12 rounded-full bg-black/30 backdrop-blur-sm
-              hover:bg-black/50 transition-colors
+              hover:bg-black/50 transition-all duration-300
               flex items-center justify-center text-white
+              transition-opacity hover:opacity-80
             "
             aria-label="Previous slide"
           >
@@ -116,8 +153,9 @@ export default function HeroCarousel({ slides = [], autoRotate = true, interval 
             className="
               absolute right-4 top-1/2 -translate-y-1/2 z-20
               w-12 h-12 rounded-full bg-black/30 backdrop-blur-sm
-              hover:bg-black/50 transition-colors
+              hover:bg-black/50 transition-all duration-300
               flex items-center justify-center text-white
+              transition-opacity hover:opacity-80
             "
             aria-label="Next slide"
           >
@@ -128,13 +166,13 @@ export default function HeroCarousel({ slides = [], autoRotate = true, interval 
 
       {/* Indicators */}
       {slides.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2 pb-4">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               className={`
-                w-2 h-2 rounded-full transition-all
+                w-2 h-2 rounded-full transition-all duration-300
                 ${
                   index === currentIndex
                     ? 'bg-white w-8'
