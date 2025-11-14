@@ -139,9 +139,9 @@ export default function HeroCarousel({ slides = [], autoRotate = true, interval 
             className="
               absolute left-4 top-1/2 -translate-y-1/2 z-20
               w-12 h-12 rounded-full bg-black/30 backdrop-blur-sm
-              hover:bg-black/50 transition-all duration-300
+              hover:bg-black/50 transition-colors duration-300
               flex items-center justify-center text-white
-              transition-opacity hover:opacity-80
+              shrink-0
             "
             aria-label="Previous slide"
           >
@@ -153,9 +153,9 @@ export default function HeroCarousel({ slides = [], autoRotate = true, interval 
             className="
               absolute right-4 top-1/2 -translate-y-1/2 z-20
               w-12 h-12 rounded-full bg-black/30 backdrop-blur-sm
-              hover:bg-black/50 transition-all duration-300
+              hover:bg-black/50 transition-colors duration-300
               flex items-center justify-center text-white
-              transition-opacity hover:opacity-80
+              shrink-0
             "
             aria-label="Next slide"
           >
