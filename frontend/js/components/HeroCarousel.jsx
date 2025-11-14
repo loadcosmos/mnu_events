@@ -131,52 +131,66 @@ export default function HeroCarousel({ slides = [], autoRotate = true, interval 
         ))}
       </div>
 
-      {/* Navigation Arrows */}
+      {/* Navigation Arrows - Desktop Only */}
       {slides.length > 1 && (
         <>
+          {/* Previous Button */}
           <button
             onClick={prevSlide}
-            className="
-              absolute left-4 top-1/2 -translate-y-1/2 z-20
-              w-12 h-12 rounded-full bg-black/30 backdrop-blur-sm
-              hover:bg-black/50 transition-colors duration-300
-              flex items-center justify-center text-white
-              shrink-0
-            "
             aria-label="Previous slide"
+            className="
+              hidden md:flex
+              absolute left-4 top-1/2 z-20
+              items-center justify-center
+              w-12 h-12
+              bg-black/30 backdrop-blur-sm
+              rounded-full
+              text-white
+              hover:bg-black/50
+              transition-colors
+              duration-200
+            "
+            style={{ transform: 'translateY(-50%)' }}
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft size={24} strokeWidth={2} />
           </button>
 
+          {/* Next Button */}
           <button
             onClick={nextSlide}
-            className="
-              absolute right-4 top-1/2 -translate-y-1/2 z-20
-              w-12 h-12 rounded-full bg-black/30 backdrop-blur-sm
-              hover:bg-black/50 transition-colors duration-300
-              flex items-center justify-center text-white
-              shrink-0
-            "
             aria-label="Next slide"
+            className="
+              hidden md:flex
+              absolute right-4 top-1/2 z-20
+              items-center justify-center
+              w-12 h-12
+              bg-black/30 backdrop-blur-sm
+              rounded-full
+              text-white
+              hover:bg-black/50
+              transition-colors
+              duration-200
+            "
+            style={{ transform: 'translateY(-50%)' }}
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight size={24} strokeWidth={2} />
           </button>
         </>
       )}
 
-      {/* Indicators */}
+      {/* Slide Indicators */}
       {slides.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2 pb-4">
+        <div className="absolute bottom-16 sm:bottom-12 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               className={`
-                w-2 h-2 rounded-full transition-all duration-300
+                h-2 rounded-full transition-all duration-300
                 ${
                   index === currentIndex
                     ? 'bg-white w-8'
-                    : 'bg-white/50 hover:bg-white/75'
+                    : 'bg-white/50 hover:bg-white/75 w-2'
                 }
               `}
               aria-label={`Go to slide ${index + 1}`}
