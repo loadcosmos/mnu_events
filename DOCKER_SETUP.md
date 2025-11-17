@@ -138,8 +138,8 @@ Open your browser and navigate to:
 After seeding the database, you can log in with:
 
 ```
-Email: admin@mnu.edu.kz
-Password: admin123
+Email: admin@kazguu.kz
+Password: Password123!
 ```
 
 ⚠️ **Security Note**: Change the admin password immediately after first login in production environments.
