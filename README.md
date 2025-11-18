@@ -109,34 +109,32 @@ PostgreSQL запускается в Docker:
 - **Organizer:** organizer@kazguu.kz / Password123!
 - **Student:** student1@kazguu.kz / Password123!
 
-## Недавние улучшения
+## 📚 Documentation
 
-### ✅ Backend
-- ✅ Исправлены критические уязвимости безопасности (crypto.randomBytes, SSL validation)
-- ✅ Включен TypeScript strict mode для лучшей type safety
-- ✅ Созданы переиспользуемые утилиты (pagination, authorization)
-- ✅ Добавлено 9 индексов БД для оптимизации запросов (50-90% быстрее)
-- ✅ Рефакторинг EventsService с использованием новых утилит
+The documentation has been reorganized for clarity. Choose what you need:
 
-### ✅ Frontend
-- ✅ Созданы общие утилиты (constants, formatters, error handlers)
-- ✅ Устранено дублирование кода (4+ экземпляра)
-- ✅ Создан переиспользуемый компонент LanguageSelector
-- ✅ Готово для code splitting и оптимизации
+| Document | Purpose | Read Time |
+|----------|---------|-----------|
+| **[README.md](./README.md)** | This file - quick overview | 5 min |
+| **[SETUP.md](./SETUP.md)** | Installation, Docker, configuration | 15 min |
+| **[CLAUDE.md](./CLAUDE.md)** | Developer quick reference | 10 min |
+| **[PROJECT_STATUS.md](./PROJECT_STATUS.md)** | Status (82% complete), roadmap, timeline | 20 min |
+| **[DEVELOPMENT.md](./DEVELOPMENT.md)** | Dev checklists, guidelines, UI/UX | 15 min |
+| **[WSL_VS_WINDOWS_ANALYSIS.md](./WSL_VS_WINDOWS_ANALYSIS.md)** | Windows/WSL comparison | 10 min |
 
-### 📝 Документация
-- ✅ CLAUDE.md обновлен с best practices из NestJS/Prisma/React
-- ✅ Создан REFACTORING_SUMMARY.md с детальным отчетом
-- ✅ Добавлены примеры использования и security notes
+### Recent Improvements (2025-11-13 to 2025-11-18)
+- ✅ 3 new consolidated documentation files (SETUP.md, PROJECT_STATUS.md, DEVELOPMENT.md)
+- ✅ Refactored CLAUDE.md for quick reference
+- ✅ Added WSL vs Windows detailed analysis
+- ✅ Backend: Security fixes, shared utilities, 9 DB indexes
+- ✅ Frontend: Shared utilities, code deduplication, dark theme support
+- ✅ Overall: 82% implementation complete, C+ grade (production work needed)
 
-### 🚀 Следующие шаги
-- ⏳ Добавить Error Boundaries (критично для production)
-- ⏳ Завершить консолидацию Layout компонентов
-- ⏳ Рефакторинг остальных сервисов (Users, Clubs, Registrations)
-- ⏳ Добавить code splitting для уменьшения bundle size
-- ⏳ Добавить тесты (цель: 80% coverage)
-
-**Подробнее:** См. [REFACTORING_SUMMARY.md](./REFACTORING_SUMMARY.md) и [CLAUDE.md](./CLAUDE.md)
+### Current Status
+- ⚠️ **Production Ready:** NO (requires 8-10 weeks of hardening)
+- 🟢 **Development:** All core features complete (95%+)
+- 🔴 **Security Issues:** 8 critical issues identified
+- 🧪 **Testing:** <10% backend, <5% frontend coverage
 
 ## Дополнительно
 
