@@ -3,11 +3,54 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import helmet from 'helmet';
 
 async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
+
+    // Security Headers - Helmet middleware
+    // Защищает приложение от известных веб-уязвимостей через установку HTTP заголовков
+    const isDevelopment = configService.get('nodeEnv') === 'development';
+    
+    app.use(helmet({
+      // Content Security Policy - защита от XSS и injection атак
+      contentSecurityPolicy: isDevelopment ? false : {
+        directives: {
+          defaultSrc: ["'self'"], // По умолчанию загружать ресурсы только с того же origin
+          scriptSrc: ["'self'", "'unsafe-inline'"], // Разрешить inline скрипты для Swagger UI
+          styleSrc: ["'self'", "'unsafe-inline'"], // Разрешить inline стили для Swagger UI
+          imgSrc: ["'self'", 'data:', 'https:'], // Разрешить изображения с https и data URLs
+          fontSrc: ["'self'", 'data:'], // Разрешить шрифты
+          connectSrc: ["'self'"], // Разрешить AJAX запросы только к своему API
+          frameSrc: ["'none'"], // Запретить embedding в frames (защита от clickjacking)
+          objectSrc: ["'none'"], // Запретить <object>, <embed>, <applet>
+        },
+      },
+      // HTTP Strict Transport Security - только для production (требует HTTPS)
+      hsts: isDevelopment ? false : {
+        maxAge: 31536000, // 1 год в секундах
+        includeSubDomains: true, // Применять HSTS ко всем поддоменам
+        preload: true, // Разрешить включение в HSTS preload список браузеров
+      },
+      // X-Frame-Options - защита от clickjacking атак
+      frameguard: {
+        action: 'deny', // Полностью запрещаем отображение сайта во фреймах
+      },
+      // X-Content-Type-Options - защита от MIME type sniffing
+      noSniff: true, // Браузер не должен пытаться угадать MIME type файлов
+      // X-XSS-Protection - защита от XSS (устаревший, но все еще полезный)
+      xssFilter: true, // Включить встроенную защиту браузера от XSS
+      // Referrer-Policy - контролирует передачу referrer информации
+      referrerPolicy: {
+        policy: 'strict-origin-when-cross-origin', // Отправлять полный referrer только на тот же origin
+      },
+      // Hide X-Powered-By header - не раскрываем технологию сервера
+      hidePoweredBy: true,
+    }));
+    
+    console.log(`[Bootstrap] Helmet configured for ${isDevelopment ? 'DEVELOPMENT' : 'PRODUCTION'} mode`);
 
     // Global prefix
     app.setGlobalPrefix('api');

@@ -5,13 +5,15 @@ Quick reference and guidance for Claude Code when working with MNU Events Platfo
 ## 🎯 Project Overview
 
 **MNU Events Platform** - University events management system
-**Status:** 82% Complete | Grade: C+ | Production Ready: ❌
+**Status:** 82% Complete | Grade: C+ | MVP Launch: 6 weeks
+**Security Score:** 6.5/10 (3/8 critical fixes done)
 
 **Tech Stack:**
 - Backend: NestJS 10 + Prisma ORM + PostgreSQL
 - Frontend: React 19 + Vite 7 + Tailwind CSS + React Router v7
-- Auth: JWT with role-based access control (STUDENT, ORGANIZER, ADMIN)
+- Auth: JWT with role-based access control (STUDENT, ORGANIZER, ADMIN, **MODERATOR**)
 - Design: Liquid glass (glassmorphism) + dark theme
+- **New:** Monetization, Gamification, Moderation systems
 
 ---
 
@@ -22,12 +24,13 @@ This repository has been reorganized with focused documentation:
 | Document | Purpose | Audience |
 |----------|---------|----------|
 | **README.md** | Quick start & overview | Everyone |
+| **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** | 🆕 MVP roadmap (6 weeks) | Project leads, Developers |
 | **SETUP.md** | Installation & configuration | New developers |
 | **PROJECT_STATUS.md** | Current status & roadmap | Project leads |
 | **DEVELOPMENT.md** | Dev tools & checklists | Developers |
 | **WSL_VS_WINDOWS_ANALYSIS.md** | Environment comparison | Windows users |
 
-**⚠️ See specific docs instead of this file for detailed guidance.**
+**⚠️ See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) for new features and implementation details.**
 
 ---
 
@@ -52,6 +55,64 @@ Or see **SETUP.md** for detailed installation steps.
 
 ---
 
+## 🆕 New Features in Development
+
+**See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) for complete roadmap**
+
+### Phase 1-3: Moderation System (7 days)
+- **MODERATOR role** - New permission level between ORGANIZER and ADMIN
+- Moderation queue API endpoints
+- Technical filters (100 char minimum, repetition detection)
+- Content safety checks
+
+**Key files to create:**
+- `backend/src/moderation/` - New module
+- `backend/prisma/schema.prisma` - Add ModerationQueue model
+- `frontend/js/pages/ModeratorDashboard.jsx` - New page
+
+### Phase 4: Monetization (12 days)
+- Flexible pricing for external venues (5,000-20,000 тг)
+- Advertisement system (TOP_BANNER, NATIVE_FEED, STORY_BANNER)
+- Paid events with Kaspi transfer verification
+- Premium subscription (500 тг/month)
+
+**Key files to create:**
+- `backend/src/pricing/` - Pricing module
+- `backend/src/advertisements/` - Ads module
+- `backend/prisma/schema.prisma` - Add PricingTier, Advertisement, PremiumSubscription models
+- `frontend/js/pages/PaymentVerificationPage.jsx` - Organizer payment checks
+
+### Phase 5: Gamification (8 days)
+- Points system (earn for attendance, participation)
+- User levels: Новичок, Активист, Лидер, Легенда
+- Achievements system
+- Profile badges
+
+**Key files to create:**
+- `backend/src/gamification/` - New module
+- `backend/prisma/schema.prisma` - Add UserPoints, Achievement models
+- `frontend/js/components/GamificationProfile.jsx` - Progress display
+
+### Quick Reference for New Developers:
+```typescript
+// Example: MODERATOR role check
+import { ROLES } from '../common/constants';
+
+@Roles(ROLES.MODERATOR, ROLES.ADMIN)
+@UseGuards(JwtAuthGuard, RolesGuard)
+async getModerationQueue() { ... }
+```
+
+```javascript
+// Example: Premium subscription check (frontend)
+import { ROLES } from '@/utils';
+
+const isPremium = user.subscription?.status === 'ACTIVE';
+const listingLimit = isPremium ? 10 : 3;
+```
+
+---
+
 ## 🗂️ Project Structure
 
 ```
@@ -65,6 +126,10 @@ backend/src/
 ├── checkin/       # QR validation
 ├── services/      # Marketplace
 ├── analytics/     # Statistics
+├── moderation/    # 🆕 Content moderation (MODERATOR role)
+├── pricing/       # 🆕 Flexible pricing for external venues
+├── advertisements/# 🆕 Advertisement system
+├── gamification/  # 🆕 Points, levels, achievements
 ├── common/        # 🌟 Shared utilities & constants
 ├── prisma/        # Database service
 └── config/        # Configuration
@@ -152,29 +217,34 @@ import { ROLES, formatDate, getCategoryColor, extractErrorMessage } from '@/util
 
 ---
 
-## ⚠️ Critical Issues & Roadmap
+## ⚠️ Status & Roadmap
 
-### Security Issues (8 Critical)
-- JWT tokens in localStorage (XSS vulnerable)
-- No JWT token blacklist
-- No CSRF protection
-- No input sanitization
-- Weak password hashing
-- Hardcoded secrets in .env.example
-- No error boundaries
-- No environment validation
+### MVP Launch: 6 Weeks (240-304 hours)
 
-**Full audit:** See PROJECT_STATUS.md
+**Current Status:**
+- 🟢 3/8 critical security fixes done (Helmet, secrets, validation)
+- 🟡 3 more security fixes for MVP (webhook, IDOR, race conditions)
+- 🔴 5 security fixes deferred (JWT cookies, CSRF, XSS, etc.)
 
-### Production Requirements (8-10 weeks)
-1. Fix security vulnerabilities (Week 1-2)
-2. Add logging & monitoring (Week 3-4)
-3. Comprehensive testing (Week 5-6)
-4. Performance optimization (Week 7-8)
-5. CI/CD setup (Week 9)
-6. Security audit & deployment (Week 10)
+**MVP Priorities (see [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)):**
+1. **Week 1:** Critical security (webhook verification, IDOR, race conditions)
+2. **Week 2:** Moderation system (MODERATOR role, queue, filters)
+3. **Week 3-4:** Monetization (pricing, ads, paid events, premium)
+4. **Week 5:** Gamification (points, levels, achievements)
+5. **Week 6:** Testing & production (E2E, load, security)
 
-**Detailed roadmap:** See PROJECT_STATUS.md
+**Expected Results:**
+- ✅ Full monetization system operational
+- ✅ MODERATOR role with moderation workflow
+- ✅ Basic gamification live
+- ✅ 200+ students, 30-50k тг/month revenue target
+
+**Deferred Features:**
+- Full security hardening (5 critical issues)
+- Personalized recommendations
+- Kaspi API integration (manual verification instead)
+
+**Full roadmap:** See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)
 
 ---
 
@@ -205,6 +275,91 @@ docker-compose up -d                       # All services
 docker-compose logs -f                     # Live logs
 docker-compose down -v                     # Stop & remove data
 ```
+
+---
+
+## 🚀 Implementing New Features
+
+### Adding MODERATOR Role
+```typescript
+// 1. Update schema (backend/prisma/schema.prisma)
+enum Role {
+  STUDENT
+  ORGANIZER
+  ADMIN
+  MODERATOR  // Add this
+}
+
+// 2. Create migration
+npx prisma migrate dev --name add-moderator-role
+
+// 3. Update constants (backend/src/common/constants/roles.ts)
+export const ROLES = {
+  STUDENT: 'STUDENT',
+  ORGANIZER: 'ORGANIZER',
+  ADMIN: 'ADMIN',
+  MODERATOR: 'MODERATOR',  // Add this
+};
+
+// 4. Use in guards
+@Roles(ROLES.MODERATOR, ROLES.ADMIN)
+@UseGuards(JwtAuthGuard, RolesGuard)
+```
+
+### Adding Gamification
+```typescript
+// 1. Create models (backend/prisma/schema.prisma)
+model UserPoints {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  points    Int      @default(0)
+  level     String   @default("NOVICE") // NOVICE, ACTIVIST, LEADER, LEGEND
+  updatedAt DateTime @updatedAt
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // FIRST_EVENT, CULTURAL_10, SPORTS_10, etc.
+  earnedAt    DateTime @default(now())
+}
+
+// 2. Create service (backend/src/gamification/gamification.service.ts)
+async awardPoints(userId: string, points: number, reason: string) {
+  const userPoints = await this.prisma.userPoints.upsert({
+    where: { userId },
+    create: { userId, points },
+    update: { points: { increment: points } },
+  });
+  
+  // Check level up
+  const newLevel = this.calculateLevel(userPoints.points);
+  if (newLevel !== userPoints.level) {
+    await this.levelUp(userId, newLevel);
+  }
+}
+```
+
+### Adding Monetization
+```typescript
+// 1. Pricing tiers (backend/src/pricing/pricing.service.ts)
+const PRICING_TIERS = {
+  BASIC: { price: 5000, name: 'Базовое размещение' },
+  PREMIUM: { price: 10000, name: 'Премиум размещение' },
+  PACKAGE_5: { price: 20000, name: 'Пакет (5 мероприятий)' },
+};
+
+// 2. Advertisement positions
+const AD_POSITIONS = {
+  TOP_BANNER: { price: 10000, size: '300x100', placement: 'hero' },
+  NATIVE_FEED: { price: 8000, size: 'card', placement: 'feed' },
+  STORY_BANNER: { price: 15000, size: 'vertical', placement: 'stories' },
+};
+```
+
+**See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) for complete implementation guide.**
 
 ---
 
@@ -272,16 +427,20 @@ A: After 8-10 weeks of fixes. See PROJECT_STATUS.md for roadmap.
 
 ## 🔗 Documentation Index
 
-1. **README.md** - Project overview & quick start
-2. **SETUP.md** - Installation, Docker, environment config
-3. **PROJECT_STATUS.md** - Status, issues, roadmap, timeline
-4. **DEVELOPMENT.md** - Dev checklists, tools, UI guidelines
-5. **WSL_VS_WINDOWS_ANALYSIS.md** - Platform comparison
-6. **CLAUDE.md** - This file (quick reference)
+1. **README.md** - Project overview & quick start (5 min)
+2. **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** - 🆕 MVP roadmap & new features (30 min)
+3. **SETUP.md** - Installation, Docker, environment config (15 min)
+4. **PROJECT_STATUS.md** - Status, issues, roadmap, timeline (20 min)
+5. **DEVELOPMENT.md** - Dev checklists, tools, UI guidelines (15 min)
+6. **WSL_VS_WINDOWS_ANALYSIS.md** - Platform comparison (10 min)
+7. **CLAUDE.md** - This file (quick reference) (10 min)
+
+**For new feature development:** Start with [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)
 
 ---
 
-**Last Updated:** 2025-11-18
-**Version:** 3.0 (Simplified Reference Guide)
+**Last Updated:** 2025-11-19
+**Version:** 4.0 (MVP Roadmap Integration)
+**Status:** MVP in development - 6 weeks to launch
 
-For detailed guidance, refer to specific documentation above. 👆
+For detailed roadmap and new features, refer to [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) 👆

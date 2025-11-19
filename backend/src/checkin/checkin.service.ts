@@ -21,12 +21,13 @@ import {
 } from './dto/checkin-stats.dto';
 import * as QRCode from 'qrcode';
 import * as crypto from 'crypto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class CheckinService {
   private readonly rateLimitMap = new Map<string, number>();
 
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   /**
    * MODE 1: Organizer scans student's ticket QR code
@@ -58,9 +59,14 @@ export class CheckinService {
     }
 
     // 3. Verify QR signature
+    // SECURITY: PAYMENT_SECRET must be set in environment variables
+    if (!process.env.PAYMENT_SECRET) {
+      throw new BadRequestException('Payment secret not configured');
+    }
+
     const { signature, ...dataToVerify } = qrPayload;
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.PAYMENT_SECRET || 'default-secret-key')
+      .createHmac('sha256', process.env.PAYMENT_SECRET)
       .update(JSON.stringify(dataToVerify))
       .digest('hex');
 
@@ -163,9 +169,14 @@ export class CheckinService {
     }
 
     // 2. Verify QR signature
+    // SECURITY: PAYMENT_SECRET must be set in environment variables
+    if (!process.env.PAYMENT_SECRET) {
+      throw new BadRequestException('Payment secret not configured');
+    }
+
     const { signature, ...dataToVerify } = qrPayload;
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.PAYMENT_SECRET || 'default-secret-key')
+      .createHmac('sha256', process.env.PAYMENT_SECRET)
       .update(JSON.stringify(dataToVerify))
       .digest('hex');
 
@@ -252,13 +263,21 @@ export class CheckinService {
   /**
    * Get check-in statistics for an event
    */
-  async getEventStats(eventId: string): Promise<CheckInStatsDto> {
+  async getEventStats(
+    eventId: string,
+    userId: string,
+    role: Role,
+  ): Promise<CheckInStatsDto> {
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
     });
 
     if (!event) {
       throw new NotFoundException('Event not found');
+    }
+
+    if (role !== Role.ADMIN && event.creatorId !== userId) {
+      throw new ForbiddenException('You do not have access to this event');
     }
 
     const totalCheckIns = await this.prisma.checkIn.count({
@@ -367,8 +386,13 @@ export class CheckinService {
     };
 
     // Sign the payload
+    // SECURITY: PAYMENT_SECRET must be set in environment variables
+    if (!process.env.PAYMENT_SECRET) {
+      throw new BadRequestException('Payment secret not configured');
+    }
+
     const signature = crypto
-      .createHmac('sha256', process.env.PAYMENT_SECRET || 'default-secret-key')
+      .createHmac('sha256', process.env.PAYMENT_SECRET)
       .update(JSON.stringify(qrPayload))
       .digest('hex');
 

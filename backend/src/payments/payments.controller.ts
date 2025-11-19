@@ -6,7 +6,11 @@ import {
   Body,
   UseGuards,
   Request,
+  Headers,
+  UnauthorizedException,
+  InternalServerErrorException,
 } from '@nestjs/common';
+import * as crypto from 'crypto';
 import {
   ApiTags,
   ApiOperation,
@@ -24,7 +28,7 @@ import { RequestWithUser } from '../common/interfaces/request-with-user.interfac
 @ApiTags('Payments')
 @Controller('payments')
 export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  constructor(private readonly paymentsService: PaymentsService) { }
 
   @Post('create')
   @UseGuards(JwtAuthGuard)
@@ -52,8 +56,30 @@ export class PaymentsController {
     description: 'Payment processed successfully, ticket created',
   })
   @ApiResponse({ status: 400, description: 'Payment failed or declined' })
+  @ApiResponse({ status: 401, description: 'Invalid signature' })
   @ApiResponse({ status: 404, description: 'Transaction not found' })
-  async processWebhook(@Body() dto: PaymentWebhookDto) {
+  async processWebhook(
+    @Body() dto: PaymentWebhookDto,
+    @Headers('x-payment-signature') signature: string,
+  ) {
+    if (!signature) {
+      throw new UnauthorizedException('Missing signature');
+    }
+
+    const secret = process.env.PAYMENT_SECRET;
+    if (!secret) {
+      throw new InternalServerErrorException('Payment secret not configured');
+    }
+
+    const calculatedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(JSON.stringify(dto))
+      .digest('hex');
+
+    if (signature !== calculatedSignature) {
+      throw new UnauthorizedException('Invalid signature');
+    }
+
     return this.paymentsService.processWebhook(dto);
   }
 

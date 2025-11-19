@@ -329,8 +329,13 @@ export class PaymentsService {
     };
 
     // Sign the payload for security validation
+    // SECURITY: PAYMENT_SECRET must be set in environment variables
+    if (!process.env.PAYMENT_SECRET) {
+      throw new BadRequestException('Payment secret not configured');
+    }
+    
     const signature = crypto
-      .createHmac('sha256', process.env.PAYMENT_SECRET || 'default-secret-key')
+      .createHmac('sha256', process.env.PAYMENT_SECRET)
       .update(JSON.stringify(qrPayload))
       .digest('hex');
 

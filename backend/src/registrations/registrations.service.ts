@@ -7,89 +7,99 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
-import { Role, RegistrationStatus, EventStatus } from '@prisma/client';
+import { CreateRegistrationDto } from './dto/create-registration.dto';
+import { Role, RegistrationStatus, EventStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class RegistrationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createRegistrationDto: CreateRegistrationDto, userId: string) {
     const { eventId } = createRegistrationDto;
 
-    // Check if event exists
-    const event = await this.prisma.event.findUnique({
-      where: { id: eventId },
-      include: {
-        _count: {
-          select: {
-            registrations: {
-              where: { status: RegistrationStatus.REGISTERED },
+    return this.prisma.$transaction(async (tx) => {
+      // Lock the event row to prevent race conditions
+      await tx.$executeRaw`SELECT * FROM "events" WHERE id = ${eventId} FOR UPDATE`;
+
+      // Check if event exists
+      const event = await tx.event.findUnique({
+        where: { id: eventId },
+        include: {
+          _count: {
+            select: {
+              registrations: {
+                where: { status: RegistrationStatus.REGISTERED },
+              },
             },
           },
         },
-      },
-    });
+      });
 
-    if (!event) {
-      throw new NotFoundException('Event not found');
-    }
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
 
-    // Check if event is not cancelled
-    if (event.status === EventStatus.CANCELLED) {
-      throw new BadRequestException('Cannot register for cancelled event');
-    }
+      // Check if event is not cancelled
+      if (event.status === EventStatus.CANCELLED) {
+        throw new BadRequestException('Cannot register for cancelled event');
+      }
 
-    // Check if event has already ended
-    if (event.endDate < new Date()) {
-      throw new BadRequestException('Cannot register for past event');
-    }
+      // Check if event has already ended
+      if (event.endDate < new Date()) {
+        throw new BadRequestException('Cannot register for past event');
+      }
 
-    // Check if user already registered
-    const existingRegistration = await this.prisma.registration.findUnique({
-      where: {
-        userId_eventId: {
+      // Check if user already registered
+      const existingRegistration = await tx.registration.findUnique({
+        where: {
+          userId_eventId: {
+            userId,
+            eventId,
+          },
+        },
+      });
+
+      if (existingRegistration) {
+        throw new ConflictException(
+          'You are already registered for this event',
+        );
+      }
+
+      // Check capacity
+      const currentRegistrations = event._count.registrations;
+      const isFull = currentRegistrations >= event.capacity;
+
+      const registration = await tx.registration.create({
+        data: {
           userId,
           eventId,
+          status: isFull
+            ? RegistrationStatus.WAITLIST
+            : RegistrationStatus.REGISTERED,
         },
-      },
-    });
-
-    if (existingRegistration) {
-      throw new ConflictException('You are already registered for this event');
-    }
-
-    // Check capacity
-    const currentRegistrations = event._count.registrations;
-    const isFull = currentRegistrations >= event.capacity;
-
-    const registration = await this.prisma.registration.create({
-      data: {
-        userId,
-        eventId,
-        status: isFull ? RegistrationStatus.WAITLIST : RegistrationStatus.REGISTERED,
-      },
-      include: {
-        event: {
-          select: {
-            id: true,
-            title: true,
-            startDate: true,
-            endDate: true,
-            location: true,
+        include: {
+          event: {
+            select: {
+              id: true,
+              title: true,
+              startDate: true,
+              endDate: true,
+              location: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
           },
         },
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-          },
-        },
-      },
-    });
+      });
 
-    return registration;
+      return registration;
+    });
   }
 
   async findMyRegistrations(userId: string, page: number = 1, limit: number = 10) {

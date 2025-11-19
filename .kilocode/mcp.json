@@ -17,6 +17,32 @@
         "@modelcontextprotocol/server-filesystem",
         "//wsl.localhost/Ubuntu-22.04/home/loadcosmos/mnu_events"
       ]
+    },
+    "perplexity": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "perplexity-mcp"
+      ],
+      "env": {
+        "PERPLEXITY_API_KEY": ""
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.38"
+      ]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://mnu_user:mnu_password@localhost:5432/mnu_events_dev"
+      ]
     }
   }
 }

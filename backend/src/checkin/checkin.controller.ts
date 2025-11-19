@@ -27,7 +27,7 @@ import { RequestWithUser } from '../common/interfaces/request-with-user.interfac
 @Controller('checkin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class CheckinController {
-  constructor(private readonly checkinService: CheckinService) {}
+  constructor(private readonly checkinService: CheckinService) { }
 
   @Post('validate-ticket')
   @Roles(Role.ORGANIZER, Role.ADMIN)
@@ -92,8 +92,8 @@ export class CheckinController {
     description: 'Check-in statistics',
   })
   @ApiResponse({ status: 404, description: 'Event not found' })
-  async getEventStats(@Param('id') id: string) {
-    return this.checkinService.getEventStats(id);
+  async getEventStats(@Param('id') id: string, @Request() req: RequestWithUser) {
+    return this.checkinService.getEventStats(id, req.user.sub, req.user.role);
   }
 
   @Get('event/:id/list')

@@ -1,21 +1,44 @@
-export default () => ({
-  port: parseInt(process.env.PORT || '3001', 10),
-  nodeEnv: process.env.NODE_ENV || 'development',
-  database: {
-    url: process.env.DATABASE_URL,
-  },
-  jwt: {
-    secret: process.env.JWT_SECRET,
-    expiresIn: process.env.JWT_EXPIRATION || '1h',
-  },
-  refreshToken: {
-    secret: process.env.REFRESH_TOKEN_SECRET,
-    expiresIn: process.env.REFRESH_TOKEN_EXPIRATION || '7d',
-  },
-  emailVerification: {
-    secret: process.env.EMAIL_VERIFICATION_SECRET,
-    expiresIn: process.env.EMAIL_VERIFICATION_EXPIRATION || '24h',
-  },
+export default () => {
+  // SECURITY: Validate required secrets on startup
+  const requiredSecrets = [
+    'JWT_SECRET',
+    'REFRESH_TOKEN_SECRET',
+    'EMAIL_VERIFICATION_SECRET',
+    'PAYMENT_SECRET',
+  ];
+
+  const missingSecrets = requiredSecrets.filter(
+    (secret) => !process.env[secret]
+  );
+
+  if (missingSecrets.length > 0) {
+    throw new Error(
+      `CRITICAL SECURITY ERROR: Missing required environment variables: ${missingSecrets.join(', ')}. ` +
+      `Application cannot start without these secrets configured.`
+    );
+  }
+
+  return {
+    port: parseInt(process.env.PORT || '3001', 10),
+    nodeEnv: process.env.NODE_ENV || 'development',
+    database: {
+      url: process.env.DATABASE_URL,
+    },
+    jwt: {
+      secret: process.env.JWT_SECRET,
+      expiresIn: process.env.JWT_EXPIRATION || '1h',
+    },
+    refreshToken: {
+      secret: process.env.REFRESH_TOKEN_SECRET,
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRATION || '7d',
+    },
+    emailVerification: {
+      secret: process.env.EMAIL_VERIFICATION_SECRET,
+      expiresIn: process.env.EMAIL_VERIFICATION_EXPIRATION || '24h',
+    },
+    payment: {
+      secret: process.env.PAYMENT_SECRET,
+    },
   email: {
     smtp: {
       host: process.env.SMTP_HOST,
@@ -32,8 +55,9 @@ export default () => ({
     ttl: parseInt(process.env.THROTTLE_TTL || '60', 10),
     limit: parseInt(process.env.THROTTLE_LIMIT || '10', 10),
   },
-  upload: {
-    maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB
-    uploadDir: process.env.UPLOAD_DIR || './uploads',
-  },
-});
+    upload: {
+      maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB
+      uploadDir: process.env.UPLOAD_DIR || './uploads',
+    },
+  };
+};
