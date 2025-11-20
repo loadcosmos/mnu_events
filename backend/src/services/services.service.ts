@@ -6,21 +6,24 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+import { ModerationService } from '../moderation/moderation.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { FilterServicesDto } from './dto/filter-services.dto';
 import {
   validatePagination,
   createPaginatedResponse,
-} from '../common/utils/pagination.util';
-import { requireCreatorOrAdmin } from '../common/utils/authorization.util';
-import { Prisma, Role } from '@prisma/client';
+  requireCreatorOrAdmin,
+  validateServiceListing,
+} from '../common/utils';
+import { Prisma, Role, ModerationType } from '@prisma/client';
 
 @Injectable()
 export class ServicesService {
   constructor(
     private prisma: PrismaService,
     private subscriptionsService: SubscriptionsService,
+    private moderationService: ModerationService,
   ) {}
 
   /**
@@ -128,7 +131,7 @@ export class ServicesService {
   /**
    * Create a new service
    */
-  async create(dto: CreateServiceDto, userId: string) {
+  async create(dto: CreateServiceDto, userId: string, userRole: Role) {
     // Check service creation limit
     const { canCreate, current, limit, isPremium } =
       await this.subscriptionsService.canCreateService(userId);
@@ -143,10 +146,21 @@ export class ServicesService {
       );
     }
 
+    // Moderation logic:
+    // - STUDENT: create with isActive=false + add to moderation queue + validate filters
+    // - ORGANIZER/ADMIN/MODERATOR: create with isActive=true (auto-approved)
+    const needsModeration = userRole === Role.STUDENT;
+
+    // Apply automatic moderation filters for students
+    if (needsModeration) {
+      validateServiceListing(dto.title, dto.description);
+    }
+
     const service = await this.prisma.service.create({
       data: {
         ...dto,
         providerId: userId,
+        isActive: !needsModeration, // false for students, true for others
       },
       include: {
         provider: {
@@ -160,6 +174,15 @@ export class ServicesService {
         },
       },
     });
+
+    if (needsModeration) {
+      // Students must go through moderation
+      await this.moderationService.addToQueue(ModerationType.SERVICE, service.id);
+      console.log(`[ServicesService] Service added to moderation queue: ${service.id}`);
+    } else {
+      // Organizers/Admins/Moderators auto-approved
+      console.log(`[ServicesService] Service created by ${userRole}, auto-approved`);
+    }
 
     return this.formatService(service);
   }

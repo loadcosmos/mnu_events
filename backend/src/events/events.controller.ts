@@ -31,13 +31,13 @@ export class EventsController {
   @Post()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ORGANIZER, Role.ADMIN)
-  @ApiOperation({ summary: 'Create new event (Organizer/Admin only)' })
+  @Roles(Role.ORGANIZER, Role.ADMIN, Role.MODERATOR)
+  @ApiOperation({ summary: 'Create new event (Organizer/Admin/Moderator only)' })
   @ApiResponse({ status: 201, description: 'Event created' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   create(@Body() createEventDto: CreateEventDto, @CurrentUser() user: any) {
-    return this.eventsService.create(createEventDto, user.id);
+    return this.eventsService.create(createEventDto, user.id, user.role);
   }
 
   @Get()

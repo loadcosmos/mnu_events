@@ -143,20 +143,23 @@ export class ModerationService {
                 break;
             case ModerationType.EVENT:
                 // For events, we update the status:
-                // - Approved: Set to UPCOMING (ready to be published)
-                // - Rejected: Set to CANCELLED
+                // - Approved: PENDING_MODERATION → UPCOMING (ready to be published)
+                // - Rejected: PENDING_MODERATION → CANCELLED
                 const event = await this.prisma.event.findUnique({
                     where: { id: itemId },
                     select: { status: true },
                 });
 
                 if (event) {
-                    await this.prisma.event.update({
-                        where: { id: itemId },
-                        data: {
-                            status: isApproved ? 'UPCOMING' : 'CANCELLED',
-                        },
-                    });
+                    // Only update if event is in PENDING_MODERATION status
+                    if (event.status === 'PENDING_MODERATION') {
+                        await this.prisma.event.update({
+                            where: { id: itemId },
+                            data: {
+                                status: isApproved ? 'UPCOMING' : 'CANCELLED',
+                            },
+                        });
+                    }
                 }
                 break;
         }

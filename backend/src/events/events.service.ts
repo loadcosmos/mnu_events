@@ -5,21 +5,26 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ModerationService } from '../moderation/moderation.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { FilterEventsDto } from './dto/filter-events.dto';
-import { Role, Prisma } from '@prisma/client';
+import { Role, Prisma, ModerationType } from '@prisma/client';
 import {
   validatePagination,
   createPaginatedResponse,
   requireCreatorOrAdmin,
+  validateEventListing,
 } from '../common/utils';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private moderationService: ModerationService,
+  ) {}
 
-  async create(createEventDto: CreateEventDto, userId: string) {
+  async create(createEventDto: CreateEventDto, userId: string, userRole: Role) {
     // Validate dates
     const startDate = new Date(createEventDto.startDate);
     const endDate = new Date(createEventDto.endDate);
@@ -32,12 +37,28 @@ export class EventsService {
       throw new BadRequestException('Start date cannot be in the past');
     }
 
+    // Moderation logic:
+    // - ADMIN/MODERATOR: create with UPCOMING status (auto-approved)
+    // - ORGANIZER: create with PENDING_MODERATION status + add to queue + validate filters
+    const needsModeration = userRole !== Role.ADMIN && userRole !== Role.MODERATOR;
+
+    // Apply automatic moderation filters for organizers
+    if (needsModeration) {
+      validateEventListing(
+        createEventDto.title,
+        createEventDto.description,
+        createEventDto.isPaid || false,
+        createEventDto.price ? Number(createEventDto.price) : undefined,
+      );
+    }
+
     const event = await this.prisma.event.create({
       data: {
         ...createEventDto,
         startDate,
         endDate,
         creatorId: userId,
+        status: needsModeration ? 'PENDING_MODERATION' : 'UPCOMING',
       },
       include: {
         creator: {
@@ -55,6 +76,15 @@ export class EventsService {
         },
       },
     });
+
+    if (needsModeration) {
+      // Organizers must go through moderation
+      await this.moderationService.addToQueue(ModerationType.EVENT, event.id);
+      console.log(`[EventsService] Event added to moderation queue: ${event.id}`);
+    } else {
+      // Admin/Moderator events are auto-approved
+      console.log(`[EventsService] Event created by ${userRole}, auto-approved`);
+    }
 
     return event;
   }

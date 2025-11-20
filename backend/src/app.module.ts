@@ -18,6 +18,7 @@ import { SettingsModule } from './settings/settings.module';
 import { AdvertisementsModule } from './advertisements/advertisements.module';
 import { PaymentVerificationModule } from './payment-verification/payment-verification.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { GamificationModule } from './gamification/gamification.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -50,6 +51,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     AdvertisementsModule,
     PaymentVerificationModule,
     SubscriptionsModule,
+    GamificationModule,
   ],
   providers: [
     {

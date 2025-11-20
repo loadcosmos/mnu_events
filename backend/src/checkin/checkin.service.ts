@@ -6,6 +6,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { GamificationService } from '../gamification/gamification.service';
 import {
   ValidateTicketDto,
   ValidateTicketResponseDto,
@@ -27,7 +28,10 @@ import { Role } from '@prisma/client';
 export class CheckinService {
   private readonly rateLimitMap = new Map<string, number>();
 
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private prisma: PrismaService,
+    private gamificationService: GamificationService,
+  ) { }
 
   /**
    * MODE 1: Organizer scans student's ticket QR code
@@ -129,6 +133,13 @@ export class CheckinService {
         },
       }),
     ]);
+
+    // Award points for check-in (async, don't wait)
+    this.gamificationService
+      .onEventCheckIn(ticket.userId, dto.eventId)
+      .catch((err) =>
+        console.error('[CheckinService] Gamification error:', err),
+      );
 
     return {
       success: true,
@@ -238,6 +249,13 @@ export class CheckinService {
         scanMode: 'STUDENTS_SCAN',
       },
     });
+
+    // Award points for check-in (async, don't wait)
+    this.gamificationService
+      .onEventCheckIn(userId, event.id)
+      .catch((err) =>
+        console.error('[CheckinService] Gamification error:', err),
+      );
 
     // 9. Clean up old rate limit entries (older than 10 seconds)
     setTimeout(() => {
