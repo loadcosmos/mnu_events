@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
-import { CreateRegistrationDto } from './dto/create-registration.dto';
+
 import { Role, RegistrationStatus, EventStatus, Prisma } from '@prisma/client';
 
 @Injectable()

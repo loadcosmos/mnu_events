@@ -13,6 +13,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { CheckinModule } from './checkin/checkin.module';
 import { ServicesModule } from './services/services.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { ModerationModule } from './moderation/moderation.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -40,6 +41,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     CheckinModule,
     ServicesModule,
     AnalyticsModule,
+    ModerationModule,
   ],
   providers: [
     {
@@ -64,4 +66,4 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

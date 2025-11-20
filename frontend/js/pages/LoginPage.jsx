@@ -53,18 +53,18 @@ export default function LoginPage() {
       const userRole = response?.user?.role;
       
       // Проверяем соответствие выбранного типа входа и роли пользователя
-      if (loginType === 'admin' && userRole !== 'ADMIN' && userRole !== 'ORGANIZER') {
-        setError('Access denied. Admin or Organizer privileges required.');
+      if (loginType === 'admin' && userRole !== 'ADMIN' && userRole !== 'ORGANIZER' && userRole !== 'MODERATOR') {
+        setError('Access denied. Admin, Organizer, or Moderator privileges required.');
         setLoading(false);
         return;
       }
-      
-      if (loginType === 'student' && (userRole === 'ADMIN' || userRole === 'ORGANIZER')) {
-        setError('Please use Admin login for admin/organizer accounts.');
+
+      if (loginType === 'student' && (userRole === 'ADMIN' || userRole === 'ORGANIZER' || userRole === 'MODERATOR')) {
+        setError('Please use Admin login for admin/organizer/moderator accounts.');
         setLoading(false);
         return;
       }
-      
+
       // Редирект в зависимости от роли
       if (userRole === 'ORGANIZER') {
         navigate('/organizer', { replace: true });
@@ -75,6 +75,11 @@ export default function LoginPage() {
         navigate('/admin', { replace: true });
         toast.success('Welcome back!', {
           description: `Logged in as Admin: ${response?.user?.firstName || response?.user?.email}`,
+        });
+      } else if (userRole === 'MODERATOR') {
+        navigate('/moderator', { replace: true });
+        toast.success('Welcome back!', {
+          description: `Logged in as Moderator: ${response?.user?.firstName || response?.user?.email}`,
         });
       } else {
         // Студенты идут на главную страницу

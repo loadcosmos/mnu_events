@@ -58,6 +58,18 @@ async function main() {
     },
   });
 
+  const moderator = await prisma.user.create({
+    data: {
+      email: 'moderator@kazguu.kz',
+      password: hashedPassword,
+      firstName: 'Sarah',
+      lastName: 'Moderator',
+      role: Role.MODERATOR,
+      emailVerified: true,
+      faculty: 'Administration',
+    },
+  });
+
   const student1 = await prisma.user.create({
     data: {
       email: 'student1@kazguu.kz',
@@ -761,6 +773,7 @@ async function main() {
   ║   ────────────────────────────────────────────────────────   ║
   ║   Admin:      admin@kazguu.kz                                ║
   ║   Organizer:  organizer@kazguu.kz                            ║
+  ║   Moderator:  moderator@kazguu.kz                            ║
   ║   Student 1:  student1@kazguu.kz                             ║
   ║   Student 2:  student2@kazguu.kz                             ║
   ║   Student 3:  student3@kazguu.kz                             ║
@@ -768,7 +781,7 @@ async function main() {
   ║   Password for all: Password123!                             ║
   ║                                                              ║
   ║   Created:                                                   ║
-  ║   - 5 Users (1 Admin, 1 Organizer, 3 Students)               ║
+  ║   - 6 Users (1 Admin, 1 Organizer, 1 Moderator, 3 Students) ║
   ║   - 13 Events (10 free + 2 paid + 1 lecture)                 ║
   ║   - 7 Free Registrations                                     ║
   ║   - 3 Paid Tickets (with QR codes)                           ║
@@ -783,6 +796,11 @@ async function main() {
   ║   - QR check-in (2 modes)                                    ║
   ║   - Services marketplace                                     ║
   ║   - Advertisement system                                     ║
+  ║                                                              ║
+  ║   🛡️ Moderation System Ready:                                ║
+  ║   - Content moderation queue                                 ║
+  ║   - Moderator role with access to /moderator dashboard       ║
+  ║   - Validation filters for spam prevention                   ║
   ║                                                              ║
   ╚══════════════════════════════════════════════════════════════╝
   `);

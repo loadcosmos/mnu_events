@@ -8,6 +8,8 @@ import {
   Min,
   MaxLength,
   IsUrl,
+  MinLength,
+  Matches,
 } from 'class-validator';
 import { ServiceType, ServiceCategory, PriceType } from '@prisma/client';
 
@@ -37,6 +39,11 @@ export class CreateServiceDto {
   })
   @IsString()
   @IsNotEmpty()
+  @MinLength(100, { message: 'Description must be at least 100 characters long' })
+  @MaxLength(5000)
+  @Matches(/^(?!.*(.)\1{5,})/, {
+    message: 'Description contains too many repeated characters',
+  })
   description: string;
 
   @ApiProperty({

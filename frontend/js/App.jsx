@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Layout from './components/Layout.jsx';
 import OrganizerLayout from './components/OrganizerLayout.jsx';
 import AdminLayout from './components/AdminLayout.jsx';
+import ModeratorLayout from './components/ModeratorLayout.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from './components/ui/sonner.jsx';
 
@@ -33,6 +34,8 @@ import AdminEventsPage from './pages/AdminEventsPage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import AdminClubsPage from './pages/AdminClubsPage.jsx';
 import MockPaymentPage from './pages/MockPaymentPage.jsx';
+import ModerationQueuePage from './pages/ModerationQueuePage.jsx';
+import ModeratorDashboardPage from './pages/ModeratorDashboardPage.jsx';
 
 /**
  * Главный компонент приложения
@@ -46,100 +49,122 @@ function App() {
         <AuthProvider>
           <Toaster />
           <Routes>
-          {/* Публичные маршруты без Layout */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
-          <Route path="/mock-payment/:transactionId" element={<MockPaymentPage />} />
-          
-          {/* Публичные маршруты с Layout */}
-          <Route path="/" element={<Layout><HomePage /></Layout>} />
-          <Route path="/events" element={<Layout><EventsPage /></Layout>} />
-          <Route path="/events/:id" element={<Layout><EventDetailsPage /></Layout>} />
-          <Route path="/clubs" element={<Layout><ClubsPage /></Layout>} />
-          <Route path="/clubs/:id" element={<Layout><ClubDetailsPage /></Layout>} />
+            {/* Публичные маршруты без Layout */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/mock-payment/:transactionId" element={<MockPaymentPage />} />
 
-          {/* Services & Tutoring (Phase 3) */}
-          <Route path="/services" element={<Layout><ServicesPage /></Layout>} />
-          <Route path="/tutoring" element={<Layout><TutoringPage /></Layout>} />
-          <Route path="/services/:id" element={<Layout><ServiceDetailsPage /></Layout>} />
+            {/* Публичные маршруты с Layout */}
+            <Route path="/" element={<Layout><HomePage /></Layout>} />
+            <Route path="/events" element={<Layout><EventsPage /></Layout>} />
+            <Route path="/events/:id" element={<Layout><EventDetailsPage /></Layout>} />
+            <Route path="/clubs" element={<Layout><ClubsPage /></Layout>} />
+            <Route path="/clubs/:id" element={<Layout><ClubDetailsPage /></Layout>} />
 
-          {/* Защищенные маршруты для организаторов - требуют роль ORGANIZER */}
-          <Route
-            path="/organizer"
-            element={
-              <ProtectedRoute roles={['ORGANIZER']}>
-                <OrganizerLayout><OrganizerPage /></OrganizerLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/organizer/create-event"
-            element={
-              <ProtectedRoute roles={['ORGANIZER']}>
-                <OrganizerLayout><CreateEventPage /></OrganizerLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/organizer/events/:id/edit"
-            element={
-              <ProtectedRoute roles={['ORGANIZER']}>
-                <OrganizerLayout><EditEventPage /></OrganizerLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/organizer/scanner/:eventId"
-            element={
-              <ProtectedRoute roles={['ORGANIZER']}>
-                <OrganizerScannerPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/organizer/analytics"
-            element={
-              <ProtectedRoute roles={['ORGANIZER']}>
-                <OrganizerLayout><OrganizerAnalyticsPage /></OrganizerLayout>
-              </ProtectedRoute>
-            }
-          />
+            {/* Services & Tutoring (Phase 3) */}
+            <Route path="/services" element={<Layout><ServicesPage /></Layout>} />
+            <Route path="/tutoring" element={<Layout><TutoringPage /></Layout>} />
+            <Route path="/services/:id" element={<Layout><ServiceDetailsPage /></Layout>} />
 
-          {/* Защищенные маршруты для студентов - требуют роль STUDENT */}
-          <Route
-            path="/registrations"
-            element={
-              <ProtectedRoute roles={['STUDENT']}>
-                <Layout><MyRegistrationsPage /></Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Layout><ProfilePage /></Layout>
-              </ProtectedRoute>
-            }
-          />
+            {/* Защищенные маршруты для организаторов - требуют роль ORGANIZER */}
+            <Route
+              path="/organizer"
+              element={
+                <ProtectedRoute roles={['ORGANIZER']}>
+                  <OrganizerLayout><OrganizerPage /></OrganizerLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/organizer/create-event"
+              element={
+                <ProtectedRoute roles={['ORGANIZER']}>
+                  <OrganizerLayout><CreateEventPage /></OrganizerLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/organizer/events/:id/edit"
+              element={
+                <ProtectedRoute roles={['ORGANIZER']}>
+                  <OrganizerLayout><EditEventPage /></OrganizerLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/organizer/scanner/:eventId"
+              element={
+                <ProtectedRoute roles={['ORGANIZER']}>
+                  <OrganizerScannerPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/organizer/analytics"
+              element={
+                <ProtectedRoute roles={['ORGANIZER']}>
+                  <OrganizerLayout><OrganizerAnalyticsPage /></OrganizerLayout>
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Защищенные маршруты для администратора - требуют роль ADMIN */}
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedRoute roles={['ADMIN']}>
-                <AdminLayout><AdminRoutes /></AdminLayout>
-              </ProtectedRoute>
-            }
-          />
+            {/* Защищенные маршруты для студентов - требуют роль STUDENT */}
+            <Route
+              path="/registrations"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <Layout><MyRegistrationsPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Layout><ProfilePage /></Layout>
+                </ProtectedRoute>
+              }
+            />
 
-          {/* 404 - не найдено */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+            {/* Защищенные маршруты для модераторов - требуют роль MODERATOR */}
+            <Route
+              path="/moderator/*"
+              element={
+                <ProtectedRoute roles={['MODERATOR']}>
+                  <ModeratorLayout><ModeratorRoutes /></ModeratorLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Защищенные маршруты для администратора - требуют роль ADMIN */}
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedRoute roles={['ADMIN']}>
+                  <AdminLayout><AdminRoutes /></AdminLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* 404 - не найдено */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
+  );
+}
+
+/**
+ * Вложенные маршруты модератора
+ */
+function ModeratorRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<ModeratorDashboardPage />} />
+      <Route path="/queue" element={<ModerationQueuePage />} />
+    </Routes>
   );
 }
 

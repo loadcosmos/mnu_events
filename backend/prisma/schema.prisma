@@ -35,6 +35,7 @@ model User {
   tickets          Ticket[]
   checkIns         CheckIn[]
   services         Service[]
+  moderatedItems   ModerationQueue[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -48,6 +49,7 @@ model User {
 enum Role {
   STUDENT
   ORGANIZER
+  MODERATOR
   ADMIN
 }
 
@@ -339,4 +341,33 @@ enum AdPosition {
   NATIVE_FEED      // В ленте событий/клубов
   BOTTOM_BANNER    // Внизу страницы
   SIDEBAR          // Боковая панель
+}
+
+model ModerationQueue {
+  id          String          @id @default(uuid())
+  itemType    ModerationType
+  itemId      String
+  status      ModerationStatus @default(PENDING)
+  moderatorId String?
+  moderator   User?           @relation(fields: [moderatorId], references: [id])
+  rejectionReason String?     @db.Text
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([status])
+  @@index([itemType])
+  @@index([moderatorId])
+  @@map("moderation_queue")
+}
+
+enum ModerationType {
+  SERVICE
+  EVENT
+  ADVERTISEMENT
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

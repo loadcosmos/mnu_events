@@ -33,6 +33,9 @@ build/
 *.sln
 *.sw?
 
+# Claude Code settings (contains secrets!)
+.claude
+
 # OS
 .DS_Store
 Thumbs.db
