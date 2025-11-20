@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import settingsService from '../services/settingsService';
-import { extractErrorMessage } from '@/utils';
+import { extractErrorMessage } from '../utils';
 
 const PricingSettingsPage = () => {
   const [pricing, setPricing] = useState({
