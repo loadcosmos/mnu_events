@@ -11,11 +11,15 @@
       }
     },
     "filesystem": {
-      "command": "npx",
+      "command": "docker",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "//wsl.localhost/Ubuntu-22.04/home/loadcosmos/mnu_events"
+        "run",
+        "-i",
+        "--rm",
+        "--mount",
+        "type=bind,src=//wsl.localhost/Ubuntu-22.04/home/loadcosmos,dst=/projects",
+        "mcp/filesystem",
+        "/projects"
       ]
     },
     "perplexity": {

@@ -112,6 +112,80 @@ describe('AuthService', () => {
         }),
       ).rejects.toThrow(UnauthorizedException);
     });
+
+    it('should successfully login with valid credentials', async () => {
+      const hashedPassword = await bcrypt.hash('Password123!', 10);
+      const mockUser = {
+        id: '1',
+        email: 'test@kazguu.kz',
+        password: hashedPassword,
+        firstName: 'Test',
+        lastName: 'User',
+        role: 'STUDENT',
+        emailVerified: true,
+      };
+
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+      mockJwtService.signAsync.mockResolvedValue('mock-access-token');
+
+      const result = await service.login({
+        email: 'test@kazguu.kz',
+        password: 'Password123!',
+      });
+
+      expect(result).toHaveProperty('accessToken');
+      expect(result).toHaveProperty('user');
+      expect(result.user.email).toBe('test@kazguu.kz');
+      expect(mockJwtService.signAsync).toHaveBeenCalled();
+    });
+
+    it('should throw UnauthorizedException for wrong password', async () => {
+      const hashedPassword = await bcrypt.hash('CorrectPassword', 10);
+      const mockUser = {
+        id: '1',
+        email: 'test@kazguu.kz',
+        password: hashedPassword,
+        emailVerified: true,
+      };
+
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+
+      await expect(
+        service.login({
+          email: 'test@kazguu.kz',
+          password: 'WrongPassword',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('validateUser', () => {
+    it('should return user for valid userId', async () => {
+      const mockUser = {
+        id: '1',
+        email: 'test@kazguu.kz',
+        firstName: 'Test',
+        lastName: 'User',
+        role: 'STUDENT',
+      };
+
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+
+      const result = await service.validateUser('1');
+
+      expect(result).toEqual(mockUser);
+      expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
+    });
+
+    it('should throw UnauthorizedException for invalid userId', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+
+      await expect(service.validateUser('invalid-id')).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
   });
 });
 
