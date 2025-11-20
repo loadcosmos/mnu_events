@@ -285,11 +285,24 @@ export default function OrganizerPage() {
                             variant="outline"
                             size="sm"
                             asChild
+                            className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white rounded-xl transition-all"
+                            title="Display QR for students to scan (lectures/free events)"
+                          >
+                            <Link to={`/organizer/event-qr/${event.id}`}>
+                              <i className="fa-solid fa-desktop mr-1" />
+                              QR Display
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
                             className="border-[#d62e1f] text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white rounded-xl transition-all"
+                            title="Scan student tickets (paid events)"
                           >
                             <Link to={`/organizer/scanner/${event.id}`}>
                               <i className="fa-solid fa-qrcode mr-1" />
-                              Scan
+                              Scan Tickets
                             </Link>
                           </Button>
                           <Button

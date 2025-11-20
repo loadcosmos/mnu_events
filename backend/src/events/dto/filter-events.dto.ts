@@ -32,4 +32,11 @@ export class FilterEventsDto {
   @IsString()
   @IsOptional()
   creatorId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Comma-separated CSI tags (CREATIVITY,SERVICE,INTELLIGENCE)'
+  })
+  @IsString()
+  @IsOptional()
+  csiTags?: string;
 }

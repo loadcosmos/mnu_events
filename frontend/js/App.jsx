@@ -24,6 +24,8 @@ import ServiceDetailsPage from './pages/ServiceDetailsPage.jsx';
 import OrganizerPage from './pages/OrganizerPage.jsx';
 import OrganizerScannerPage from './pages/OrganizerScannerPage.jsx';
 import OrganizerAnalyticsPage from './pages/OrganizerAnalyticsPage.jsx';
+import EventQRDisplayPage from './pages/EventQRDisplayPage.jsx';
+import StudentScannerPage from './pages/StudentScannerPage.jsx';
 import AdminLoginPage from './pages/AdminLoginPage.jsx';
 import VerifyEmailPage from './pages/VerifyEmailPage.jsx';
 import CreateEventPage from './pages/CreateEventPage.jsx';
@@ -103,6 +105,14 @@ function App() {
               }
             />
             <Route
+              path="/organizer/event-qr/:eventId"
+              element={
+                <ProtectedRoute roles={['ORGANIZER']}>
+                  <EventQRDisplayPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/organizer/analytics"
               element={
                 <ProtectedRoute roles={['ORGANIZER']}>
@@ -125,6 +135,14 @@ function App() {
               element={
                 <ProtectedRoute roles={['STUDENT']}>
                   <Layout><CsiDashboardPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/scan-event"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <StudentScannerPage />
                 </ProtectedRoute>
               }
             />
