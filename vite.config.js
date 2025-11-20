@@ -12,6 +12,8 @@ export default defineConfig({
     host: '0.0.0.0', // Разрешить доступ с других устройств в сети
     hmr: {
       overlay: true, // Показывать overlay с ошибками
+      host: 'localhost',  // Явно указать хост для HMR
+      protocol: 'ws',     // Явно указать протокол
     },
   },
   build: {

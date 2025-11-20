@@ -16,12 +16,17 @@ export class ModerationService {
         });
     }
 
-    async getQueue(status: ModerationStatus = ModerationStatus.PENDING, type?: ModerationType) {
+    async getQueue(status?: ModerationStatus, type?: ModerationType) {
+        const whereClause: any = {};
+        if (status) {
+            whereClause.status = status;
+        }
+        if (type) {
+            whereClause.itemType = type;
+        }
+
         const queueItems = await this.prisma.moderationQueue.findMany({
-            where: {
-                status,
-                ...(type && { itemType: type }),
-            },
+            where: whereClause,
             include: {
                 moderator: {
                     select: {
@@ -121,9 +126,7 @@ export class ModerationService {
     }
 
     private async updateItemStatus(type: ModerationType, itemId: string, isApproved: boolean) {
-        // This logic depends on the actual models having an 'isActive' or similar field
-        // For now, we assume Services and Advertisements have 'isActive'
-        // Events might have 'status'
+        // Update the status of the moderated item based on approval decision
 
         switch (type) {
             case ModerationType.SERVICE:
@@ -139,10 +142,22 @@ export class ModerationService {
                 });
                 break;
             case ModerationType.EVENT:
-                // Events might need a specific status update logic
-                // For now, we assume approved events are published/active
-                // If rejected, maybe set to CANCELLED or keep as DRAFT/PENDING
-                // This requires checking Event model structure more closely if needed
+                // For events, we update the status:
+                // - Approved: Set to UPCOMING (ready to be published)
+                // - Rejected: Set to CANCELLED
+                const event = await this.prisma.event.findUnique({
+                    where: { id: itemId },
+                    select: { status: true },
+                });
+
+                if (event) {
+                    await this.prisma.event.update({
+                        where: { id: itemId },
+                        data: {
+                            status: isApproved ? 'UPCOMING' : 'CANCELLED',
+                        },
+                    });
+                }
                 break;
         }
     }

@@ -406,6 +406,16 @@ export class AuthService {
     };
   }
 
+  async validateUser(userId: string, email: string, role: string): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new UnauthorizedException('Invalid user');
+    }
+    return user;
+  }
+
   /**
    * Generate a cryptographically secure 6-digit verification code
    * Uses crypto.randomBytes() instead of Math.random() for security

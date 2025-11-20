@@ -32,7 +32,6 @@ build/
 *.njsproj
 *.sln
 *.sw?
-
 # Claude Code settings (contains secrets!)
 .claude
 
@@ -68,3 +67,5 @@ docker-compose.override.yml
 # Vite
 .vite/
 FRONTEND_DESIGN_ANALYSIS_REPORT.md
+.kilocode/
+.kilocode/mcp.json

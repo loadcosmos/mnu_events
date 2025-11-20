@@ -46,8 +46,8 @@ describe('EventsService', () => {
         description: 'Test Description',
         category: Category.ACADEMIC,
         location: 'Test Location',
-        startDate: new Date('2025-12-01T10:00:00Z'),
-        endDate: new Date('2025-12-01T12:00:00Z'),
+        startDate: '2025-12-01T10:00:00Z',
+        endDate: '2025-12-01T12:00:00Z',
         capacity: 100,
         isPaid: false,
       };
@@ -82,8 +82,8 @@ describe('EventsService', () => {
         description: 'Test Description',
         category: Category.ACADEMIC,
         location: 'Test Location',
-        startDate: new Date('2025-12-01T12:00:00Z'),
-        endDate: new Date('2025-12-01T10:00:00Z'), // Before start
+        startDate: '2025-12-01T12:00:00Z',
+        endDate: '2025-12-01T10:00:00Z', // Before start
         capacity: 100,
         isPaid: false,
       };
@@ -103,8 +103,8 @@ describe('EventsService', () => {
         description: 'Test Description',
         category: Category.ACADEMIC,
         location: 'Test Location',
-        startDate: pastDate,
-        endDate: new Date('2025-12-01T12:00:00Z'),
+        startDate: pastDate.toISOString(),
+        endDate: '2025-12-01T12:00:00Z',
         capacity: 100,
         isPaid: false,
       };

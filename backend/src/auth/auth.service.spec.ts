@@ -171,7 +171,7 @@ describe('AuthService', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      const result = await service.validateUser('1');
+      const result = await service['validateUser']('1', 'test@kazguu.kz', 'STUDENT');
 
       expect(result).toEqual(mockUser);
       expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({
@@ -182,7 +182,7 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException for invalid userId', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.validateUser('invalid-id')).rejects.toThrow(
+      await expect(service['validateUser']('invalid-id', 'invalid@kazguu.kz', 'STUDENT')).rejects.toThrow(
         UnauthorizedException,
       );
     });

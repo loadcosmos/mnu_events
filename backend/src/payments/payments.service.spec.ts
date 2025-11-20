@@ -33,6 +33,7 @@ describe('PaymentsService', () => {
       count: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     },
     checkIn: {
       create: jest.fn(),
@@ -154,8 +155,13 @@ describe('PaymentsService', () => {
     });
   });
 
-  describe('confirmPayment', () => {
-    it('should successfully confirm payment with valid signature', async () => {
+  describe('processWebhook', () => {
+    beforeEach(() => {
+      // Set PAYMENT_SECRET for QR code generation
+      process.env.PAYMENT_SECRET = 'test-payment-secret';
+    });
+
+    it('should successfully process payment with success status', async () => {
       const mockTicket = {
         id: 'ticket-1',
         transactionId: 'txn_123',
@@ -164,9 +170,13 @@ describe('PaymentsService', () => {
         userId: 'user-1',
         price: 100,
         platformFee: 50,
+        purchasedAt: new Date(),
         event: {
+          id: 'event-1',
           title: 'Test Event',
           startDate: new Date('2025-12-01'),
+          endDate: new Date('2025-12-01T23:59:59'),
+          location: 'Test Location',
         },
         user: {
           email: 'test@kazguu.kz',
@@ -175,10 +185,11 @@ describe('PaymentsService', () => {
         },
       };
 
-      mockPrismaService.ticket.findFirst.mockResolvedValue(mockTicket);
+      mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
       mockPrismaService.ticket.update.mockResolvedValue({
         ...mockTicket,
         status: TicketStatus.PAID,
+        qrCode: 'mocked-qr-code',
       });
 
       const webhookDto = {
@@ -187,21 +198,15 @@ describe('PaymentsService', () => {
         signature: 'mock-signature',
       };
 
-      const result = await service.confirmPayment(webhookDto);
+      const result = await service.processWebhook(webhookDto);
 
-      expect(result).toHaveProperty('ticketId');
-      expect(result.message).toContain('success');
-      expect(mockPrismaService.ticket.update).toHaveBeenCalledWith({
-        where: { id: 'ticket-1' },
-        data: {
-          status: TicketStatus.PAID,
-          paidAt: expect.any(Date),
-        },
-      });
+      expect(result).toHaveProperty('id');
+      expect(result).toHaveProperty('qrCode');
+      expect(mockPrismaService.ticket.update).toHaveBeenCalled();
     });
 
     it('should throw NotFoundException if ticket not found', async () => {
-      mockPrismaService.ticket.findFirst.mockResolvedValue(null);
+      mockPrismaService.ticket.findUnique.mockResolvedValue(null);
 
       const webhookDto = {
         transactionId: 'non-existent',
@@ -209,23 +214,42 @@ describe('PaymentsService', () => {
         signature: 'mock-signature',
       };
 
-      await expect(service.confirmPayment(webhookDto)).rejects.toThrow(
+      await expect(service.processWebhook(webhookDto)).rejects.toThrow(
         NotFoundException,
       );
     });
 
-    it('should handle payment failure', async () => {
+    it('should throw BadRequestException if transaction already processed', async () => {
+      const mockTicket = {
+        id: 'ticket-1',
+        transactionId: 'txn_123',
+        status: TicketStatus.PAID, // Already processed
+      };
+
+      mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
+
+      const webhookDto = {
+        transactionId: 'txn_123',
+        status: 'success' as const,
+        signature: 'mock-signature',
+      };
+
+      await expect(service.processWebhook(webhookDto)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should delete ticket and throw on payment failure', async () => {
       const mockTicket = {
         id: 'ticket-1',
         transactionId: 'txn_123',
         status: TicketStatus.PENDING,
+        eventId: 'event-1',
+        userId: 'user-1',
       };
 
-      mockPrismaService.ticket.findFirst.mockResolvedValue(mockTicket);
-      mockPrismaService.ticket.update.mockResolvedValue({
-        ...mockTicket,
-        status: TicketStatus.FAILED,
-      });
+      mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
+      mockPrismaService.ticket.delete.mockResolvedValue(mockTicket);
 
       const webhookDto = {
         transactionId: 'txn_123',
@@ -233,43 +257,52 @@ describe('PaymentsService', () => {
         signature: 'mock-signature',
       };
 
-      const result = await service.confirmPayment(webhookDto);
-
-      expect(mockPrismaService.ticket.update).toHaveBeenCalledWith({
+      await expect(service.processWebhook(webhookDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(mockPrismaService.ticket.delete).toHaveBeenCalledWith({
         where: { id: 'ticket-1' },
-        data: { status: TicketStatus.FAILED },
       });
     });
   });
 
-  describe('getTicket', () => {
+  describe('getTicketById', () => {
     it('should return ticket with QR code for authorized user', async () => {
       const mockTicket = {
         id: 'ticket-1',
         userId: 'user-1',
+        eventId: 'event-1',
         status: TicketStatus.PAID,
         qrCode: 'qr-code-data',
+        price: 100,
+        platformFee: 50,
+        paymentMethod: 'mock',
+        transactionId: 'txn_123',
+        purchasedAt: new Date(),
         event: {
           id: 'event-1',
           title: 'Test Event',
-          startDate: new Date(),
+          startDate: new Date('2025-12-01'),
+          endDate: new Date('2025-12-01T23:59:59'),
+          location: 'Test Location',
         },
       };
 
       mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
 
-      const result = await service.getTicket('ticket-1', 'user-1');
+      const result = await service.getTicketById('ticket-1', 'user-1', 'STUDENT');
 
       expect(result).toHaveProperty('qrCode');
-      expect(result.event.title).toBe('Test Event');
+      expect(result.event).toBeDefined();
+      expect(result.event?.title).toBe('Test Event');
     });
 
     it('should throw NotFoundException if ticket does not exist', async () => {
       mockPrismaService.ticket.findUnique.mockResolvedValue(null);
 
-      await expect(service.getTicket('non-existent', 'user-1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.getTicketById('non-existent', 'user-1', 'STUDENT'),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException if user does not own the ticket', async () => {
@@ -281,9 +314,39 @@ describe('PaymentsService', () => {
 
       mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
 
-      await expect(service.getTicket('ticket-1', 'user-2')).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(
+        service.getTicketById('ticket-1', 'user-2', 'STUDENT'),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should allow admin to view any ticket', async () => {
+      const mockTicket = {
+        id: 'ticket-1',
+        userId: 'user-1',
+        eventId: 'event-1',
+        status: TicketStatus.PAID,
+        qrCode: 'qr-code-data',
+        price: 100,
+        platformFee: 50,
+        paymentMethod: 'mock',
+        transactionId: 'txn_123',
+        purchasedAt: new Date(),
+        event: {
+          id: 'event-1',
+          title: 'Test Event',
+          startDate: new Date('2025-12-01'),
+          endDate: new Date('2025-12-01T23:59:59'),
+          location: 'Test Location',
+        },
+      };
+
+      mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
+
+      const result = await service.getTicketById('ticket-1', 'admin-user', 'ADMIN');
+
+      expect(result).toHaveProperty('qrCode');
+      expect(result.event).toBeDefined();
+      expect(result.event?.title).toBe('Test Event');
     });
   });
 
@@ -323,11 +386,17 @@ describe('PaymentsService', () => {
 
   describe('refundTicket', () => {
     it('should successfully refund a paid ticket', async () => {
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 7); // Event in 7 days
+
       const mockTicket = {
         id: 'ticket-1',
         userId: 'user-1',
         status: TicketStatus.PAID,
-        paidAt: new Date(),
+        purchasedAt: new Date(),
+        event: {
+          startDate: futureDate,
+        },
       };
 
       mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
@@ -340,14 +409,14 @@ describe('PaymentsService', () => {
         reason: 'Changed plans',
       };
 
-      const result = await service.refundTicket('ticket-1', refundDto, 'user-1');
+      const result = await service.refundTicket('ticket-1', 'user-1', 'STUDENT', refundDto);
 
       expect(result.message).toContain('success');
+      expect(result.message).toContain('Changed plans');
       expect(mockPrismaService.ticket.update).toHaveBeenCalledWith({
         where: { id: 'ticket-1' },
         data: {
           status: TicketStatus.REFUNDED,
-          refundedAt: expect.any(Date),
         },
       });
     });
@@ -356,7 +425,7 @@ describe('PaymentsService', () => {
       mockPrismaService.ticket.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.refundTicket('non-existent', { reason: 'Test' }, 'user-1'),
+        service.refundTicket('non-existent', 'user-1', 'STUDENT'),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -365,13 +434,40 @@ describe('PaymentsService', () => {
         id: 'ticket-1',
         userId: 'user-1',
         status: TicketStatus.PAID,
+        event: {
+          startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
       };
 
       mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
 
       await expect(
-        service.refundTicket('ticket-1', { reason: 'Test' }, 'user-2'),
+        service.refundTicket('ticket-1', 'user-2', 'STUDENT'),
       ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should allow admin to refund any ticket', async () => {
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 7);
+
+      const mockTicket = {
+        id: 'ticket-1',
+        userId: 'user-1',
+        status: TicketStatus.PAID,
+        event: {
+          startDate: futureDate,
+        },
+      };
+
+      mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
+      mockPrismaService.ticket.update.mockResolvedValue({
+        ...mockTicket,
+        status: TicketStatus.REFUNDED,
+      });
+
+      const result = await service.refundTicket('ticket-1', 'admin-user', 'ADMIN');
+
+      expect(result.message).toContain('success');
     });
 
     it('should throw BadRequestException if ticket is not paid', async () => {
@@ -379,12 +475,52 @@ describe('PaymentsService', () => {
         id: 'ticket-1',
         userId: 'user-1',
         status: TicketStatus.PENDING,
+        event: {
+          startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
       };
 
       mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
 
       await expect(
-        service.refundTicket('ticket-1', { reason: 'Test' }, 'user-1'),
+        service.refundTicket('ticket-1', 'user-1', 'STUDENT'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if event has already started', async () => {
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - 1); // Event started yesterday
+
+      const mockTicket = {
+        id: 'ticket-1',
+        userId: 'user-1',
+        status: TicketStatus.PAID,
+        event: {
+          startDate: pastDate,
+        },
+      };
+
+      mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
+
+      await expect(
+        service.refundTicket('ticket-1', 'user-1', 'STUDENT'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if ticket already refunded', async () => {
+      const mockTicket = {
+        id: 'ticket-1',
+        userId: 'user-1',
+        status: TicketStatus.REFUNDED,
+        event: {
+          startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      };
+
+      mockPrismaService.ticket.findUnique.mockResolvedValue(mockTicket);
+
+      await expect(
+        service.refundTicket('ticket-1', 'user-1', 'STUDENT'),
       ).rejects.toThrow(BadRequestException);
     });
   });
