@@ -47,6 +47,15 @@ const analyticsService = {
     const response = await apiClient.get(`/api/analytics/event/${eventId}`);
     return response.data;
   },
+
+  /**
+   * Get student CSI (Creativity, Service, Intelligence) statistics
+   * @param {string} userId - User ID
+   */
+  getStudentCsiStats: async (userId) => {
+    const response = await apiClient.get(`/api/analytics/student/${userId}/csi`);
+    return response.data;
+  },
 };
 
 export default analyticsService;

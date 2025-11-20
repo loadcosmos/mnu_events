@@ -7,6 +7,8 @@ import { cn } from '../lib/utils';
 import OrganizerLayout from './OrganizerLayout.jsx';
 import AdminLayout from './AdminLayout.jsx';
 import BottomNavigation from './BottomNavigation';
+import GamificationBadge from './Gamification/GamificationBadge';
+import gamificationService from '../services/gamificationService';
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -19,9 +21,26 @@ export default function Layout({ children }) {
   const [selectedLang, setSelectedLang] = useState('ENG');
   const [profileOpen, setProfileOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [gamificationData, setGamificationData] = useState(null);
   const langDropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
-  
+
+  // Load gamification data for students
+  useEffect(() => {
+    const loadGamificationData = async () => {
+      if (isAuthenticated() && user?.role === 'STUDENT') {
+        try {
+          const stats = await gamificationService.getUserStats();
+          setGamificationData(stats);
+        } catch (error) {
+          console.error('Failed to load gamification data:', error);
+        }
+      }
+    };
+
+    loadGamificationData();
+  }, [user?.id, user?.role, isAuthenticated]);
+
   // Редирект организаторов и админов с публичных страниц на их страницы
   useEffect(() => {
     if (isAuthenticated() && user) {
@@ -36,7 +55,7 @@ export default function Layout({ children }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, location.pathname, navigate]);
-  
+
   // Закрытие dropdown при клике вне
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -92,12 +111,12 @@ export default function Layout({ children }) {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [location.pathname]);
-  
+
   // Если пользователь - организатор, используем OrganizerLayout
   if (isAuthenticated() && user?.role === 'ORGANIZER') {
     return <OrganizerLayout>{children}</OrganizerLayout>;
   }
-  
+
   // Если пользователь - админ, используем AdminLayout
   if (isAuthenticated() && user?.role === 'ADMIN') {
     return <AdminLayout>{children}</AdminLayout>;
@@ -115,14 +134,14 @@ export default function Layout({ children }) {
   ];
 
   const isHomePage = location.pathname === '/';
-  
+
   // Определяем, должны ли элементы быть белыми (когда hero section виден в светлом режиме)
   const isHeroVisible = isHomePage && !isScrolled && !isDark;
-  const textColorClass = isHeroVisible 
-    ? 'text-white' 
+  const textColorClass = isHeroVisible
+    ? 'text-white'
     : 'text-gray-800 dark:text-white';
-  const iconColorClass = isHeroVisible 
-    ? 'text-white' 
+  const iconColorClass = isHeroVisible
+    ? 'text-white'
     : 'text-gray-800 dark:text-white';
   const hoverClass = isHeroVisible
     ? 'hover:bg-white/20'
@@ -131,11 +150,10 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
       <header
-        className={`fixed top-0 z-50 w-full transition-all duration-300 ease-in-out ${
-          isScrolled
-            ? 'liquid-glass-strong'
-            : 'liquid-glass-subtle'
-        }`}
+        className={`fixed top-0 z-50 w-full transition-all duration-300 ease-in-out ${isScrolled
+          ? 'liquid-glass-strong'
+          : 'liquid-glass-subtle'
+          }`}
       >
         <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
           {/* Left side - Language selector & Theme toggle (Desktop only) */}
@@ -165,9 +183,8 @@ export default function Layout({ children }) {
               >
                 {selectedLang}
                 <i
-                  className={`fa-solid fa-chevron-down text-xs transition-transform ${iconColorClass} ${
-                    langOpen ? 'rotate-180' : ''
-                  }`}
+                  className={`fa-solid fa-chevron-down text-xs transition-transform ${iconColorClass} ${langOpen ? 'rotate-180' : ''
+                    }`}
                 />
               </Button>
               {langOpen && (
@@ -243,9 +260,18 @@ export default function Layout({ children }) {
             </nav>
 
             {/* Auth buttons (Desktop only) */}
-            <div className="hidden md:flex items-center">
+            <div className="hidden md:flex items-center gap-3">
               {isAuthenticated() ? (
                 <>
+                  {/* Gamification Badge for Students */}
+                  {user?.role === 'STUDENT' && gamificationData && (
+                    <GamificationBadge
+                      level={gamificationData.level}
+                      points={gamificationData.points}
+                      size="small"
+                      showPoints={false}
+                    />
+                  )}
                   {/* Profile dropdown (Desktop only) */}
                   <div className="relative" ref={profileDropdownRef}>
                     <Button
@@ -259,23 +285,32 @@ export default function Layout({ children }) {
                         {user?.firstName || user?.email}
                       </span>
                       <i
-                        className={`fa-solid fa-chevron-down text-xs transition-transform ${iconColorClass} ${
-                          profileOpen ? 'rotate-180' : ''
-                        }`}
+                        className={`fa-solid fa-chevron-down text-xs transition-transform ${iconColorClass} ${profileOpen ? 'rotate-180' : ''
+                          }`}
                       />
                     </Button>
                     {profileOpen && (
                       <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl liquid-glass-strong shadow-xl z-50">
                         <div className="p-1">
                           {user?.role === 'STUDENT' && (
-                            <Link
-                              to="/registrations"
-                              onClick={() => setProfileOpen(false)}
-                              className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:bg-gray-200/50 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all rounded-xl"
-                            >
-                              <i className="fa-solid fa-calendar-check w-4 text-center" />
-                              My Registrations
-                            </Link>
+                            <>
+                              <Link
+                                to="/registrations"
+                                onClick={() => setProfileOpen(false)}
+                                className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:bg-gray-200/50 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all rounded-xl"
+                              >
+                                <i className="fa-solid fa-calendar-check w-4 text-center" />
+                                My Registrations
+                              </Link>
+                              <Link
+                                to="/csi-dashboard"
+                                onClick={() => setProfileOpen(false)}
+                                className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:bg-gray-200/50 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all rounded-xl"
+                              >
+                                <i className="fa-solid fa-chart-line w-4 text-center" />
+                                CSI Dashboard
+                              </Link>
+                            </>
                           )}
                           <Link
                             to="/profile"

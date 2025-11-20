@@ -6,7 +6,8 @@ import EventModal from '../components/EventModal';
 import FilterSheet from '../components/FilterSheet';
 import NativeAd from '../components/NativeAd';
 import { formatDate } from '../utils/dateFormatters';
-import { EVENT_CATEGORIES } from '../utils/constants';
+import { EVENT_CATEGORIES, CSI_CATEGORIES } from '../utils/constants';
+import { getCsiIcon, getCsiColors, getAllCsiCategories } from '../utils/categoryMappers';
 
 // Mock ads data (will be loaded from API later)
 const mockAds = [
@@ -25,6 +26,7 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
+  const [selectedCsiTags, setSelectedCsiTags] = useState([]);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [events, setEvents] = useState([]);
@@ -38,10 +40,12 @@ export default function EventsPage() {
   // Collapsible filter sections
   const [categoryExpanded, setCategoryExpanded] = useState(false);
   const [statusExpanded, setStatusExpanded] = useState(false);
+  const [csiExpanded, setCsiExpanded] = useState(false);
   const [dateExpanded, setDateExpanded] = useState(false);
 
   const categories = ['ALL', ...Object.values(EVENT_CATEGORIES)];
   const statuses = ['ALL', 'UPCOMING', 'ONGOING', 'COMPLETED'];
+  const csiCategories = getAllCsiCategories();
 
   const openEventModal = (eventId) => {
     setModalEventId(eventId);
@@ -53,6 +57,14 @@ export default function EventsPage() {
     setTimeout(() => setModalEventId(null), 300);
   };
 
+  const toggleCsiTag = (csiValue) => {
+    setSelectedCsiTags((prev) =>
+      prev.includes(csiValue)
+        ? prev.filter((tag) => tag !== csiValue)
+        : [...prev, csiValue]
+    );
+  };
+
   // Load events when filters change
   useEffect(() => {
     const debounceTime = searchQuery ? 500 : 300;
@@ -62,7 +74,7 @@ export default function EventsPage() {
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, selectedStatus, searchQuery, startDate, endDate]);
+  }, [selectedCategory, selectedStatus, selectedCsiTags, searchQuery, startDate, endDate]);
 
   const loadEvents = async () => {
     try {
@@ -84,6 +96,10 @@ export default function EventsPage() {
 
       if (searchQuery) {
         params.search = searchQuery;
+      }
+
+      if (selectedCsiTags.length > 0) {
+        params.csiTags = selectedCsiTags.join(',');
       }
 
       if (startDate) {
@@ -167,7 +183,7 @@ export default function EventsPage() {
         </div>
         {/* Category Filters */}
         <div className="max-w-7xl mx-auto px-4 pb-4">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mb-3">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -181,6 +197,33 @@ export default function EventsPage() {
                 {cat}
               </button>
             ))}
+          </div>
+
+          {/* CSI Filters */}
+          <div>
+            <p className="text-xs font-semibold text-gray-500 dark:text-[#666666] mb-2 transition-colors duration-300">
+              CSI Tags (Multi-select)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {csiCategories.map((csi) => {
+                const isSelected = selectedCsiTags.includes(csi.value);
+                const colors = getCsiColors(csi.value);
+                return (
+                  <button
+                    key={csi.value}
+                    onClick={() => toggleCsiTag(csi.value)}
+                    className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all border-2 ${
+                      isSelected
+                        ? `${colors.bg} ${colors.text} ${colors.border} scale-105`
+                        : 'bg-gray-100 dark:bg-[#1a1a1a] border-gray-300 dark:border-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:scale-105'
+                    }`}
+                  >
+                    <span className="mr-1">{getCsiIcon(csi.value)}</span>
+                    {csi.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
@@ -293,11 +336,25 @@ export default function EventsPage() {
 
                       {/* Content Section - Strict Vertical Layout with Proper Padding */}
                       <div className="flex-1 flex flex-col px-5 py-5 md:px-6 md:py-6 space-y-4">
-                        {/* Category Badge */}
-                        <div className="flex-shrink-0">
+                        {/* Category Badge and CSI Tags */}
+                        <div className="flex-shrink-0 flex items-center gap-2 flex-wrap">
                           <span className="inline-block bg-[#d62e1f] text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide">
                             {event.category}
                           </span>
+                          {/* CSI Tags */}
+                          {event.csiTags && event.csiTags.length > 0 && (
+                            event.csiTags.map((csiTag) => {
+                              const colors = getCsiColors(csiTag);
+                              return (
+                                <span
+                                  key={csiTag}
+                                  className={`inline-flex items-center gap-1 ${colors.bg} ${colors.text} ${colors.border} px-2.5 py-1 rounded-lg text-xs font-semibold border`}
+                                >
+                                  {getCsiIcon(csiTag)}
+                                </span>
+                              );
+                            })
+                          )}
                         </div>
 
                         {/* Date/Time - MNU Red + Bold */}
@@ -428,6 +485,51 @@ export default function EventsPage() {
                     {status}
                   </label>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* CSI Tags Filter - Collapsible */}
+          <div className="border border-gray-200 dark:border-[#2a2a2a] rounded-lg overflow-hidden transition-colors duration-300">
+            <button
+              onClick={() => setCsiExpanded(!csiExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition-colors"
+            >
+              <span>CSI Tags</span>
+              <i
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${
+                  csiExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {csiExpanded && (
+              <div className="p-3 space-y-2 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
+                <p className="text-xs text-gray-500 dark:text-[#666666] mb-2 transition-colors duration-300">
+                  Select multiple tags
+                </p>
+                {csiCategories.map((csi) => {
+                  const isSelected = selectedCsiTags.includes(csi.value);
+                  const colors = getCsiColors(csi.value);
+                  return (
+                    <label
+                      key={csi.value}
+                      className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-all border-2 ${
+                        isSelected
+                          ? `${colors.bg} ${colors.text} ${colors.border}`
+                          : 'bg-gray-100 dark:bg-[#2a2a2a] border-gray-200 dark:border-[#3a3a3a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleCsiTag(csi.value)}
+                        className="mr-3 accent-[#d62e1f]"
+                      />
+                      <span className="mr-2">{getCsiIcon(csi.value)}</span>
+                      {csi.label}
+                    </label>
+                  );
+                })}
               </div>
             )}
           </div>

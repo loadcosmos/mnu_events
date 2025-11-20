@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventsService } from './events.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { ModerationService } from '../moderation/moderation.service';
 import {
   NotFoundException,
   ForbiddenException,
@@ -23,11 +24,16 @@ describe('EventsService', () => {
     },
   };
 
+  const mockModerationService = {
+    addToQueue: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EventsService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: ModerationService, useValue: mockModerationService },
       ],
     }).compile();
 
@@ -70,7 +76,7 @@ describe('EventsService', () => {
 
       mockPrismaService.event.create.mockResolvedValue(mockEvent);
 
-      const result = await service.create(createEventDto, 'user-1');
+      const result = await service.create(createEventDto, 'user-1', Role.ORGANIZER);
 
       expect(result).toEqual(mockEvent);
       expect(mockPrismaService.event.create).toHaveBeenCalled();
@@ -88,7 +94,7 @@ describe('EventsService', () => {
         isPaid: false,
       };
 
-      await expect(service.create(createEventDto, 'user-1')).rejects.toThrow(
+      await expect(service.create(createEventDto, 'user-1', Role.ORGANIZER)).rejects.toThrow(
         BadRequestException,
       );
       expect(mockPrismaService.event.create).not.toHaveBeenCalled();
@@ -109,7 +115,7 @@ describe('EventsService', () => {
         isPaid: false,
       };
 
-      await expect(service.create(createEventDto, 'user-1')).rejects.toThrow(
+      await expect(service.create(createEventDto, 'user-1', Role.ORGANIZER)).rejects.toThrow(
         BadRequestException,
       );
     });

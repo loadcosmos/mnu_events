@@ -2,6 +2,7 @@ import {
   PrismaClient,
   Role,
   Category,
+  CsiCategory,
   EventStatus,
   ClubCategory,
   ServiceType,
@@ -122,6 +123,7 @@ async function main() {
       description:
         'Annual coding competition for students. Build innovative solutions in 24 hours! Prizes for top 3 teams.',
       category: Category.TECH,
+      csiTags: [CsiCategory.CREATIVITY, CsiCategory.INTELLIGENCE],
       location: 'Main Hall, Building A',
       startDate: new Date(`${eventYear}-12-15T10:00:00`),
       endDate: new Date(`${eventYear}-12-15T18:00:00`),
@@ -139,6 +141,7 @@ async function main() {
       description:
         'Meet top employers and explore career opportunities. Bring your resume and dress professionally.',
       category: Category.CAREER,
+      csiTags: [CsiCategory.INTELLIGENCE, CsiCategory.SERVICE],
       location: 'Sports Complex',
       startDate: new Date(`${eventYear}-12-20T09:00:00`),
       endDate: new Date(`${eventYear}-12-20T17:00:00`),
@@ -156,6 +159,7 @@ async function main() {
       description:
         'Inter-faculty football championship. Register your team now! 7 players per team.',
       category: Category.SPORTS,
+      csiTags: [CsiCategory.CREATIVITY],
       location: 'Stadium',
       startDate: new Date(`${eventYear}-12-10T14:00:00`),
       endDate: new Date(`${eventYear}-12-10T18:00:00`),
@@ -173,6 +177,7 @@ async function main() {
       description:
         'Celebrate Kazakh culture with traditional music, dance, and food. Free entry for all students.',
       category: Category.CULTURAL,
+      csiTags: [CsiCategory.CREATIVITY],
       location: 'Concert Hall',
       startDate: new Date(`${eventYear}-12-18T18:00:00`),
       endDate: new Date(`${eventYear}-12-18T21:00:00`),
@@ -190,6 +195,7 @@ async function main() {
       description:
         'Learn the basics of AI and ML from industry experts. Hands-on coding session included.',
       category: Category.ACADEMIC,
+      csiTags: [CsiCategory.INTELLIGENCE],
       location: 'Room 301, Building B',
       startDate: new Date(`${eventYear}-12-12T10:00:00`),
       endDate: new Date(`${eventYear}-12-12T13:00:00`),
@@ -207,6 +213,7 @@ async function main() {
       description:
         'Meet new friends and network with fellow students. Refreshments will be provided.',
       category: Category.SOCIAL,
+      csiTags: [CsiCategory.SERVICE],
       location: 'Student Lounge',
       startDate: new Date(`${eventYear}-12-08T17:00:00`),
       endDate: new Date(`${eventYear}-12-08T20:00:00`),
@@ -224,6 +231,7 @@ async function main() {
       description:
         'Present your startup idea to investors. Top 3 winners receive seed funding!',
       category: Category.CAREER,
+      csiTags: [CsiCategory.CREATIVITY, CsiCategory.INTELLIGENCE],
       location: 'Innovation Lab',
       startDate: new Date(`${eventYear}-12-22T13:00:00`),
       endDate: new Date(`${eventYear}-12-22T17:00:00`),
@@ -240,6 +248,7 @@ async function main() {
       title: 'Chess Championship',
       description: 'University chess tournament. All skill levels welcome. Prizes for top 3 players.',
       category: Category.SPORTS,
+      csiTags: [CsiCategory.INTELLIGENCE],
       location: 'Library Conference Room',
       startDate: new Date(`${eventYear}-12-14T10:00:00`),
       endDate: new Date(`${eventYear}-12-14T16:00:00`),
@@ -257,6 +266,7 @@ async function main() {
       description:
         'Student photography showcase. Submit your best work and vote for your favorites!',
       category: Category.CULTURAL,
+      csiTags: [CsiCategory.CREATIVITY],
       location: 'Art Gallery',
       startDate: new Date(`${eventYear}-12-16T12:00:00`),
       endDate: new Date(`${eventYear}-12-16T18:00:00`),
@@ -274,6 +284,7 @@ async function main() {
       description:
         'Join us in giving back to the community. Various volunteer activities available.',
       category: Category.SOCIAL,
+      csiTags: [CsiCategory.SERVICE],
       location: 'City Community Center',
       startDate: new Date(`${eventYear}-12-09T09:00:00`),
       endDate: new Date(`${eventYear}-12-09T15:00:00`),
@@ -292,6 +303,7 @@ async function main() {
       description:
         'Exclusive networking event with industry leaders and successful entrepreneurs. Ticket includes dinner and drinks.',
       category: Category.CAREER,
+      csiTags: [CsiCategory.INTELLIGENCE, CsiCategory.SERVICE],
       location: 'Grand Ballroom, Rixos Hotel',
       startDate: new Date(`${eventYear}-12-25T19:00:00`),
       endDate: new Date(`${eventYear}-12-25T23:00:00`),
@@ -313,6 +325,7 @@ async function main() {
       description:
         '3-hour intensive Python programming course with certification. Materials and laptop provided.',
       category: Category.TECH,
+      csiTags: [CsiCategory.CREATIVITY, CsiCategory.INTELLIGENCE],
       location: 'IT Lab, Building C',
       startDate: new Date(`${eventYear}-12-19T10:00:00`),
       endDate: new Date(`${eventYear}-12-19T13:00:00`),
@@ -334,6 +347,7 @@ async function main() {
       description:
         'Free educational lecture on Artificial Intelligence basics. Open to all students.',
       category: Category.ACADEMIC,
+      csiTags: [CsiCategory.INTELLIGENCE],
       location: 'Lecture Hall 1, Building B',
       startDate: new Date(`${eventYear}-12-11T14:00:00`),
       endDate: new Date(`${eventYear}-12-11T16:00:00`),

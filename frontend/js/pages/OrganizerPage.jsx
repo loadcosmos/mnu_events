@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import eventsService from '../services/eventsService';
+import apiClient from '../services/apiClient';
+import { toast } from 'sonner';
 
 export default function OrganizerPage() {
   const { user, isAuthenticated } = useAuth();
@@ -65,6 +67,37 @@ export default function OrganizerPage() {
       month: 'short',
       year: 'numeric',
     });
+  };
+
+  const handleExportParticipants = async (eventId, eventTitle) => {
+    try {
+      toast.info('Exporting participants...', {
+        description: 'Downloading CSV file',
+      });
+
+      const response = await apiClient.get(`/api/registrations/event/${eventId}/export`, {
+        responseType: 'blob',
+      });
+
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${eventTitle.replace(/\s+/g, '_')}_participants_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success('Export successful!', {
+        description: 'Participants list downloaded',
+      });
+    } catch (err) {
+      console.error('[OrganizerPage] Export failed:', err);
+      toast.error('Export failed', {
+        description: err.response?.data?.message || 'Failed to export participants list',
+      });
+    }
   };
 
   const getStatusBadge = (event) => {
@@ -239,7 +272,7 @@ export default function OrganizerPage() {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2 ml-4 flex-wrap">
                           <Button
                             variant="outline"
                             size="sm"
@@ -258,6 +291,15 @@ export default function OrganizerPage() {
                               <i className="fa-solid fa-qrcode mr-1" />
                               Scan
                             </Link>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleExportParticipants(event.id, event.title)}
+                            className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all"
+                          >
+                            <i className="fa-solid fa-download mr-1" />
+                            Export
                           </Button>
                           <Button
                             size="sm"

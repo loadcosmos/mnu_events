@@ -350,4 +350,90 @@ export class RegistrationsService {
 
     return updatedRegistration;
   }
+
+  /**
+   * Export event participants as CSV
+   * Organizers can only export their own events
+   */
+  async exportEventParticipants(eventId: string, userId: string, role: Role): Promise<string> {
+    // Check if event exists
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+      select: {
+        id: true,
+        title: true,
+        creatorId: true,
+        csiTags: true,
+      },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    // Check permissions (organizers can only export their own events)
+    if (role === Role.ORGANIZER && event.creatorId !== userId) {
+      throw new ForbiddenException('You can only export participants for your own events');
+    }
+
+    // Get all registrations with user details and check-in status
+    const registrations = await this.prisma.registration.findMany({
+      where: { eventId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            faculty: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    // Get check-ins for this event
+    const checkIns = await this.prisma.checkIn.findMany({
+      where: { eventId },
+      select: {
+        userId: true,
+        checkedInAt: true,
+      },
+    });
+
+    // Create a map of userId -> check-in time
+    const checkInMap = new Map(checkIns.map(ci => [ci.userId, ci.checkedInAt]));
+
+    // Generate CSV
+    const headers = [
+      'Name',
+      'Email',
+      'Faculty',
+      'Registration Date',
+      'Check-in Status',
+      'Check-in Time',
+      'CSI Tags',
+    ];
+
+    const csvRows = registrations.map((reg) => {
+      const checkInTime = checkInMap.get(reg.user.id);
+      const csiTagsString = event.csiTags?.join(', ') || 'None';
+
+      return [
+        `${reg.user.firstName} ${reg.user.lastName}`,
+        reg.user.email,
+        reg.user.faculty || 'N/A',
+        reg.createdAt.toISOString().split('T')[0], // Date only
+        checkInTime ? 'Checked In' : 'Registered',
+        checkInTime ? checkInTime.toISOString() : 'N/A',
+        csiTagsString,
+      ].map(field => `"${field}"`).join(','); // Quote fields to handle commas
+    });
+
+    // Combine headers and rows
+    const csv = [headers.join(','), ...csvRows].join('\n');
+
+    return csv;
+  }
 }

@@ -7,8 +7,9 @@ import {
   IsInt,
   Min,
   IsOptional,
+  IsArray,
 } from 'class-validator';
-import { Category, EventStatus } from '@prisma/client';
+import { Category, CsiCategory, EventStatus } from '@prisma/client';
 
 export class CreateEventDto {
   @ApiProperty({ example: 'Hackathon 2024' })
@@ -24,6 +25,16 @@ export class CreateEventDto {
   @ApiProperty({ enum: Category, example: Category.TECH })
   @IsEnum(Category)
   category: Category;
+
+  @ApiPropertyOptional({
+    enum: CsiCategory,
+    isArray: true,
+    example: [CsiCategory.CREATIVITY, CsiCategory.INTELLIGENCE]
+  })
+  @IsArray()
+  @IsEnum(CsiCategory, { each: true })
+  @IsOptional()
+  csiTags?: CsiCategory[];
 
   @ApiProperty({ example: 'Main Hall, Building A' })
   @IsString()
@@ -52,4 +63,14 @@ export class CreateEventDto {
   @IsEnum(EventStatus)
   @IsOptional()
   status?: EventStatus;
+
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
+  isPaid?: boolean;
+
+  @ApiPropertyOptional({ example: 5000 })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  price?: number;
 }

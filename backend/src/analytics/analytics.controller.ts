@@ -4,6 +4,7 @@ import {
   Param,
   UseGuards,
   Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -107,5 +108,29 @@ export class AnalyticsController {
   @ApiResponse({ status: 404, description: 'Event not found' })
   async getEventStats(@Param('id') id: string) {
     return this.analyticsService.getEventStats(id);
+  }
+
+  @Get('student/:userId/csi')
+  @Roles(Role.STUDENT, Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get student CSI (Creativity, Service, Intelligence) statistics',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Student CSI participation breakdown with event counts',
+  })
+  @ApiResponse({ status: 403, description: 'Access denied' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getStudentCsiStats(
+    @Param('userId') userId: string,
+    @Request() req: RequestWithUser,
+  ) {
+    // Ensure students can only view their own stats (unless ADMIN)
+    if (req.user.role !== Role.ADMIN && req.user.sub !== userId) {
+      throw new ForbiddenException('You can only view your own CSI statistics');
+    }
+
+    return this.analyticsService.getStudentCsiStats(userId);
   }
 }

@@ -37,6 +37,7 @@ import PricingSettingsPage from './pages/PricingSettingsPage.jsx';
 import MockPaymentPage from './pages/MockPaymentPage.jsx';
 import ModerationQueuePage from './pages/ModerationQueuePage.jsx';
 import ModeratorDashboardPage from './pages/ModeratorDashboardPage.jsx';
+import CsiDashboardPage from './pages/CsiDashboardPage.jsx';
 
 /**
  * Главный компонент приложения
@@ -116,6 +117,14 @@ function App() {
               element={
                 <ProtectedRoute roles={['STUDENT']}>
                   <Layout><MyRegistrationsPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/csi-dashboard"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <Layout><CsiDashboardPage /></Layout>
                 </ProtectedRoute>
               }
             />

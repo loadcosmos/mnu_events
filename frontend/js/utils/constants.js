@@ -22,6 +22,49 @@ export const EVENT_CATEGORIES = {
   OTHER: 'OTHER',
 };
 
+// CSI Categories (Creativity, Service, Intelligence)
+export const CSI_CATEGORIES = {
+  CREATIVITY: 'CREATIVITY',
+  SERVICE: 'SERVICE',
+  INTELLIGENCE: 'INTELLIGENCE',
+};
+
+// CSI Display Names
+export const CSI_LABELS = {
+  CREATIVITY: 'Creativity',
+  SERVICE: 'Service',
+  INTELLIGENCE: 'Intelligence',
+};
+
+// CSI Icons (emojis)
+export const CSI_ICONS = {
+  CREATIVITY: '🎨',
+  SERVICE: '🤝',
+  INTELLIGENCE: '🧠',
+};
+
+// CSI Colors (for badges and UI)
+export const CSI_COLORS = {
+  CREATIVITY: {
+    bg: 'bg-purple-100 dark:bg-purple-900/30',
+    text: 'text-purple-700 dark:text-purple-300',
+    border: 'border-purple-300 dark:border-purple-700',
+    gradient: 'from-purple-500 to-pink-500',
+  },
+  SERVICE: {
+    bg: 'bg-green-100 dark:bg-green-900/30',
+    text: 'text-green-700 dark:text-green-300',
+    border: 'border-green-300 dark:border-green-700',
+    gradient: 'from-green-500 to-emerald-500',
+  },
+  INTELLIGENCE: {
+    bg: 'bg-blue-100 dark:bg-blue-900/30',
+    text: 'text-blue-700 dark:text-blue-300',
+    border: 'border-blue-300 dark:border-blue-700',
+    gradient: 'from-blue-500 to-cyan-500',
+  },
+};
+
 // Event statuses
 export const EVENT_STATUSES = {
   UPCOMING: 'UPCOMING',

@@ -15,6 +15,7 @@ import {
 } from '../components/ui/select.jsx';
 import eventsService from '../services/eventsService';
 import { toast } from 'sonner';
+import { getAllCsiCategories, getCsiIcon, getCsiColors } from '../utils/categoryMappers';
 
 const CATEGORIES = [
   { value: 'ACADEMIC', label: 'Academic' },
@@ -35,6 +36,7 @@ export default function CreateEventPage() {
     title: '',
     description: '',
     category: '',
+    csiTags: [],
     location: '',
     startDate: '',
     startTime: '',
@@ -54,6 +56,20 @@ export default function CreateEventPage() {
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setError('');
+  };
+
+  const handleCsiToggle = (csiValue) => {
+    setFormData(prev => {
+      const currentTags = prev.csiTags || [];
+      const isSelected = currentTags.includes(csiValue);
+
+      return {
+        ...prev,
+        csiTags: isSelected
+          ? currentTags.filter(tag => tag !== csiValue)
+          : [...currentTags, csiValue],
+      };
+    });
   };
 
   const validateForm = () => {
@@ -122,6 +138,7 @@ export default function CreateEventPage() {
         title: formData.title.trim(),
         description: formData.description.trim(),
         category: formData.category,
+        csiTags: formData.csiTags,
         location: formData.location.trim(),
         startDate,
         endDate,
@@ -230,6 +247,38 @@ export default function CreateEventPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* CSI Tags */}
+            <div className="space-y-2">
+              <Label className="dark:text-white">CSI Tags (Optional)</Label>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Select all that apply: Creativity, Service, Intelligence
+              </p>
+              <div className="flex flex-wrap gap-3 mt-2">
+                {getAllCsiCategories().map((csi) => {
+                  const isSelected = formData.csiTags.includes(csi.value);
+                  const colors = getCsiColors(csi.value);
+
+                  return (
+                    <button
+                      key={csi.value}
+                      type="button"
+                      onClick={() => handleCsiToggle(csi.value)}
+                      className={`
+                        px-4 py-2 rounded-xl border-2 transition-all
+                        ${isSelected
+                          ? `${colors.bg} ${colors.border} ${colors.text} scale-105`
+                          : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:scale-105'
+                        }
+                      `}
+                    >
+                      <span className="mr-2">{getCsiIcon(csi.value)}</span>
+                      {csi.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Location */}

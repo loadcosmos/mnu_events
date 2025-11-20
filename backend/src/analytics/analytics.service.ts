@@ -506,4 +506,108 @@ export class AnalyticsService {
       .map(([month, data]) => ({ month, ...data }))
       .sort((a, b) => a.month.localeCompare(b.month));
   }
+
+  /**
+   * Get student CSI statistics
+   * Calculates participation across Creativity, Service, Intelligence categories
+   */
+  async getStudentCsiStats(userId: string) {
+    // Verify user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Get all check-ins for this student with event CSI tags
+    const checkIns = await this.prisma.checkIn.findMany({
+      where: { userId },
+      include: {
+        event: {
+          select: {
+            id: true,
+            title: true,
+            csiTags: true,
+            category: true,
+            startDate: true,
+            endDate: true,
+          },
+        },
+      },
+      orderBy: { checkedInAt: 'desc' },
+    });
+
+    // Initialize CSI breakdown
+    const csiBreakdown: {
+      [key: string]: {
+        events: number;
+        eventIds: Set<string>;
+        eventDetails: Array<{
+          id: string;
+          title: string;
+          category: string;
+          date: Date;
+        }>;
+      };
+    } = {
+      CREATIVITY: { events: 0, eventIds: new Set<string>(), eventDetails: [] },
+      SERVICE: { events: 0, eventIds: new Set<string>(), eventDetails: [] },
+      INTELLIGENCE: { events: 0, eventIds: new Set<string>(), eventDetails: [] },
+    };
+
+    // Count events per CSI category
+    checkIns.forEach((checkIn) => {
+      const csiTags = checkIn.event.csiTags || [];
+
+      csiTags.forEach((tag) => {
+        if (csiBreakdown[tag]) {
+          // Only count each event once per CSI category
+          if (!csiBreakdown[tag].eventIds.has(checkIn.event.id)) {
+            csiBreakdown[tag].eventIds.add(checkIn.event.id);
+            csiBreakdown[tag].events += 1;
+            csiBreakdown[tag].eventDetails.push({
+              id: checkIn.event.id,
+              title: checkIn.event.title,
+              category: checkIn.event.category,
+              date: checkIn.event.startDate,
+            });
+          }
+        }
+      });
+    });
+
+    // Calculate totals
+    const totalCsiEvents = checkIns.filter(c => c.event.csiTags && c.event.csiTags.length > 0).length;
+    const totalEvents = checkIns.length;
+
+    // Format response
+    return {
+      userId: user.id,
+      totalEvents,
+      totalCsiEvents,
+      csiBreakdown: {
+        creativity: {
+          events: csiBreakdown.CREATIVITY.events,
+          recentEvents: csiBreakdown.CREATIVITY.eventDetails.slice(0, 5),
+        },
+        service: {
+          events: csiBreakdown.SERVICE.events,
+          recentEvents: csiBreakdown.SERVICE.eventDetails.slice(0, 5),
+        },
+        intelligence: {
+          events: csiBreakdown.INTELLIGENCE.events,
+          recentEvents: csiBreakdown.INTELLIGENCE.eventDetails.slice(0, 5),
+        },
+      },
+      requirements: {
+        // No hard requirements - just tracking
+        creativity: { completed: csiBreakdown.CREATIVITY.events, status: 'tracking' },
+        service: { completed: csiBreakdown.SERVICE.events, status: 'tracking' },
+        intelligence: { completed: csiBreakdown.INTELLIGENCE.events, status: 'tracking' },
+      },
+    };
+  }
 }

@@ -66,6 +66,7 @@ model Event {
   title       String
   description String   @db.Text
   category    Category
+  csiTags     CsiCategory[]
   location    String
   startDate   DateTime
   endDate     DateTime
@@ -113,6 +114,12 @@ enum Category {
   SOCIAL
   CAREER
   OTHER
+}
+
+enum CsiCategory {
+  CREATIVITY
+  SERVICE
+  INTELLIGENCE
 }
 
 enum EventStatus {

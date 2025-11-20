@@ -10,6 +10,7 @@ import AdBanner from '../components/AdBanner';
 import AdModal from '../components/AdModal';
 import { formatDate } from '../utils/dateFormatters';
 import { COLORS } from '../utils/constants';
+import { getCsiIcon, getCsiColors } from '../utils/categoryMappers';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -429,6 +430,20 @@ export default function HomePage() {
                         <span className="inline-block bg-[#d62e1f] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                           {event.category}
                         </span>
+                        {/* CSI Tags */}
+                        {event.csiTags && event.csiTags.length > 0 && (
+                          event.csiTags.map((csiTag) => {
+                            const colors = getCsiColors(csiTag);
+                            return (
+                              <span
+                                key={csiTag}
+                                className={`inline-flex items-center gap-1 ${colors.bg} ${colors.text} ${colors.border} px-2.5 py-1 rounded-lg text-xs font-semibold border`}
+                              >
+                                {getCsiIcon(csiTag)}
+                              </span>
+                            );
+                          })
+                        )}
                         <div className="flex items-center gap-2 text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
                           <i className="fa-regular fa-calendar text-sm" />
                           <span className="text-sm font-medium">{formatDate(event.startDate)}</span>
@@ -505,11 +520,25 @@ export default function HomePage() {
                     </div>
                     {/* Enhanced Content */}
                     <div className="p-4 md:p-5 lg:p-6 space-y-3 overflow-hidden">
-                      {/* Category */}
-                      <div>
+                      {/* Category and CSI Tags */}
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="inline-block bg-[#d62e1f] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                           {event.category}
                         </span>
+                        {/* CSI Tags */}
+                        {event.csiTags && event.csiTags.length > 0 && (
+                          event.csiTags.map((csiTag) => {
+                            const colors = getCsiColors(csiTag);
+                            return (
+                              <span
+                                key={csiTag}
+                                className={`inline-flex items-center gap-1 ${colors.bg} ${colors.text} ${colors.border} px-2.5 py-1 rounded-lg text-xs font-semibold border`}
+                              >
+                                {getCsiIcon(csiTag)}
+                              </span>
+                            );
+                          })
+                        )}
                       </div>
 
                       {/* Date/Time - Red and Bold */}
@@ -632,11 +661,25 @@ export default function HomePage() {
                       </div>
                       {/* Enhanced Content */}
                       <div className="p-4 md:p-5 lg:p-6 space-y-3 overflow-hidden">
-                        {/* Category */}
-                        <div>
+                        {/* Category and CSI Tags */}
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="inline-block bg-[#d62e1f] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-md">
                             {event.category}
                           </span>
+                          {/* CSI Tags */}
+                          {event.csiTags && event.csiTags.length > 0 && (
+                            event.csiTags.map((csiTag) => {
+                              const colors = getCsiColors(csiTag);
+                              return (
+                                <span
+                                  key={csiTag}
+                                  className={`inline-flex items-center gap-1 ${colors.bg} ${colors.text} ${colors.border} px-2.5 py-1 rounded-lg text-xs font-semibold border`}
+                                >
+                                  {getCsiIcon(csiTag)}
+                                </span>
+                              );
+                            })
+                          )}
                         </div>
 
                         {/* Date/Time - Red and Bold */}

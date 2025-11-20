@@ -8,7 +8,10 @@ import {
   Delete,
   Query,
   UseGuards,
+  Res,
+  Header,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { RegistrationsService } from './registrations.service';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
@@ -76,6 +79,29 @@ export class RegistrationsController {
       limit ? parseInt(limit) : 10,
       search,
     );
+  }
+
+  @Get('event/:eventId/export')
+  @Roles(Role.ORGANIZER, Role.ADMIN)
+  @ApiOperation({ summary: 'Export event participants as CSV (Organizer/Admin only)' })
+  @ApiResponse({ status: 200, description: 'CSV file generated', type: 'string' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Event not found' })
+  @Header('Content-Type', 'text/csv')
+  async exportEventParticipants(
+    @Param('eventId') eventId: string,
+    @CurrentUser() user: any,
+    @Res() res: Response,
+  ) {
+    const csv = await this.registrationsService.exportEventParticipants(
+      eventId,
+      user.id,
+      user.role,
+    );
+
+    const filename = `event-${eventId}-participants-${new Date().toISOString().split('T')[0]}.csv`;
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csv);
   }
 
   @Delete(':id')

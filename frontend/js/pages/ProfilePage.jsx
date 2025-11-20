@@ -9,6 +9,7 @@ import registrationsService from '../services/registrationsService';
 import analyticsService from '../services/analyticsService';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
+import GamificationCard from '../components/Gamification/GamificationCard';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -295,6 +296,19 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Gamification Section (Students only) */}
+      {currentUser?.role === 'STUDENT' && (
+        <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
+              Геймификация <span className="text-[#d62e1f]">Progress</span>
+            </h2>
+
+            <GamificationCard userId={currentUser?.id} />
+          </div>
+        </div>
+      )}
 
       {/* Quick Links Section */}
       <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">

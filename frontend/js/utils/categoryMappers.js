@@ -3,7 +3,15 @@
  * Provides consistent translations and mappings across the application
  */
 
-import { EVENT_CATEGORIES, EVENT_STATUSES, CLUB_CATEGORIES } from './constants';
+import {
+  EVENT_CATEGORIES,
+  EVENT_STATUSES,
+  CLUB_CATEGORIES,
+  CSI_CATEGORIES,
+  CSI_LABELS,
+  CSI_ICONS,
+  CSI_COLORS,
+} from './constants';
 
 /**
  * Maps event category enum to display name
@@ -82,4 +90,42 @@ export const getClubCategoryDisplayName = (category) => {
   };
 
   return categoryMap[category] || category;
+};
+
+/**
+ * Get CSI category display name
+ */
+export const getCsiLabel = (csiCategory) => {
+  return CSI_LABELS[csiCategory] || csiCategory;
+};
+
+/**
+ * Get CSI category icon
+ */
+export const getCsiIcon = (csiCategory) => {
+  return CSI_ICONS[csiCategory] || '📌';
+};
+
+/**
+ * Get CSI category colors (Tailwind classes)
+ */
+export const getCsiColors = (csiCategory) => {
+  return CSI_COLORS[csiCategory] || {
+    bg: 'bg-gray-100 dark:bg-gray-900/30',
+    text: 'text-gray-700 dark:text-gray-300',
+    border: 'border-gray-300 dark:border-gray-700',
+    gradient: 'from-gray-500 to-gray-600',
+  };
+};
+
+/**
+ * Get all CSI categories as array for selection
+ */
+export const getAllCsiCategories = () => {
+  return Object.keys(CSI_CATEGORIES).map((key) => ({
+    value: CSI_CATEGORIES[key],
+    label: CSI_LABELS[key],
+    icon: CSI_ICONS[key],
+    colors: CSI_COLORS[key],
+  }));
 };
