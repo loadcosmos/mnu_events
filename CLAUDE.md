@@ -5,7 +5,7 @@ Quick reference and guidance for Claude Code when working with MNU Events Platfo
 ## 🎯 Project Overview
 
 **MNU Events Platform** - University events management system
-**Status:** 82% Complete | Grade: C+ | Production Ready: ❌
+**Status:** 89% Complete | Grade: B- | Production Ready: ❌
 
 **Tech Stack:**
 - Backend: NestJS 10 + Prisma ORM + PostgreSQL
@@ -25,6 +25,7 @@ This repository has been reorganized with focused documentation:
 | **SETUP.md** | Installation & configuration | New developers |
 | **PROJECT_STATUS.md** | Current status & roadmap | Project leads |
 | **DEVELOPMENT.md** | Dev tools & checklists | Developers |
+| **TESTING.md** | Testing guide & best practices | Developers |
 | **WSL_VS_WINDOWS_ANALYSIS.md** | Environment comparison | Windows users |
 
 **⚠️ See specific docs instead of this file for detailed guidance.**
@@ -150,6 +151,24 @@ import { ROLES, formatDate, getCategoryColor, extractErrorMessage } from '@/util
 
 **See SETUP.md** for database operations.
 
+### Running Tests
+```bash
+# Backend unit tests
+cd backend && npm test
+
+# Backend E2E tests
+cd backend && npm run test:e2e
+
+# Frontend tests
+cd frontend && npm test
+
+# With coverage
+npm run test:cov  # backend
+npm run test:coverage  # frontend
+```
+
+**See TESTING.md** for comprehensive testing guide.
+
 ---
 
 ## ⚠️ Critical Issues & Roadmap
@@ -256,8 +275,8 @@ A: See DEVELOPMENT.md → "Adding a New Backend Feature"
 **Q: Where are the shared utilities?**
 A: Backend: `backend/src/common/utils/` | Frontend: `frontend/js/utils/`
 
-**Q: How do I run E2E tests?**
-A: See DEVELOPMENT.md → "E2E Testing"
+**Q: How do I run tests?**
+A: See TESTING.md for complete testing guide
 
 **Q: What's not production-ready?**
 A: See PROJECT_STATUS.md → "Critical Issues"
@@ -276,12 +295,13 @@ A: After 8-10 weeks of fixes. See PROJECT_STATUS.md for roadmap.
 2. **SETUP.md** - Installation, Docker, environment config
 3. **PROJECT_STATUS.md** - Status, issues, roadmap, timeline
 4. **DEVELOPMENT.md** - Dev checklists, tools, UI guidelines
-5. **WSL_VS_WINDOWS_ANALYSIS.md** - Platform comparison
-6. **CLAUDE.md** - This file (quick reference)
+5. **TESTING.md** - Testing guide & best practices *(NEW)*
+6. **WSL_VS_WINDOWS_ANALYSIS.md** - Platform comparison
+7. **CLAUDE.md** - This file (quick reference)
 
 ---
 
-**Last Updated:** 2025-11-18
-**Version:** 3.0 (Simplified Reference Guide)
+**Last Updated:** 2025-11-20
+**Version:** 3.1 (Phase 5-6 Complete)
 
 For detailed guidance, refer to specific documentation above. 👆
