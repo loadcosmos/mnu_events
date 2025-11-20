@@ -234,5 +234,6 @@ export default function ModerationQueuePage() {
                     </div>
                 </div>
             )}
+        </div>
     );
 }

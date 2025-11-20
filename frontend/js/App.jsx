@@ -33,6 +33,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
 import AdminEventsPage from './pages/AdminEventsPage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import AdminClubsPage from './pages/AdminClubsPage.jsx';
+import PricingSettingsPage from './pages/PricingSettingsPage.jsx';
 import MockPaymentPage from './pages/MockPaymentPage.jsx';
 import ModerationQueuePage from './pages/ModerationQueuePage.jsx';
 import ModeratorDashboardPage from './pages/ModeratorDashboardPage.jsx';
@@ -178,6 +179,7 @@ function AdminRoutes() {
       <Route path="/events" element={<AdminEventsPage />} />
       <Route path="/users" element={<AdminUsersPage />} />
       <Route path="/clubs" element={<AdminClubsPage />} />
+      <Route path="/pricing" element={<PricingSettingsPage />} />
     </Routes>
   );
 }

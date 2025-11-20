@@ -2,8 +2,10 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { FilterServicesDto } from './dto/filter-services.dto';
@@ -16,7 +18,10 @@ import { Prisma, Role } from '@prisma/client';
 
 @Injectable()
 export class ServicesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private subscriptionsService: SubscriptionsService,
+  ) {}
 
   /**
    * Get all services with filters
@@ -124,6 +129,20 @@ export class ServicesService {
    * Create a new service
    */
   async create(dto: CreateServiceDto, userId: string) {
+    // Check service creation limit
+    const { canCreate, current, limit, isPremium } =
+      await this.subscriptionsService.canCreateService(userId);
+
+    if (!canCreate) {
+      throw new BadRequestException(
+        `You have reached your service listing limit (${limit}). ${
+          !isPremium
+            ? 'Upgrade to Premium to create up to 10 listings.'
+            : ''
+        }`,
+      );
+    }
+
     const service = await this.prisma.service.create({
       data: {
         ...dto,

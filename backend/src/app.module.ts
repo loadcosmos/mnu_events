@@ -14,6 +14,10 @@ import { CheckinModule } from './checkin/checkin.module';
 import { ServicesModule } from './services/services.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ModerationModule } from './moderation/moderation.module';
+import { SettingsModule } from './settings/settings.module';
+import { AdvertisementsModule } from './advertisements/advertisements.module';
+import { PaymentVerificationModule } from './payment-verification/payment-verification.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -42,6 +46,10 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     ServicesModule,
     AnalyticsModule,
     ModerationModule,
+    SettingsModule,
+    AdvertisementsModule,
+    PaymentVerificationModule,
+    SubscriptionsModule,
   ],
   providers: [
     {

@@ -36,6 +36,7 @@ model User {
   checkIns         CheckIn[]
   services         Service[]
   moderatedItems   ModerationQueue[]
+  subscriptions    Subscription[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -219,6 +220,7 @@ model Ticket {
   // Relations
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentVerification PaymentVerification?
 
   @@index([eventId])
   @@index([userId])
@@ -317,30 +319,41 @@ enum PriceType {
 }
 
 model Advertisement {
-  id          String     @id @default(uuid())
-  title       String
-  imageUrl    String
-  linkUrl     String?
-  position    AdPosition
-  isActive    Boolean    @default(true)
-  startDate   DateTime
-  endDate     DateTime
-  impressions Int        @default(0)
-  clicks      Int        @default(0)
-  createdAt   DateTime   @default(now())
+  id            String        @id @default(uuid())
+  title         String
+  imageUrl      String
+  linkUrl       String?
+  position      AdPosition
+  price         Decimal       @db.Decimal(10, 2) @default(10000.00)
+  duration      Int           @default(4) // weeks
+  paymentStatus PaymentStatus @default(PENDING)
+  isActive      Boolean       @default(false) // Active only after payment
+  startDate     DateTime
+  endDate       DateTime
+  impressions   Int           @default(0)
+  clicks        Int           @default(0)
+  createdAt     DateTime      @default(now())
 
   @@index([position])
   @@index([isActive])
+  @@index([paymentStatus])
   @@index([startDate, endDate])
   @@map("advertisements")
 }
 
 enum AdPosition {
-  TOP_BANNER       // Над hero section
-  HERO_SLIDE       // Слайд в carousel
-  NATIVE_FEED      // В ленте событий/клубов
-  BOTTOM_BANNER    // Внизу страницы
-  SIDEBAR          // Боковая панель
+  TOP_BANNER       // 10,000 тг/неделя
+  HERO_SLIDE       // Legacy - keep for existing data
+  NATIVE_FEED      // 8,000 тг/неделя
+  STORY_BANNER     // 15,000 тг/неделя (new)
+  BOTTOM_BANNER    // Legacy - keep for existing data
+  SIDEBAR          // Desktop only
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  EXPIRED
 }
 
 model ModerationQueue {
@@ -370,4 +383,62 @@ enum ModerationStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+// ============================================
+// PRICING & SUBSCRIPTION MODELS
+// ============================================
+
+model EventPricing {
+  id           String   @id @default(uuid())
+  basePrice    Decimal  @db.Decimal(10, 2) @default(5000.00)
+  premiumPrice Decimal  @db.Decimal(10, 2) @default(10000.00)
+  packagePrice Decimal  @db.Decimal(10, 2) @default(20000.00) // 5 events
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("event_pricing")
+}
+
+model PaymentVerification {
+  id              String             @id @default(uuid())
+  ticketId        String             @unique
+  ticket          Ticket             @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  receiptImageUrl String             // S3/Cloudinary URL
+  status          VerificationStatus @default(PENDING)
+  organizerNotes  String?            @db.Text
+  verifiedAt      DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([status])
+  @@index([ticketId])
+  @@map("payment_verifications")
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Subscription {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      SubscriptionType
+  price     Decimal          @db.Decimal(10, 2)
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean          @default(true)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([isActive])
+  @@index([userId, isActive]) // Composite index for active subscription check
+  @@map("subscriptions")
+}
+
+enum SubscriptionType {
+  PREMIUM  // 500 тг/месяц - 10 service listings
 }
