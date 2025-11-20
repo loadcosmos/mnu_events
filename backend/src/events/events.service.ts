@@ -150,6 +150,16 @@ export class EventsService {
       where.creatorId = filterDto.creatorId;
     }
 
+    // CSI Tags filtering: event must have ALL selected tags
+    if (filterDto?.csiTags) {
+      const csiTagsArray = filterDto.csiTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      if (csiTagsArray.length > 0) {
+        where.csiTags = {
+          hasEvery: csiTagsArray,
+        };
+      }
+    }
+
     try {
       const [events, total] = await Promise.all([
         this.prisma.event.findMany({

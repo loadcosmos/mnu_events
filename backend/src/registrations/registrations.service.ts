@@ -405,11 +405,12 @@ export class RegistrationsService {
     // Create a map of userId -> check-in time
     const checkInMap = new Map(checkIns.map(ci => [ci.userId, ci.checkedInAt]));
 
-    // Generate CSV
+    // Generate CSV with proper encoding
     const headers = [
       'Name',
       'Email',
       'Faculty',
+      'Year',
       'Registration Date',
       'Check-in Status',
       'Check-in Time',
@@ -418,21 +419,26 @@ export class RegistrationsService {
 
     const csvRows = registrations.map((reg) => {
       const checkInTime = checkInMap.get(reg.user.id);
-      const csiTagsString = event.csiTags?.join(', ') || 'None';
+      const csiTagsString = event.csiTags && event.csiTags.length > 0 ? event.csiTags.join(', ') : 'None';
+      const fullName = `${reg.user.firstName || ''} ${reg.user.lastName || ''}`.trim();
+      const registrationDate = reg.createdAt ? new Date(reg.createdAt).toLocaleDateString('en-GB') : 'N/A';
+      const checkInDate = checkInTime ? new Date(checkInTime).toLocaleString('en-GB') : 'N/A';
 
       return [
-        `${reg.user.firstName} ${reg.user.lastName}`,
-        reg.user.email,
+        fullName || 'N/A',
+        reg.user.email || 'N/A',
         reg.user.faculty || 'N/A',
-        reg.createdAt.toISOString().split('T')[0], // Date only
-        checkInTime ? 'Checked In' : 'Registered',
-        checkInTime ? checkInTime.toISOString() : 'N/A',
+        reg.user.year || 'N/A',
+        registrationDate,
+        checkInTime ? 'Checked In' : 'Registered Only',
+        checkInDate,
         csiTagsString,
-      ].map(field => `"${field}"`).join(','); // Quote fields to handle commas
+      ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(','); // Escape quotes properly
     });
 
-    // Combine headers and rows
-    const csv = [headers.join(','), ...csvRows].join('\n');
+    // Combine headers and rows with UTF-8 BOM for Excel compatibility
+    const BOM = '\uFEFF';
+    const csv = BOM + [headers.join(','), ...csvRows].join('\n');
 
     return csv;
   }

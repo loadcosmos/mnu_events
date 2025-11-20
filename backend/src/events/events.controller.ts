@@ -49,6 +49,9 @@ export class EventsController {
   @ApiQuery({ name: 'category', required: false, enum: ['ACADEMIC', 'SPORTS', 'CULTURAL', 'TECH', 'SOCIAL', 'CAREER', 'OTHER'] })
   @ApiQuery({ name: 'status', required: false, enum: ['UPCOMING', 'ONGOING', 'COMPLETED', 'CANCELLED'] })
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'csiTags', required: false, type: String, description: 'Comma-separated CSI tags (CREATIVITY,SERVICE,INTELLIGENCE)' })
+  @ApiQuery({ name: 'startDateFrom', required: false, type: String })
+  @ApiQuery({ name: 'startDateTo', required: false, type: String })
   @ApiResponse({ status: 200, description: 'Events retrieved' })
   findAll(
     @Query('page') page?: string,
@@ -56,13 +59,19 @@ export class EventsController {
     @Query('category') category?: string,
     @Query('status') status?: string,
     @Query('search') search?: string,
+    @Query('csiTags') csiTags?: string,
+    @Query('startDateFrom') startDateFrom?: string,
+    @Query('startDateTo') startDateTo?: string,
   ) {
     // Собираем фильтры вручную, исключая page и limit
     const filters: FilterEventsDto = {};
     if (category) filters.category = category as any;
     if (status) filters.status = status as any;
     if (search) filters.search = search;
-    
+    if (csiTags) filters.csiTags = csiTags;
+    if (startDateFrom) filters.startDateFrom = startDateFrom;
+    if (startDateTo) filters.startDateTo = startDateTo;
+
     return this.eventsService.findAll(
       page ? parseInt(page) : 1,
       limit ? parseInt(limit) : 10,

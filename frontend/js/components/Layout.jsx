@@ -310,6 +310,14 @@ export default function Layout({ children }) {
                                 <i className="fa-solid fa-chart-line w-4 text-center" />
                                 CSI Dashboard
                               </Link>
+                              <Link
+                                to="/scan-event"
+                                onClick={() => setProfileOpen(false)}
+                                className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-[#a0a0a0] hover:bg-gray-200/50 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all rounded-xl"
+                              >
+                                <i className="fa-solid fa-qrcode w-4 text-center" />
+                                Scan Event QR
+                              </Link>
                             </>
                           )}
                           <Link
