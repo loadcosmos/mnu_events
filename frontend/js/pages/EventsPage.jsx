@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '../components/ui/input';
 import eventsService from '../services/eventsService';
@@ -76,7 +76,7 @@ export default function EventsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, selectedStatus, selectedCsiTags, searchQuery, startDate, endDate]);
 
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -137,7 +137,7 @@ export default function EventsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory, selectedStatus, searchQuery, selectedCsiTags, startDate, endDate]);
 
   const sortedEvents = [...events].sort(
     (a, b) => new Date(a.startDate) - new Date(b.startDate)

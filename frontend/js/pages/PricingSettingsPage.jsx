@@ -17,15 +17,26 @@ const PricingSettingsPage = () => {
     loadPricing();
   }, []);
 
+  // Auto-clear success message after 3 seconds with cleanup
+  useEffect(() => {
+    if (!success) return;
+
+    const timer = setTimeout(() => setSuccess(''), 3000);
+
+    return () => clearTimeout(timer);
+  }, [success]);
+
   const loadPricing = async () => {
     try {
       setLoading(true);
       const data = await settingsService.getPricing();
-      setPricing({
-        basePrice: Number(data.basePrice),
-        premiumPrice: Number(data.premiumPrice),
-        packagePrice: Number(data.packagePrice),
-      });
+      if (data) {
+        setPricing({
+          basePrice: Number(data.basePrice || 0),
+          premiumPrice: Number(data.premiumPrice || 0),
+          packagePrice: Number(data.packagePrice || 0),
+        });
+      }
     } catch (err) {
       setError(extractErrorMessage(err));
     } finally {
@@ -50,7 +61,6 @@ const PricingSettingsPage = () => {
       setSaving(true);
       await settingsService.updatePricing(pricing);
       setSuccess('Тарифы успешно обновлены!');
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(extractErrorMessage(err));
     } finally {

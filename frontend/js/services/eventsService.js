@@ -17,16 +17,20 @@ const eventsService = {
   async getAll(params = {}) {
     try {
       const queryParams = new URLSearchParams();
-      
+
       // page и limit передаются отдельно как query параметры
       if (params.page !== undefined) queryParams.append('page', params.page.toString());
       if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
-      
+
       // Остальные параметры фильтрации
       if (params.category) queryParams.append('category', params.category);
       if (params.search) queryParams.append('search', params.search);
       if (params.status) queryParams.append('status', params.status);
       if (params.date) queryParams.append('date', params.date);
+      if (params.csiTags) queryParams.append('csiTags', params.csiTags);
+      if (params.startDateFrom) queryParams.append('startDateFrom', params.startDateFrom);
+      if (params.startDateTo) queryParams.append('startDateTo', params.startDateTo);
+      if (params.creatorId) queryParams.append('creatorId', params.creatorId);
 
       const queryString = queryParams.toString();
       const url = queryString ? `/api/events?${queryString}` : '/api/events';

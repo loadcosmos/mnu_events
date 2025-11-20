@@ -208,7 +208,7 @@ export default function OrganizerScannerPage() {
                   <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{stats.checkedIn}</h3>
+                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalCheckIns || 0}</h3>
                   <span className="text-sm text-gray-600 dark:text-[#a0a0a0]">Checked In</span>
                 </div>
               </div>
@@ -222,8 +222,10 @@ export default function OrganizerScannerPage() {
                   <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</h3>
-                  <span className="text-sm text-gray-600 dark:text-[#a0a0a0]">Total Tickets</span>
+                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
+                    {stats.totalTickets || stats.totalRegistrations || 0}
+                  </h3>
+                  <span className="text-sm text-gray-600 dark:text-[#a0a0a0]">Total Participants</span>
                 </div>
               </div>
             </CardContent>
@@ -237,7 +239,7 @@ export default function OrganizerScannerPage() {
                 </div>
                 <div>
                   <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-                    {stats.total > 0 ? Math.round((stats.checkedIn / stats.total) * 100) : 0}%
+                    {stats.checkInRate || 0}%
                   </h3>
                   <span className="text-sm text-gray-600 dark:text-[#a0a0a0]">Check-in Rate</span>
                 </div>

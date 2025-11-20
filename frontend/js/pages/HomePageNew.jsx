@@ -90,7 +90,7 @@ export default function HomePage() {
   const { isAuthenticated, user } = useAuth();
 
   // State
-  const [activeTab, setActiveTab] = useState('services');
+  const [activeTab, setActiveTab] = useState('events');
   const [events, setEvents] = useState([]);
   const [clubs, setClubs] = useState([]);
   const [services] = useState(mockServices); // Will be loaded from API later
@@ -120,8 +120,9 @@ export default function HomePage() {
   useEffect(() => {
     if (events.length === 0) return;
 
+    const slideCount = Math.min(events.length, 6);
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % Math.min(events.length, 6));
+      setCurrentSlide((prev) => (prev + 1) % slideCount);
     }, 5000);
 
     return () => clearInterval(interval);
@@ -180,12 +181,16 @@ export default function HomePage() {
   // Render content based on active tab
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'events':
+        return renderEventsTab();
+      case 'clubs':
+        return renderClubsTab();
       case 'services':
         return renderServicesTab('GENERAL');
       case 'tutoring':
         return renderServicesTab('TUTORING');
       default:
-        return renderServicesTab('GENERAL');
+        return renderEventsTab();
     }
   };
 
@@ -262,9 +267,8 @@ export default function HomePage() {
               return (
                 <div
                   key={event.id}
-                  className={`absolute inset-0 transition-opacity duration-1000 ${
-                    isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                  }`}
+                  className={`absolute inset-0 transition-opacity duration-1000 ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                    }`}
                 >
                   <div
                     className="absolute inset-0 bg-cover bg-center"
@@ -311,11 +315,10 @@ export default function HomePage() {
                       <button
                         key={idx}
                         onClick={() => setCurrentSlide(idx)}
-                        className={`h-3 rounded-full transition-all ${
-                          idx === currentSlide
-                            ? 'bg-[#d62e1f] w-8'
-                            : 'liquid-glass-subtle hover:liquid-glass w-3'
-                        }`}
+                        className={`h-3 rounded-full transition-all ${idx === currentSlide
+                          ? 'bg-[#d62e1f] w-8'
+                          : 'liquid-glass-subtle hover:liquid-glass w-3'
+                          }`}
                         aria-label={`Go to slide ${idx + 1}`}
                       />
                     ))}

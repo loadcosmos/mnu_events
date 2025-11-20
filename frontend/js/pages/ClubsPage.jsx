@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '../components/ui/input';
 import clubsService from '../services/clubsService';
 import FilterSheet from '../components/FilterSheet';
-import { CLUB_CATEGORIES } from '../utils/constants';
+import { CLUB_CATEGORIES, CSI_CATEGORIES } from '../utils/constants';
 
 export default function ClubsPage() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function ClubsPage() {
   // Collapsible filter sections
   const [categoryExpanded, setCategoryExpanded] = useState(false);
 
-  const categories = ['ALL', ...Object.values(CLUB_CATEGORIES)];
+  const categories = ['ALL', ...new Set([...Object.values(CLUB_CATEGORIES), ...Object.values(CSI_CATEGORIES)])];
 
   useEffect(() => {
     const debounceTime = searchQuery ? 500 : 0;
@@ -35,7 +35,7 @@ export default function ClubsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory]);
 
-  const loadClubs = async () => {
+  const loadClubs = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -51,6 +51,17 @@ export default function ClubsPage() {
 
       if (searchQuery) {
         params.search = searchQuery;
+      }
+
+      // Check if selected category is a CSI category
+      const isCsiCategory = Object.values(CSI_CATEGORIES).includes(selectedCategory);
+
+      if (selectedCategory !== 'ALL') {
+        if (isCsiCategory) {
+          params.csiTags = selectedCategory;
+        } else {
+          params.category = selectedCategory;
+        }
       }
 
       const response = await clubsService.getAll(params);
@@ -80,7 +91,7 @@ export default function ClubsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
@@ -117,11 +128,10 @@ export default function ClubsPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full font-semibold transition-colors ${
-                  selectedCategory === cat
-                    ? 'liquid-glass-red-button text-white'
-                    : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
-                }`}
+                className={`px-4 py-2 rounded-full font-semibold transition-colors ${selectedCategory === cat
+                  ? 'liquid-glass-red-button text-white'
+                  : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                  }`}
               >
                 {cat}
               </button>
@@ -292,9 +302,8 @@ export default function ClubsPage() {
             >
               <span>Category</span>
               <i
-                className={`fa-solid fa-chevron-down text-sm transition-transform ${
-                  categoryExpanded ? 'rotate-180' : ''
-                }`}
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${categoryExpanded ? 'rotate-180' : ''
+                  }`}
               />
             </button>
             {categoryExpanded && (
@@ -302,11 +311,10 @@ export default function ClubsPage() {
                 {categories.map((category) => (
                   <label
                     key={category}
-                    className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-colors ${
-                      selectedCategory === category
-                        ? 'liquid-glass-red-button text-white'
-                        : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-colors ${selectedCategory === category
+                      ? 'liquid-glass-red-button text-white'
+                      : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     <input
                       type="radio"

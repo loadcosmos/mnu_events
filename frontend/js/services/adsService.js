@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import { api } from './apiClient.js';
 
 /**
  * Advertisements Service
@@ -10,10 +10,19 @@ const adsService = {
    * @param {string} position - Ad position (TOP_BANNER, HERO_SLIDE, NATIVE_FEED, BOTTOM_BANNER, SIDEBAR)
    */
   getActive: async (position) => {
-    const response = await apiClient.get('/advertisements/active', {
+    const response = await api.get('/advertisements/active', {
       params: { position }
     });
-    return response.data;
+    return response;
+  },
+
+  /**
+   * Create a new advertisement
+   * @param {Object} data - Advertisement data
+   */
+  create: async (data) => {
+    const response = await api.post('/advertisements', data);
+    return response;
   },
 
   /**
@@ -22,7 +31,7 @@ const adsService = {
    */
   trackImpression: async (adId) => {
     try {
-      await apiClient.post(`/advertisements/${adId}/impression`);
+      await api.post(`/advertisements/${adId}/impression`);
     } catch (error) {
       console.warn('Failed to track ad impression:', error);
       // Don't throw error - tracking failures shouldn't break the app
@@ -35,7 +44,7 @@ const adsService = {
    */
   trackClick: async (adId) => {
     try {
-      await apiClient.post(`/advertisements/${adId}/click`);
+      await api.post(`/advertisements/${adId}/click`);
     } catch (error) {
       console.warn('Failed to track ad click:', error);
     }

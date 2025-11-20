@@ -196,17 +196,23 @@ export class AnalyticsService {
       totalCheckIns: checkInsCount,
       checkInRate: Math.round(checkInRate * 10) / 10,
       revenueGenerated,
-      eventPerformance: eventPerformance.map((event) => ({
-        eventId: event.id,
-        title: event.title,
-        registrations: event._count.registrations,
-        checkIns: event._count.checkIns,
-        revenue: event.tickets.reduce(
-          (sum, ticket) =>
-            sum + ticket.price.toNumber() + ticket.platformFee.toNumber(),
-          0,
-        ),
-      })),
+      eventPerformance: eventPerformance.map((event) => {
+        const eventCheckInRate = event._count.registrations > 0
+          ? (event._count.checkIns / event._count.registrations) * 100
+          : 0;
+        return {
+          eventId: event.id,
+          title: event.title,
+          registrations: event._count.registrations,
+          checkIns: event._count.checkIns,
+          checkInRate: Math.round(eventCheckInRate * 10) / 10,
+          revenue: event.tickets.reduce(
+            (sum, ticket) =>
+              sum + ticket.price.toNumber() + ticket.platformFee.toNumber(),
+            0,
+          ),
+        };
+      }),
     };
   }
 

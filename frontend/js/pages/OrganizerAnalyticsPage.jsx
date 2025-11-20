@@ -89,16 +89,16 @@ export default function OrganizerAnalyticsPage() {
   }
 
   // Prepare chart data
-  const eventPerformanceData = stats.eventPerformance?.slice(0, 10).map(event => ({
+  const eventPerformanceData = (stats.eventPerformance || []).slice(0, 10).map(event => ({
     name: event.title.length > 20 ? event.title.substring(0, 20) + '...' : event.title,
     registrations: event.registrations,
     checkIns: event.checkIns,
-  })) || [];
+  }));
 
-  const checkInRateData = stats.eventPerformance?.slice(0, 8).map(event => ({
+  const checkInRateData = (stats.eventPerformance || []).slice(0, 8).map(event => ({
     name: event.title.length > 15 ? event.title.substring(0, 15) + '...' : event.title,
     rate: event.checkInRate || 0,
-  })) || [];
+  }));
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] py-8 px-4">
@@ -200,13 +200,12 @@ export default function OrganizerAnalyticsPage() {
                     <td className="py-3 px-4 text-sm text-right text-gray-900 dark:text-white">{event.registrations}</td>
                     <td className="py-3 px-4 text-sm text-right text-gray-900 dark:text-white">{event.checkIns}</td>
                     <td className="py-3 px-4 text-sm text-right">
-                      <span className={`font-semibold ${
-                        event.checkInRate >= 70
+                      <span className={`font-semibold ${event.checkInRate >= 70
                           ? 'text-green-600 dark:text-green-400'
                           : event.checkInRate >= 50
-                          ? 'text-yellow-600 dark:text-yellow-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}>
+                            ? 'text-yellow-600 dark:text-yellow-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }`}>
                         {event.checkInRate || 0}%
                       </span>
                     </td>

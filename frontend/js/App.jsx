@@ -21,6 +21,8 @@ import ClubDetailsPage from './pages/ClubDetailsPage.jsx';
 import ServicesPage from './pages/ServicesPage.jsx';
 import TutoringPage from './pages/TutoringPage.jsx';
 import ServiceDetailsPage from './pages/ServiceDetailsPage.jsx';
+import CreateServicePage from './pages/CreateServicePage.jsx';
+import CreateAdvertisementPage from './pages/CreateAdvertisementPage.jsx';
 import OrganizerPage from './pages/OrganizerPage.jsx';
 import OrganizerScannerPage from './pages/OrganizerScannerPage.jsx';
 import OrganizerAnalyticsPage from './pages/OrganizerAnalyticsPage.jsx';
@@ -70,6 +72,22 @@ function App() {
             <Route path="/services" element={<Layout><ServicesPage /></Layout>} />
             <Route path="/tutoring" element={<Layout><TutoringPage /></Layout>} />
             <Route path="/services/:id" element={<Layout><ServiceDetailsPage /></Layout>} />
+            <Route
+              path="/services/create"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <Layout><CreateServicePage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/advertisements/create"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <Layout><CreateAdvertisementPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
 
             {/* Защищенные маршруты для организаторов - требуют роль ORGANIZER */}
             <Route

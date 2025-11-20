@@ -268,15 +268,10 @@ export default function ServiceDetailsPage() {
                 </div>
               </div>
 
-              <div className="space-y-3 mb-6">
+              <div className="mb-6">
                 <Button onClick={handleContact} className="w-full" size="lg">
                   <Mail className="w-5 h-5 mr-2" />
                   Связаться
-                </Button>
-
-                <Button variant="outline" className="w-full" size="lg">
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Задать вопрос
                 </Button>
               </div>
 

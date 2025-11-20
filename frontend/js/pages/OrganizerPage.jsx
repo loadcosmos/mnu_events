@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
+import { Button, buttonVariants } from '../components/ui/button';
+import { cn } from '../lib/utils';
 import { Badge } from '../components/ui/badge';
 import eventsService from '../services/eventsService';
 import apiClient from '../services/apiClient';
@@ -34,7 +35,7 @@ export default function OrganizerPage() {
       // Загружаем события организатора
       const response = await eventsService.getMyEvents({ page: 1, limit: 50 });
       const events = response.data || response || [];
-      
+
       // Вычисляем статистику
       const now = new Date();
       const upcoming = events.filter(e => new Date(e.startDate) > now);
@@ -80,7 +81,8 @@ export default function OrganizerPage() {
       });
 
       // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // apiClient interceptor returns response.data, which is the Blob itself when responseType is 'blob'
+      const url = window.URL.createObjectURL(new Blob([response]));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `${eventTitle.replace(/\s+/g, '_')}_participants_${new Date().toISOString().split('T')[0]}.csv`);
@@ -231,7 +233,7 @@ export default function OrganizerPage() {
                   const capacity = event.capacity || 0;
                   const statusBadge = getStatusBadge(event);
                   const percentage = capacity > 0 ? Math.min((registrations / capacity) * 100, 100) : 0;
-                  
+
                   return (
                     <div
                       key={event.id}
@@ -273,38 +275,28 @@ export default function OrganizerPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 ml-4 flex-wrap">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                            className="border-gray-300 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl"
+                          <Link
+                            to={`/events/${event.id}`}
+                            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "border-gray-300 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl")}
                           >
-                            <Link to={`/events/${event.id}`}>View</Link>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                            className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white rounded-xl transition-all"
+                            View
+                          </Link>
+                          <Link
+                            to={`/organizer/event-qr/${event.id}`}
+                            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white rounded-xl transition-all")}
                             title="Display QR for students to scan (lectures/free events)"
                           >
-                            <Link to={`/organizer/event-qr/${event.id}`}>
-                              <i className="fa-solid fa-desktop mr-1" />
-                              QR Display
-                            </Link>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                            className="border-[#d62e1f] text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white rounded-xl transition-all"
+                            <i className="fa-solid fa-desktop mr-1" />
+                            QR Display
+                          </Link>
+                          <Link
+                            to={`/organizer/scanner/${event.id}`}
+                            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "border-[#d62e1f] text-[#d62e1f] hover:bg-[#d62e1f] hover:text-white rounded-xl transition-all")}
                             title="Scan student tickets (paid events)"
                           >
-                            <Link to={`/organizer/scanner/${event.id}`}>
-                              <i className="fa-solid fa-qrcode mr-1" />
-                              Scan Tickets
-                            </Link>
-                          </Button>
+                            <i className="fa-solid fa-qrcode mr-1" />
+                            Scan Tickets
+                          </Link>
                           <Button
                             variant="outline"
                             size="sm"
@@ -314,13 +306,12 @@ export default function OrganizerPage() {
                             <i className="fa-solid fa-download mr-1" />
                             Export
                           </Button>
-                          <Button
-                            size="sm"
-                            asChild
-                            className="liquid-glass-red-button text-white rounded-xl"
+                          <Link
+                            to={`/organizer/events/${event.id}/edit`}
+                            className={cn(buttonVariants({ size: "sm" }), "liquid-glass-red-button text-white rounded-xl")}
                           >
-                            <Link to={`/organizer/events/${event.id}/edit`}>Manage</Link>
-                          </Button>
+                            Manage
+                          </Link>
                         </div>
                       </div>
                     </div>

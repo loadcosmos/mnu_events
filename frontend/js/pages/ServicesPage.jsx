@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, SlidersHorizontal } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Filter, SlidersHorizontal, Plus, Megaphone } from 'lucide-react';
 import ServiceCard from '../components/ServiceCard';
 import { Button } from '../components/ui/button';
 
@@ -76,6 +77,7 @@ const sortOptions = [
 ];
 
 export default function ServicesPage() {
+  const navigate = useNavigate();
   const [services, setServices] = useState(mockServices);
   const [filteredServices, setFilteredServices] = useState(mockServices);
   const [searchQuery, setSearchQuery] = useState('');
@@ -133,13 +135,32 @@ export default function ServicesPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Marketplace услуг
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Найдите профессионалов для вашего проекта
-          </p>
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Marketplace услуг
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Найдите профессионалов для вашего проекта
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => navigate('/services/create')}
+              className="rounded-xl bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Service
+            </Button>
+            <Button
+              onClick={() => navigate('/advertisements/create')}
+              variant="outline"
+              className="rounded-xl"
+            >
+              <Megaphone className="w-4 h-4 mr-2" />
+              Post Ad
+            </Button>
+          </div>
         </div>
 
         {/* Search and Filters */}

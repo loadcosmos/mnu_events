@@ -83,33 +83,157 @@ export default function HomePage() {
 
   // Load events on mount
   useEffect(() => {
-    loadEvents();
-  }, []);
+    let isCancelled = false;
+
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError('');
+
+        // Load events for next 3 months
+        const today = new Date();
+        const threeMonthsLater = new Date();
+        threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+
+        const response = await eventsService.getAll({
+          page: 1,
+          limit: 100,
+          startDateFrom: today.toISOString().split('T')[0],
+          startDateTo: threeMonthsLater.toISOString().split('T')[0],
+        });
+
+        if (isCancelled) return;
+
+        // Handle different API response formats
+        let eventsData = [];
+        if (response && typeof response === 'object') {
+          if (Array.isArray(response)) {
+            eventsData = response;
+          } else if (Array.isArray(response.data)) {
+            eventsData = response.data;
+          } else if (response.events && Array.isArray(response.events)) {
+            eventsData = response.events;
+          }
+        }
+
+        // Trending Events - Sort by registration count (most popular first)
+        const trendingByPopularity = [...eventsData].sort(
+          (a, b) => {
+            const aCount = a._count?.registrations || 0;
+            const bCount = b._count?.registrations || 0;
+            // If registration counts are equal, sort by date
+            if (bCount === aCount) {
+              return new Date(a.startDate) - new Date(b.startDate);
+            }
+            return bCount - aCount;
+          }
+        );
+
+        if (isCancelled) return;
+
+        // Trending This Week - Top 6 most popular events
+        setTrendingEvents(trendingByPopularity.slice(0, 6));
+
+        // If authenticated, load user's registered events and recommendations
+        if (isAuthenticated() && user) {
+          try {
+            const registrationsResponse = await registrationsService.getMyRegistrations();
+
+            if (isCancelled) return;
+
+            const registrations = registrationsResponse.data || registrationsResponse || [];
+
+            // Extract upcoming events from registrations
+            const upcomingRegistered = registrations
+              .filter(reg => {
+                const eventDate = new Date(reg.event?.startDate);
+                return eventDate >= today && reg.status === 'REGISTERED';
+              })
+              .map(reg => reg.event)
+              .filter(event => event) // Remove null/undefined
+              .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+              .slice(0, 6);
+
+            if (isCancelled) return;
+
+            setMyUpcomingEvents(upcomingRegistered);
+
+            // If user has no upcoming registrations, show recommendations based on clubs
+            if (upcomingRegistered.length === 0) {
+              // Get events from clubs the user is a member of
+              // For now, show events sorted by date as recommendations
+              // TODO: In the future, fetch user's club memberships and filter events by those clubs
+              const recommendedByDate = [...eventsData]
+                .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+                .slice(0, 6);
+
+              setRecommendedEvents(recommendedByDate);
+            } else {
+              setRecommendedEvents([]);
+            }
+          } catch (err) {
+            console.error('[HomePage] Failed to load registrations:', err);
+            // Don't show error, just don't show the section
+          }
+        }
+      } catch (err) {
+        console.error('[HomePage] Load events failed:', err);
+        if (isCancelled) return;
+
+        const errorMessage =
+          err.response?.data?.message
+            ? Array.isArray(err.response.data.message)
+              ? err.response.data.message.join(', ')
+              : err.response.data.message
+            : err.message || 'Failed to load events';
+        setError(errorMessage);
+        setTrendingEvents([]);
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isAuthenticated, user]);
 
   // Load ads on mount
   useEffect(() => {
-    loadAds();
+    let isCancelled = false;
+
+    const load = async () => {
+      try {
+        // Load ads for different positions
+        const [topBannerAds, nativeFeedAds, bottomBannerAds] = await Promise.all([
+          adsService.getActive('TOP_BANNER'),
+          adsService.getActive('NATIVE_FEED'),
+          adsService.getActive('BOTTOM_BANNER'),
+        ]);
+
+        if (isCancelled) return;
+
+        setAds({
+          topBanner: topBannerAds?.[0] || null,
+          nativeFeed: nativeFeedAds?.[0] || null,
+          bottomBanner: bottomBannerAds?.[0] || null,
+        });
+      } catch (err) {
+        console.error('[HomePage] Failed to load ads:', err);
+        // Don't show error to user, just don't display ads
+      }
+    };
+
+    load();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
-
-  const loadAds = async () => {
-    try {
-      // Load ads for different positions
-      const [topBannerAds, nativeFeedAds, bottomBannerAds] = await Promise.all([
-        adsService.getActive('TOP_BANNER'),
-        adsService.getActive('NATIVE_FEED'),
-        adsService.getActive('BOTTOM_BANNER'),
-      ]);
-
-      setAds({
-        topBanner: topBannerAds?.[0] || null,
-        nativeFeed: nativeFeedAds?.[0] || null,
-        bottomBanner: bottomBannerAds?.[0] || null,
-      });
-    } catch (err) {
-      console.error('[HomePage] Failed to load ads:', err);
-      // Don't show error to user, just don't display ads
-    }
-  };
 
   // Auto-advance slides every 5 seconds
   useEffect(() => {
@@ -121,103 +245,6 @@ export default function HomePage() {
 
     return () => clearInterval(interval);
   }, [trendingEvents.length]);
-
-  const loadEvents = async () => {
-    try {
-      setLoading(true);
-      setError('');
-
-      // Load events for next 3 months
-      const today = new Date();
-      const threeMonthsLater = new Date();
-      threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
-
-      const response = await eventsService.getAll({
-        page: 1,
-        limit: 100,
-        startDateFrom: today.toISOString().split('T')[0],
-        startDateTo: threeMonthsLater.toISOString().split('T')[0],
-      });
-
-      // Handle different API response formats
-      let eventsData = [];
-      if (response && typeof response === 'object') {
-        if (Array.isArray(response)) {
-          eventsData = response;
-        } else if (Array.isArray(response.data)) {
-          eventsData = response.data;
-        } else if (response.events && Array.isArray(response.events)) {
-          eventsData = response.events;
-        }
-      }
-
-      // Trending Events - Sort by registration count (most popular first)
-      const trendingByPopularity = [...eventsData].sort(
-        (a, b) => {
-          const aCount = a._count?.registrations || 0;
-          const bCount = b._count?.registrations || 0;
-          // If registration counts are equal, sort by date
-          if (bCount === aCount) {
-            return new Date(a.startDate) - new Date(b.startDate);
-          }
-          return bCount - aCount;
-        }
-      );
-
-      // Trending This Week - Top 6 most popular events
-      setTrendingEvents(trendingByPopularity.slice(0, 6));
-
-      // If authenticated, load user's registered events and recommendations
-      if (isAuthenticated() && user) {
-        try {
-          const registrationsResponse = await registrationsService.getMyRegistrations();
-          const registrations = registrationsResponse.data || registrationsResponse || [];
-
-          // Extract upcoming events from registrations
-          const upcomingRegistered = registrations
-            .filter(reg => {
-              const eventDate = new Date(reg.event?.startDate);
-              return eventDate >= today && reg.status === 'REGISTERED';
-            })
-            .map(reg => reg.event)
-            .filter(event => event) // Remove null/undefined
-            .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-            .slice(0, 6);
-
-          setMyUpcomingEvents(upcomingRegistered);
-
-          // If user has no upcoming registrations, show recommendations based on clubs
-          if (upcomingRegistered.length === 0) {
-            // Get events from clubs the user is a member of
-            // For now, show events sorted by date as recommendations
-            // TODO: In the future, fetch user's club memberships and filter events by those clubs
-            const recommendedByDate = [...eventsData]
-              .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-              .slice(0, 6);
-
-            setRecommendedEvents(recommendedByDate);
-          } else {
-            setRecommendedEvents([]);
-          }
-        } catch (err) {
-          console.error('[HomePage] Failed to load registrations:', err);
-          // Don't show error, just don't show the section
-        }
-      }
-    } catch (err) {
-      console.error('[HomePage] Load events failed:', err);
-      const errorMessage =
-        err.response?.data?.message
-          ? Array.isArray(err.response.data.message)
-            ? err.response.data.message.join(', ')
-            : err.response.data.message
-          : err.message || 'Failed to load events';
-      setError(errorMessage);
-      setTrendingEvents([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">

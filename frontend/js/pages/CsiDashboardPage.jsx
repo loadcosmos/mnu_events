@@ -28,7 +28,44 @@ export default function CsiDashboardPage() {
       return;
     }
 
-    loadCsiStats();
+    let isCancelled = false;
+
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const data = await analyticsService.getStudentCsiStats(user.id);
+
+        if (isCancelled) return;
+
+        setCsiStats(data);
+      } catch (err) {
+        console.error('[CsiDashboardPage] Failed to load CSI stats:', err);
+
+        if (isCancelled) return;
+
+        const errorMessage =
+          err.response?.data?.message
+            ? Array.isArray(err.response.data.message)
+              ? err.response.data.message.join(', ')
+              : err.response.data.message
+            : err.message || 'Failed to load CSI statistics';
+        setError(errorMessage);
+        toast.error('Failed to load CSI statistics', {
+          description: errorMessage,
+        });
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [user, isAuthenticated, navigate]);
 
   const loadCsiStats = async () => {

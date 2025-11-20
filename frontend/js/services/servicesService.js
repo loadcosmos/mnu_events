@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import { api } from './apiClient.js';
 
 /**
  * Services (Marketplace) Service
@@ -10,8 +10,8 @@ const servicesService = {
    * @param {Object} filters - Filter parameters
    */
   getAll: async (filters = {}) => {
-    const response = await apiClient.get('/api/services', { params: filters });
-    return response.data;
+    const response = await api.get('/api/services', { params: filters });
+    return response;
   },
 
   /**
@@ -19,8 +19,8 @@ const servicesService = {
    * @param {string} id - Service ID
    */
   getById: async (id) => {
-    const response = await apiClient.get(`/api/services/${id}`);
-    return response.data;
+    const response = await api.get(`/api/services/${id}`);
+    return response;
   },
 
   /**
@@ -28,8 +28,8 @@ const servicesService = {
    * @param {Object} data - Service data
    */
   create: async (data) => {
-    const response = await apiClient.post('/api/services', data);
-    return response.data;
+    const response = await api.post('/api/services', data);
+    return response;
   },
 
   /**
@@ -38,8 +38,8 @@ const servicesService = {
    * @param {Object} data - Updated service data
    */
   update: async (id, data) => {
-    const response = await apiClient.put(`/api/services/${id}`, data);
-    return response.data;
+    const response = await api.put(`/api/services/${id}`, data);
+    return response;
   },
 
   /**
@@ -47,16 +47,16 @@ const servicesService = {
    * @param {string} id - Service ID
    */
   delete: async (id) => {
-    const response = await apiClient.delete(`/api/services/${id}`);
-    return response.data;
+    const response = await api.delete(`/api/services/${id}`);
+    return response;
   },
 
   /**
    * Get current user's services
    */
   getMyServices: async () => {
-    const response = await apiClient.get('/api/services/my-services');
-    return response.data;
+    const response = await api.get('/api/services/my-services');
+    return response;
   },
 
   /**
@@ -64,8 +64,8 @@ const servicesService = {
    * @param {string} providerId - Provider user ID
    */
   getByProvider: async (providerId) => {
-    const response = await apiClient.get(`/api/services/provider/${providerId}`);
-    return response.data;
+    const response = await api.get(`/api/services/provider/${providerId}`);
+    return response;
   },
 };
 

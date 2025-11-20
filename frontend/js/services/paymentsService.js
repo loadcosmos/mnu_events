@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import { api } from './apiClient.js';
 
 const paymentsService = {
   /**
@@ -8,8 +8,8 @@ const paymentsService = {
    * @returns {Promise} Payment response with transaction ID and payment URL
    */
   createPayment: async (eventId, amount) => {
-    const response = await apiClient.post('/api/payments/create', { eventId, amount });
-    return response.data;
+    const response = await api.post('/api/payments/create', { eventId, amount });
+    return response;
   },
 
   /**
@@ -19,8 +19,8 @@ const paymentsService = {
    * @returns {Promise} Confirmation response
    */
   confirmPayment: async (transactionId, status = 'success') => {
-    const response = await apiClient.post('/api/payments/webhook', { transactionId, status });
-    return response.data;
+    const response = await api.post('/api/payments/webhook', { transactionId, status });
+    return response;
   },
 
   /**
@@ -28,8 +28,8 @@ const paymentsService = {
    * @returns {Promise} List of tickets
    */
   getMyTickets: async () => {
-    const response = await apiClient.get('/api/payments/my-tickets');
-    return response.data;
+    const response = await api.get('/api/payments/my-tickets');
+    return response;
   },
 
   /**
@@ -38,8 +38,8 @@ const paymentsService = {
    * @returns {Promise} Ticket details
    */
   getTicketById: async (ticketId) => {
-    const response = await apiClient.get(`/api/payments/ticket/${ticketId}`);
-    return response.data;
+    const response = await api.get(`/api/payments/ticket/${ticketId}`);
+    return response;
   },
 
   /**
@@ -48,8 +48,8 @@ const paymentsService = {
    * @returns {Promise} Refund response
    */
   refundTicket: async (ticketId) => {
-    const response = await apiClient.post(`/api/payments/refund/${ticketId}`);
-    return response.data;
+    const response = await api.post(`/api/payments/refund/${ticketId}`);
+    return response;
   },
 
   /**
@@ -58,8 +58,8 @@ const paymentsService = {
    * @returns {Promise} Transaction details
    */
   getTransactionStatus: async (transactionId) => {
-    const response = await apiClient.get(`/api/payments/transaction/${transactionId}`);
-    return response.data;
+    const response = await api.get(`/api/payments/transaction/${transactionId}`);
+    return response;
   },
 };
 

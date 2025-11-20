@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
 export class CheckInStatsDto {
   @ApiProperty({
@@ -43,6 +44,8 @@ export class GenerateEventQRDto {
     description: 'Event ID to generate QR code for',
     example: 'clq1234567890abcdef',
   })
+  @IsString()
+  @IsNotEmpty()
   eventId: string;
 
   @ApiProperty({
@@ -50,6 +53,8 @@ export class GenerateEventQRDto {
     example: 24,
     required: false,
   })
+  @IsOptional()
+  @IsNumber()
   expiryHours?: number;
 }
 

@@ -25,7 +25,7 @@ export default function ModerationQueuePage() {
         try {
             setLoading(true);
             const data = await moderationService.getQueue(filterStatus, filterType || undefined);
-            setQueue(data);
+            setQueue(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Failed to load moderation queue:', error);
         } finally {
@@ -81,125 +81,125 @@ export default function ModerationQueuePage() {
 
     return (
         <div className="max-w-7xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                    <div>
-                        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
-                            Moderation <span className="text-[#d62e1f]">Queue</span>
-                        </h1>
-                        <p className="text-gray-600 dark:text-[#a0a0a0]">
-                            Review and manage content submissions
-                        </p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-3">
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#d62e1f] focus:border-transparent outline-none"
-                        >
-                            <option value="PENDING">Pending</option>
-                            <option value="APPROVED">Approved</option>
-                            <option value="REJECTED">Rejected</option>
-                        </select>
-
-                        <select
-                            value={filterType}
-                            onChange={(e) => setFilterType(e.target.value)}
-                            className="bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#d62e1f] focus:border-transparent outline-none"
-                        >
-                            <option value="">All Types</option>
-                            <option value="SERVICE">Services</option>
-                            <option value="EVENT">Events</option>
-                            <option value="ADVERTISEMENT">Ads</option>
-                        </select>
-                    </div>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
+                        Moderation <span className="text-[#d62e1f]">Queue</span>
+                    </h1>
+                    <p className="text-gray-600 dark:text-[#a0a0a0]">
+                        Review and manage content submissions
+                    </p>
                 </div>
 
-                {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#d62e1f]"></div>
-                    </div>
-                ) : queue.length === 0 ? (
-                    <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-[#2a2a2a]">
-                        <i className="fa-solid fa-check-circle text-4xl text-green-500 mb-4"></i>
-                        <p className="text-xl font-semibold text-gray-900 dark:text-white">All caught up!</p>
-                        <p className="text-gray-600 dark:text-[#a0a0a0]">No items found with current filters.</p>
-                    </div>
-                ) : (
-                    <div className="grid gap-6">
-                        {queue.map((item) => (
-                            <div
-                                key={item.id}
-                                className="bg-white dark:bg-[#1a1a1a] rounded-xl p-6 border border-gray-200 dark:border-[#2a2a2a] shadow-sm hover:shadow-md transition-all"
-                            >
-                                <div className="flex flex-col md:flex-row gap-6 justify-between">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${item.itemType === 'SERVICE' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                                                    item.itemType === 'EVENT' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
-                                                        'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                <div className="flex flex-wrap gap-3">
+                    <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className="bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#d62e1f] focus:border-transparent outline-none"
+                    >
+                        <option value="PENDING">Pending</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
+                    </select>
+
+                    <select
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                        className="bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#d62e1f] focus:border-transparent outline-none"
+                    >
+                        <option value="">All Types</option>
+                        <option value="SERVICE">Services</option>
+                        <option value="EVENT">Events</option>
+                        <option value="ADVERTISEMENT">Ads</option>
+                    </select>
+                </div>
+            </div>
+
+            {loading ? (
+                <div className="flex justify-center py-20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#d62e1f]"></div>
+                </div>
+            ) : queue.length === 0 ? (
+                <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-[#2a2a2a]">
+                    <i className="fa-solid fa-check-circle text-4xl text-green-500 mb-4"></i>
+                    <p className="text-xl font-semibold text-gray-900 dark:text-white">All caught up!</p>
+                    <p className="text-gray-600 dark:text-[#a0a0a0]">No items found with current filters.</p>
+                </div>
+            ) : (
+                <div className="grid gap-6">
+                    {queue.map((item) => (
+                        <div
+                            key={item.id}
+                            className="bg-white dark:bg-[#1a1a1a] rounded-xl p-6 border border-gray-200 dark:border-[#2a2a2a] shadow-sm hover:shadow-md transition-all"
+                        >
+                            <div className="flex flex-col md:flex-row gap-6 justify-between">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${item.itemType === 'SERVICE' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                            item.itemType === 'EVENT' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
+                                                'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                                            }`}>
+                                            {item.itemType}
+                                        </span>
+                                        <span className="text-sm text-gray-500 dark:text-[#666666]">
+                                            Submitted: {formatDate(item.createdAt)}
+                                        </span>
+                                        {item.status !== 'PENDING' && (
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${item.status === 'APPROVED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                                                 }`}>
-                                                {item.itemType}
+                                                {item.status}
                                             </span>
-                                            <span className="text-sm text-gray-500 dark:text-[#666666]">
-                                                Submitted: {formatDate(item.createdAt)}
-                                            </span>
-                                            {item.status !== 'PENDING' && (
-                                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${item.status === 'APPROVED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                                                    }`}>
-                                                    {item.status}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                                            {getItemTitle(item)}
-                                        </h3>
-
-                                        <div className="bg-gray-50 dark:bg-[#111] rounded-lg p-4 mb-4 text-gray-700 dark:text-[#d0d0d0] text-sm">
-                                            {getItemDescription(item)}
-                                        </div>
-
-                                        {item.details?.imageUrl && (
-                                            <img
-                                                src={item.details.imageUrl}
-                                                alt="Preview"
-                                                className="w-32 h-32 object-cover rounded-lg mb-4"
-                                            />
-                                        )}
-
-                                        {item.rejectionReason && (
-                                            <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-100 dark:border-red-900/30">
-                                                <p className="text-sm font-bold text-red-800 dark:text-red-400 mb-1">Rejection Reason:</p>
-                                                <p className="text-sm text-red-700 dark:text-red-300">{item.rejectionReason}</p>
-                                            </div>
                                         )}
                                     </div>
 
-                                    {item.status === 'PENDING' && (
-                                        <div className="flex flex-row md:flex-col gap-3 min-w-[140px] justify-center">
-                                            <Button
-                                                onClick={() => handleApprove(item.id)}
-                                                disabled={processingId === item.id}
-                                                className="bg-green-600 hover:bg-green-700 text-white w-full"
-                                            >
-                                                {processingId === item.id ? 'Processing...' : 'Approve'}
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => openRejectModal(item)}
-                                                disabled={processingId === item.id}
-                                                className="border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 w-full"
-                                            >
-                                                Reject
-                                            </Button>
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                        {getItemTitle(item)}
+                                    </h3>
+
+                                    <div className="bg-gray-50 dark:bg-[#111] rounded-lg p-4 mb-4 text-gray-700 dark:text-[#d0d0d0] text-sm">
+                                        {getItemDescription(item)}
+                                    </div>
+
+                                    {item.details?.imageUrl && (
+                                        <img
+                                            src={item.details.imageUrl}
+                                            alt="Preview"
+                                            className="w-32 h-32 object-cover rounded-lg mb-4"
+                                        />
+                                    )}
+
+                                    {item.rejectionReason && (
+                                        <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-100 dark:border-red-900/30">
+                                            <p className="text-sm font-bold text-red-800 dark:text-red-400 mb-1">Rejection Reason:</p>
+                                            <p className="text-sm text-red-700 dark:text-red-300">{item.rejectionReason}</p>
                                         </div>
                                     )}
                                 </div>
+
+                                {item.status === 'PENDING' && (
+                                    <div className="flex flex-row md:flex-col gap-3 min-w-[140px] justify-center">
+                                        <Button
+                                            onClick={() => handleApprove(item.id)}
+                                            disabled={processingId === item.id}
+                                            className="bg-green-600 hover:bg-green-700 text-white w-full"
+                                        >
+                                            {processingId === item.id ? 'Processing...' : 'Approve'}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => openRejectModal(item)}
+                                            disabled={processingId === item.id}
+                                            className="border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 w-full"
+                                        >
+                                            Reject
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
-                        ))}
-                    </div>
-                )}
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {/* Reject Modal */}
             {rejectModalOpen && (

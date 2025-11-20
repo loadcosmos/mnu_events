@@ -31,7 +31,7 @@ export default function ModeratorDashboardPage() {
 
       // Загружаем последние 5 элементов в очереди
       const queueData = await moderationService.getQueue('PENDING');
-      setRecentItems(queueData.slice(0, 5));
+      setRecentItems(Array.isArray(queueData) ? queueData.slice(0, 5) : []);
     } catch (err) {
       console.error('[ModeratorDashboard] Load statistics failed:', err);
       setError(err.message || 'Failed to load statistics');
@@ -200,11 +200,10 @@ export default function ModeratorDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                          item.itemType === 'SERVICE' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                          item.itemType === 'EVENT' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
-                          'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                        }`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${item.itemType === 'SERVICE' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                            item.itemType === 'EVENT' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
+                              'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                          }`}>
                           {item.itemType}
                         </span>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">

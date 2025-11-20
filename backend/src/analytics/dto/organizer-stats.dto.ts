@@ -45,6 +45,7 @@ export class OrganizerStatsDto {
     title: string;
     registrations: number;
     checkIns: number;
+    checkInRate: number;
     revenue: number;
   }[];
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -13,10 +13,29 @@ export default function EventQRDisplayPage() {
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [qrDataUrl, setQrDataUrl] = useState(null);
-  const [stats, setStats] = useState({ checkedIn: 0, total: 0 });
+  const [stats, setStats] = useState({
+    totalCheckIns: 0,
+    totalTickets: 0,
+    totalRegistrations: 0,
+    checkInRate: 0
+  });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastCheckIn, setLastCheckIn] = useState(null);
+
+  // Reusable AudioContext
+  const audioContextRef = useRef(null);
+
+  // Initialize AudioContext once
+  useEffect(() => {
+    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+
+    return () => {
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     loadEventAndGenerateQR();
@@ -34,7 +53,9 @@ export default function EventQRDisplayPage() {
       ]);
 
       setEvent(eventData);
-      setStats(statsData);
+      if (statsData) {
+        setStats(statsData);
+      }
       await generateQR();
     } catch (err) {
       console.error('[EventQRDisplayPage] Load failed:', err);
@@ -50,15 +71,14 @@ export default function EventQRDisplayPage() {
       const response = await checkinService.generateEventQR(eventId);
 
       // Generate QR code image from the data
-      const qrData = JSON.stringify(response.qrData);
-      const dataUrl = await QRCode.toDataURL(qrData, {
-        width: 400,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF',
-        },
-      });
+      // Generate QR code image from the data
+      // The backend returns { qrCode: 'data:image/png;base64,...', expiresAt: ... }
+      // We can use the returned qrCode directly if it's a data URL, or generate it if it's raw data.
+      // Looking at backend service, it returns qrCode as a data URL.
+      if (!response || !response.qrCode) {
+        throw new Error('Invalid response from server');
+      }
+      const dataUrl = response.qrCode;
 
       setQrDataUrl(dataUrl);
     } catch (err) {
@@ -71,14 +91,16 @@ export default function EventQRDisplayPage() {
     try {
       const statsData = await checkinService.getEventStats(eventId);
 
-      // Check if there's a new check-in
-      if (statsData.checkedIn > stats.checkedIn) {
-        setLastCheckIn(new Date());
-        // Play success sound
-        playSuccessSound();
-      }
+      if (statsData) {
+        // Check if there's a new check-in
+        if (statsData.totalCheckIns > stats.totalCheckIns) {
+          setLastCheckIn(new Date());
+          // Play success sound
+          playSuccessSound();
+        }
 
-      setStats(statsData);
+        setStats(statsData);
+      }
     } catch (err) {
       // Silently fail to not disrupt the display
       console.error('[EventQRDisplayPage] Update stats failed:', err);
@@ -94,7 +116,9 @@ export default function EventQRDisplayPage() {
   };
 
   const playSuccessSound = () => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (!audioContextRef.current) return;
+
+    const audioContext = audioContextRef.current;
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
@@ -119,6 +143,11 @@ export default function EventQRDisplayPage() {
       </div>
     );
   }
+
+  const totalParticipants = stats.totalTickets || stats.totalRegistrations || 0;
+  const checkInPercentage = totalParticipants > 0
+    ? Math.round((stats.totalCheckIns / totalParticipants) * 100)
+    : 0;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] py-8 px-4">
@@ -223,7 +252,7 @@ export default function EventQRDisplayPage() {
                   </div>
                   <div>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {stats.checkedIn}
+                      {stats.totalCheckIns}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-[#a0a0a0]">
                       Checked In
@@ -237,7 +266,7 @@ export default function EventQRDisplayPage() {
                   </div>
                   <div>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {stats.total}
+                      {totalParticipants}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-[#a0a0a0]">
                       Total Registered
@@ -250,14 +279,14 @@ export default function EventQRDisplayPage() {
                   <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-gray-600 dark:text-[#a0a0a0]">Attendance</span>
                     <span className="font-semibold text-gray-900 dark:text-white">
-                      {stats.total > 0 ? Math.round((stats.checkedIn / stats.total) * 100) : 0}%
+                      {checkInPercentage}%
                     </span>
                   </div>
                   <div className="relative h-3 bg-gray-200 dark:bg-[#2a2a2a] rounded-full overflow-hidden">
                     <div
                       className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#d62e1f] to-[#b91c1c] rounded-full transition-all duration-500"
                       style={{
-                        width: `${stats.total > 0 ? (stats.checkedIn / stats.total) * 100 : 0}%`,
+                        width: `${checkInPercentage}%`,
                       }}
                     />
                   </div>

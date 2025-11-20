@@ -428,7 +428,7 @@ export class RegistrationsService {
         fullName || 'N/A',
         reg.user.email || 'N/A',
         reg.user.faculty || 'N/A',
-        reg.user.year || 'N/A',
+        'N/A', // year field doesn't exist in User model
         registrationDate,
         checkInTime ? 'Checked In' : 'Registered Only',
         checkInDate,

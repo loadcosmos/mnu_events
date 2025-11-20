@@ -22,7 +22,7 @@ export class EventsService {
   constructor(
     private prisma: PrismaService,
     private moderationService: ModerationService,
-  ) {}
+  ) { }
 
   async create(createEventDto: CreateEventDto, userId: string, userRole: Role) {
     // Validate dates
@@ -152,7 +152,7 @@ export class EventsService {
 
     // CSI Tags filtering: event must have ALL selected tags
     if (filterDto?.csiTags) {
-      const csiTagsArray = filterDto.csiTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      const csiTagsArray = filterDto.csiTags.split(',').map(tag => tag.trim()).filter(tag => tag) as unknown as import('@prisma/client').CsiCategory[];
       if (csiTagsArray.length > 0) {
         where.csiTags = {
           hasEvery: csiTagsArray,

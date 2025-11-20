@@ -27,52 +27,87 @@ export default function EventDetailsPage() {
   const [showQRScanner, setShowQRScanner] = useState(false);
 
   useEffect(() => {
-    loadEvent();
-    if (isAuthenticated()) {
-      checkRegistration();
-    }
-  }, [id, user]);
+    let isCancelled = false;
 
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const data = await eventsService.getById(id);
+
+        if (isCancelled) return;
+
+        setEvent(data);
+
+        // Debug: логируем даты для отладки
+        if (import.meta.env.DEV && data) {
+          const eventEndDate = new Date(data.endDate);
+          const now = new Date();
+          console.log('[EventDetailsPage] Date debug:', {
+            eventEndDate: eventEndDate.toISOString(),
+            now: now.toISOString(),
+            eventEndDateLocal: eventEndDate.toLocaleString(),
+            nowLocal: now.toLocaleString(),
+            isPast: eventEndDate < now,
+            diff: eventEndDate.getTime() - now.getTime(),
+          });
+        }
+      } catch (err) {
+        if (isCancelled) return;
+
+        setError(err.message || 'Failed to load event');
+        console.error('[EventDetailsPage] Load event failed:', err);
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    if (!isAuthenticated() || !user) return;
+
+    let isCancelled = false;
+
+    const checkReg = async () => {
+      try {
+        const response = await registrationsService.getMyRegistrations();
+
+        if (isCancelled) return;
+
+        // API может вернуть массив или объект с data
+        const registrations = Array.isArray(response) ? response : (response.data || response.registrations || []);
+        const registration = registrations.find(r => r.eventId === id);
+        if (registration) {
+          setIsRegistered(true);
+          setMyRegistration(registration);
+        }
+      } catch (err) {
+        console.error('[EventDetailsPage] Check registration failed:', err);
+      }
+    };
+
+    checkReg();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [id, isAuthenticated, user]);
+
+  // Simplified reload function for updating event after registration changes
   const loadEvent = async () => {
     try {
-      setLoading(true);
-      setError('');
       const data = await eventsService.getById(id);
       setEvent(data);
-      
-      // Debug: логируем даты для отладки
-      if (import.meta.env.DEV && data) {
-        const eventEndDate = new Date(data.endDate);
-        const now = new Date();
-        console.log('[EventDetailsPage] Date debug:', {
-          eventEndDate: eventEndDate.toISOString(),
-          now: now.toISOString(),
-          eventEndDateLocal: eventEndDate.toLocaleString(),
-          nowLocal: now.toLocaleString(),
-          isPast: eventEndDate < now,
-          diff: eventEndDate.getTime() - now.getTime(),
-        });
-      }
     } catch (err) {
-      setError(err.message || 'Failed to load event');
-      console.error('[EventDetailsPage] Load event failed:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const checkRegistration = async () => {
-    try {
-      const response = await registrationsService.getMyRegistrations();
-      // API может вернуть массив или объект с data
-      const registrations = Array.isArray(response) ? response : (response.data || response.registrations || []);
-      const registration = registrations.find(r => r.eventId === id);
-      if (registration) {
-        setIsRegistered(true);
-        setMyRegistration(registration);
-      }
-    } catch (err) {
-      console.error('[EventDetailsPage] Check registration failed:', err);
+      console.error('[EventDetailsPage] Reload event failed:', err);
     }
   };
 
@@ -572,12 +607,50 @@ export default function EventDetailsPage() {
                   </div>
                 )}
 
-                {/* Сообщение для организаторов и админов */}
-                {!isPast && isAuthenticated() && user?.role !== 'STUDENT' && (
+                {/* Кнопки управления для организатора события */}
+                {isAuthenticated() && user?.role === 'ORGANIZER' && (event.creatorId === user.id || event.creator?.id === user.id) && (
+                  <div className="space-y-3 mt-4">
+                    <div className="p-4 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50">
+                      <p className="text-sm font-semibold text-blue-800 dark:text-blue-400 mb-3">
+                        Event Management
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <Link to={`/organizer/event-qr/${event.id}`}>
+                          <Button variant="outline" size="sm" className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white">
+                            <i className="fa-solid fa-desktop mr-1" />
+                            QR Display
+                          </Button>
+                        </Link>
+                        <Link to={`/organizer/scanner/${event.id}`}>
+                          <Button variant="outline" size="sm" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
+                            <i className="fa-solid fa-qrcode mr-1" />
+                            Scan Tickets
+                          </Button>
+                        </Link>
+                        <Link to={`/organizer/events/${event.id}/edit`}>
+                          <Button variant="outline" size="sm" className="border-gray-600 text-gray-600 hover:bg-gray-600 hover:text-white">
+                            <i className="fa-solid fa-edit mr-1" />
+                            Manage
+                          </Button>
+                        </Link>
+                        <Link to="/organizer/analytics">
+                          <Button variant="outline" size="sm" className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white">
+                            <i className="fa-solid fa-chart-line mr-1" />
+                            Analytics
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Сообщение для организаторов чужих событий и админов */}
+                {!isPast && isAuthenticated() && user?.role !== 'STUDENT' &&
+                 !(user?.role === 'ORGANIZER' && (event.creatorId === user.id || event.creator?.id === user.id)) && (
                   <div className="p-4 rounded-md bg-gray-50 border border-gray-200 mt-4">
                     <p className="text-sm md:text-base text-muted-foreground text-center">
                       {user?.role === 'ORGANIZER'
-                        ? 'Organizers cannot register for events. Manage your events from the dashboard.'
+                        ? 'You can only manage your own events. Go to dashboard to view your events.'
                         : 'Only students can register for events.'}
                     </p>
                   </div>

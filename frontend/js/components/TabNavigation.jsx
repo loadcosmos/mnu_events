@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Briefcase, GraduationCap, MoreHorizontal } from 'lucide-react';
+import { Briefcase, GraduationCap, MoreHorizontal, Calendar, Users } from 'lucide-react';
 
 const tabs = [
+  { id: 'events', label: 'Events', icon: Calendar },
+  { id: 'clubs', label: 'Clubs', icon: Users },
   { id: 'services', label: 'Services', icon: Briefcase },
   { id: 'tutoring', label: 'Tutoring', icon: GraduationCap },
   { id: 'more', label: 'More', icon: MoreHorizontal, dropdown: true },
@@ -34,10 +36,9 @@ export default function TabNavigation({ activeTab, onTabChange }) {
                 className={`
                   flex items-center gap-2 px-6 py-3 text-sm font-medium whitespace-nowrap
                   rounded-xl transition-all duration-300
-                  ${
-                    isActive
-                      ? 'liquid-glass-red-button text-white shadow-lg'
-                      : 'liquid-glass-button text-gray-700 dark:text-gray-300 hover:text-[#d62e1f] dark:hover:text-[#d62e1f]'
+                  ${isActive
+                    ? 'liquid-glass-red-button text-white shadow-lg'
+                    : 'liquid-glass-button text-gray-700 dark:text-gray-300 hover:text-[#d62e1f] dark:hover:text-[#d62e1f]'
                   }
                 `}
               >
