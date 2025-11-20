@@ -75,13 +75,13 @@ export class ServicesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a new service' })
+  @ApiOperation({ summary: 'Create a new service (requires moderation for students)' })
   @ApiResponse({
     status: 201,
     description: 'Service created successfully',
   })
   async create(@Body() dto: CreateServiceDto, @Request() req: RequestWithUser) {
-    return this.servicesService.create(dto, req.user.sub);
+    return this.servicesService.create(dto, req.user.sub, req.user.role);
   }
 
   @Put(':id')

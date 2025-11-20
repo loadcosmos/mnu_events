@@ -27,6 +27,10 @@ model User {
   verificationCodeExpiry DateTime?
   lastCodeSentAt DateTime?  // Для защиты от спама - 5 минут между отправками
 
+  // Gamification
+  points Int      @default(0)
+  level  UserLevel @default(NEWCOMER)
+
   // Relations
   createdEvents    Event[]        @relation("EventCreator")
   registrations    Registration[]
@@ -37,6 +41,7 @@ model User {
   services         Service[]
   moderatedItems   ModerationQueue[]
   subscriptions    Subscription[]
+  achievements     Achievement[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -44,6 +49,8 @@ model User {
   @@index([email])
   @@index([verificationCode]) // For email verification lookups
   @@index([role]) // For filtering by role
+  @@index([points]) // For leaderboard
+  @@index([level]) // For filtering by level
   @@map("users")
 }
 
@@ -109,6 +116,7 @@ enum Category {
 }
 
 enum EventStatus {
+  PENDING_MODERATION  // Waiting for moderator approval
   UPCOMING
   ONGOING
   COMPLETED
@@ -441,4 +449,37 @@ model Subscription {
 
 enum SubscriptionType {
   PREMIUM  // 500 тг/месяц - 10 service listings
+}
+
+// ============================================
+// GAMIFICATION MODELS
+// ============================================
+
+enum UserLevel {
+  NEWCOMER  // 0-100 points
+  ACTIVE    // 100-500 points
+  LEADER    // 500-1000 points
+  LEGEND    // 1000+ points
+}
+
+enum AchievementType {
+  ATTENDANCE     // First event, multiple events
+  CATEGORY       // 10 cultural, 10 sports, etc.
+  REGULARITY     // Weekly, monthly streaks
+  SOCIAL         // Club participation
+}
+
+model Achievement {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        AchievementType
+  name        String          // e.g., "First Event", "Cultural Expert"
+  description String          // e.g., "Attended first event"
+  points      Int             // Points earned for this achievement
+  earnedAt    DateTime        @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@map("achievements")
 }
