@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, SlidersHorizontal } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, Filter, SlidersHorizontal, Plus } from 'lucide-react';
 import ServiceCard from '../components/ServiceCard';
 import { Button } from '../components/ui/button';
+import { useAuth } from '../context/AuthContext';
 
 // Mock data - will be replaced with API calls
 const mockServices = [
@@ -76,6 +78,7 @@ const sortOptions = [
 ];
 
 export default function ServicesPage() {
+  const { user } = useAuth();
   const [services, setServices] = useState(mockServices);
   const [filteredServices, setFilteredServices] = useState(mockServices);
   const [searchQuery, setSearchQuery] = useState('');
@@ -133,13 +136,23 @@ export default function ServicesPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Marketplace услуг
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Найдите профессионалов для вашего проекта
-          </p>
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Marketplace услуг
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Найдите профессионалов для вашего проекта
+            </p>
+          </div>
+          {user?.role === 'STUDENT' && (
+            <Button asChild className="liquid-glass-red-button text-white rounded-2xl shrink-0">
+              <Link to="/services/create" className="flex items-center gap-2">
+                <Plus className="w-5 h-5" />
+                Post a Service
+              </Link>
+            </Button>
+          )}
         </div>
 
         {/* Search and Filters */}

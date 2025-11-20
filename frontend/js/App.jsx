@@ -21,6 +21,7 @@ import ClubDetailsPage from './pages/ClubDetailsPage.jsx';
 import ServicesPage from './pages/ServicesPage.jsx';
 import TutoringPage from './pages/TutoringPage.jsx';
 import ServiceDetailsPage from './pages/ServiceDetailsPage.jsx';
+import CreateServicePage from './pages/CreateServicePage.jsx';
 import OrganizerPage from './pages/OrganizerPage.jsx';
 import OrganizerScannerPage from './pages/OrganizerScannerPage.jsx';
 import OrganizerAnalyticsPage from './pages/OrganizerAnalyticsPage.jsx';
@@ -127,6 +128,14 @@ function App() {
               element={
                 <ProtectedRoute roles={['STUDENT']}>
                   <Layout><MyRegistrationsPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/services/create"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <Layout><CreateServicePage /></Layout>
                 </ProtectedRoute>
               }
             />

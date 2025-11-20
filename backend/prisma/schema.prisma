@@ -20,12 +20,18 @@ model User {
   avatar    String?
   faculty   String?
   role      Role     @default(STUDENT)
+  year      String?  // Student year (Freshman, Sophomore, etc.)
 
   // Email verification
   emailVerified Boolean @default(false)
   verificationCode String?
   verificationCodeExpiry DateTime?
   lastCodeSentAt DateTime?  // Для защиты от спама - 5 минут между отправками
+
+  // External Venue Information (for ORGANIZER role)
+  venueType    VenueType? // INTERNAL or EXTERNAL organizer
+  venueName    String?    // e.g., "Starbucks Almaty", "Central Theater"
+  venueAddress String?    // Physical address of external venue
 
   // Gamification
   points Int      @default(0)
@@ -59,6 +65,11 @@ enum Role {
   ORGANIZER
   MODERATOR
   ADMIN
+}
+
+enum VenueType {
+  INTERNAL  // University clubs, departments, student organizations
+  EXTERNAL  // Coffee shops, theaters, external event venues
 }
 
 model Event {
