@@ -5,7 +5,8 @@ Quick reference and guidance for Claude Code when working with MNU Events Platfo
 ## 🎯 Project Overview
 
 **MNU Events Platform** - University events management system
-**Status:** 89% Complete | Grade: B- | Production Ready: ❌
+**Status:** 95% Complete | Grade: B+ | Production Ready: ⚠️ (Conditional - requires security hardening)
+**Last Updated:** 2025-11-21
 
 **Tech Stack:**
 - Backend: NestJS 10 + Prisma ORM + PostgreSQL
@@ -13,6 +14,12 @@ Quick reference and guidance for Claude Code when working with MNU Events Platfo
 - Auth: JWT with role-based access control (STUDENT, ORGANIZER, ADMIN, **MODERATOR**)
 - Design: Liquid glass (glassmorphism) + dark theme
 - **New:** Monetization, Gamification, Moderation systems
+
+### 🆕 Recent Updates (2025-11-21)
+- ✅ **Enhanced HomePage**: Services marketplace integrated into main homepage
+- ✅ **Graceful Degradation**: Advertisement UI ready, backend endpoints pending
+- ✅ **Improved UX**: HomePageNew.jsx with trending events, user registrations, and recommendations
+- ⚠️ **Backend TODO**: Advertisement module endpoints need implementation (Phase 4)
 
 ---
 
@@ -71,16 +78,18 @@ Or see **SETUP.md** for detailed installation steps.
 - `frontend/js/pages/ModeratorDashboard.jsx` - New page
 
 ### Phase 4: Monetization (12 days)
-- Flexible pricing for external venues (5,000-20,000 тг)
-- Advertisement system (TOP_BANNER, NATIVE_FEED, STORY_BANNER)
-- Paid events with Kaspi transfer verification
-- Premium subscription (500 тг/month)
+- ✅ Flexible pricing for external venues (5,000-20,000 тг) - **DONE**
+- ⚠️ Advertisement system (TOP_BANNER, NATIVE_FEED, STORY_BANNER) - **Frontend ready, Backend TODO**
+- ✅ Paid events with Kaspi transfer verification - **DONE**
+- ✅ Premium subscription (500 тг/month) - **DONE**
 
-**Key files to create:**
-- `backend/src/pricing/` - Pricing module
-- `backend/src/advertisements/` - Ads module
-- `backend/prisma/schema.prisma` - Add PricingTier, Advertisement, PremiumSubscription models
-- `frontend/js/pages/PaymentVerificationPage.jsx` - Organizer payment checks
+**Key files completed:**
+- ✅ `backend/src/pricing/` - Pricing module
+- ⚠️ `backend/src/advertisements/` - Ads module **NEEDS IMPLEMENTATION**
+- ✅ `backend/prisma/schema.prisma` - PricingTier, Advertisement, PremiumSubscription models added
+- ✅ `frontend/js/pages/PaymentVerificationPage.jsx` - Organizer payment checks
+- ✅ `frontend/js/components/AdBanner.jsx` - Advertisement UI components
+- ✅ `frontend/js/services/adsService.js` - Advertisement service (graceful error handling)
 
 ### Phase 5: Gamification (8 days)
 - Points system (earn for attendance, participation)

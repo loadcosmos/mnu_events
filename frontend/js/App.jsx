@@ -18,7 +18,6 @@ import EventDetailsPage from './pages/EventDetailsPage.jsx';
 import MyRegistrationsPage from './pages/MyRegistrationsPage.jsx';
 import ClubsPage from './pages/ClubsPage.jsx';
 import ClubDetailsPage from './pages/ClubDetailsPage.jsx';
-import ServicesPage from './pages/ServicesPage.jsx';
 import TutoringPage from './pages/TutoringPage.jsx';
 import ServiceDetailsPage from './pages/ServiceDetailsPage.jsx';
 import CreateServicePage from './pages/CreateServicePage.jsx';
@@ -68,8 +67,7 @@ function App() {
             <Route path="/clubs" element={<Layout><ClubsPage /></Layout>} />
             <Route path="/clubs/:id" element={<Layout><ClubDetailsPage /></Layout>} />
 
-            {/* Services & Tutoring (Phase 3) */}
-            <Route path="/services" element={<Layout><ServicesPage /></Layout>} />
+            {/* Services & Tutoring (Phase 3) - Services now on homepage */}
             <Route path="/tutoring" element={<Layout><TutoringPage /></Layout>} />
             <Route path="/services/:id" element={<Layout><ServiceDetailsPage /></Layout>} />
             <Route

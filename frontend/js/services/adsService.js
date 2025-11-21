@@ -10,10 +10,21 @@ const adsService = {
    * @param {string} position - Ad position (TOP_BANNER, HERO_SLIDE, NATIVE_FEED, BOTTOM_BANNER, SIDEBAR)
    */
   getActive: async (position) => {
-    const response = await api.get('/advertisements/active', {
-      params: { position }
-    });
-    return response;
+    try {
+      const response = await api.get('/advertisements/active', {
+        params: { position }
+      });
+      return response;
+    } catch (error) {
+      // If advertisements endpoint doesn't exist (404) or other errors, return empty array
+      // This allows the app to work without ads until backend is ready
+      if (error.status === 404 || error.response?.status === 404) {
+        return [];
+      }
+      // For other errors, also return empty array but log for debugging
+      console.debug('[adsService] Advertisement endpoint not available:', error.message);
+      return [];
+    }
   },
 
   /**

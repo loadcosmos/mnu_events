@@ -8,6 +8,13 @@ Current implementation status, recent changes, and future roadmap for MNU Events
 **Current Grade:** B+ (85/100) - Feature-complete MVP with comprehensive testing
 **Last Updated:** 2025-11-21
 
+### Recent Changes (2025-11-21)
+- ✅ Services Marketplace moved to HomePage (improved UX)
+- ✅ HomePageNew.jsx created with enhanced user experience
+- ✅ Advertisement frontend integration (backend endpoints pending)
+- ✅ Graceful error handling for missing advertisement endpoints
+- ⚠️ Advertisement backend module not yet implemented
+
 ### Key Metrics
 
 | Metric | Status |
@@ -40,7 +47,7 @@ Current implementation status, recent changes, and future roadmap for MNU Events
 - [x] Payments (Mock with QR codes)
 - [x] Analytics Dashboard
 - [x] Services Marketplace
-- [x] Advertisement System
+- [ ] **Advertisement System** ⚠️ (Frontend ready, backend endpoints not implemented)
 - [x] **Gamification System** (Points, Levels, Achievements)
 - [x] **Moderation Queue** (MODERATOR role)
 - [x] **Payment Verification** (Receipt upload & approval)
@@ -48,14 +55,15 @@ Current implementation status, recent changes, and future roadmap for MNU Events
 - [x] **Settings Module** (Event pricing configuration)
 
 **Frontend Pages:**
-- [x] Home/Dashboard
+- [x] Home/Dashboard (Classic)
+- [x] **HomePageNew** - Enhanced homepage with integrated services ✨
 - [x] Events Listing & Details
 - [x] Event Registration
 - [x] Clubs & Club Details
 - [x] User Profile
 - [x] Organizer Dashboard (Analytics, Scanner, Management)
 - [x] Admin Dashboard (User Management, Statistics)
-- [x] Services Marketplace
+- [x] Services Marketplace (Now integrated into HomePage)
 - [x] Payment & Ticket System
 - [x] **Moderation Dashboard**
 - [x] **Gamification Profile** (Badges & Achievements)
@@ -571,5 +579,5 @@ npm install recharts
 
 ---
 
-**Last Updated:** 2025-11-20
-**Version:** 2.1 (Phase 5-6 Complete)
+**Last Updated:** 2025-11-21
+**Version:** 2.2 (Frontend Updates - Services on Homepage)
