@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AchievementType, UserLevel } from '@prisma/client';
 
@@ -35,6 +35,8 @@ export const LEVEL_THRESHOLDS = {
 
 @Injectable()
 export class GamificationService {
+  private readonly logger = new Logger(GamificationService.name);
+
   constructor(private prisma: PrismaService) {}
 
   /**
@@ -66,13 +68,13 @@ export class GamificationService {
       },
     });
 
-    console.log(
-      `[Gamification] User ${userId} earned ${points} points (${reason}). Total: ${newPoints}`,
+    this.logger.log(
+      `User ${userId} earned ${points} points (${reason}). Total: ${newPoints}`,
     );
 
     if (leveledUp) {
-      console.log(
-        `[Gamification] User ${userId} leveled up to ${newLevel}!`,
+      this.logger.log(
+        `User ${userId} leveled up to ${newLevel}!`,
       );
     }
 
@@ -108,8 +110,8 @@ export class GamificationService {
     });
 
     if (existing) {
-      console.log(
-        `[Gamification] User ${userId} already has achievement: ${name}`,
+      this.logger.log(
+        `User ${userId} already has achievement: ${name}`,
       );
       return;
     }
@@ -128,8 +130,8 @@ export class GamificationService {
     // Award points
     await this.awardPoints(userId, points, `Achievement: ${name}`);
 
-    console.log(
-      `[Gamification] User ${userId} earned achievement: ${name} (+${points} points)`,
+    this.logger.log(
+      `User ${userId} earned achievement: ${name} (+${points} points)`,
     );
   }
 

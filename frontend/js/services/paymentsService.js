@@ -8,7 +8,7 @@ const paymentsService = {
    * @returns {Promise} Payment response with transaction ID and payment URL
    */
   createPayment: async (eventId, amount) => {
-    const response = await api.post('/api/payments/create', { eventId, amount });
+    const response = await api.post('/payments/create', { eventId, amount });
     return response;
   },
 
@@ -19,7 +19,7 @@ const paymentsService = {
    * @returns {Promise} Confirmation response
    */
   confirmPayment: async (transactionId, status = 'success') => {
-    const response = await api.post('/api/payments/webhook', { transactionId, status });
+    const response = await api.post('/payments/webhook', { transactionId, status });
     return response;
   },
 
@@ -28,7 +28,7 @@ const paymentsService = {
    * @returns {Promise} List of tickets
    */
   getMyTickets: async () => {
-    const response = await api.get('/api/payments/my-tickets');
+    const response = await api.get('/payments/my-tickets');
     return response;
   },
 
@@ -38,7 +38,7 @@ const paymentsService = {
    * @returns {Promise} Ticket details
    */
   getTicketById: async (ticketId) => {
-    const response = await api.get(`/api/payments/ticket/${ticketId}`);
+    const response = await api.get(`/payments/ticket/${ticketId}`);
     return response;
   },
 
@@ -48,7 +48,7 @@ const paymentsService = {
    * @returns {Promise} Refund response
    */
   refundTicket: async (ticketId) => {
-    const response = await api.post(`/api/payments/refund/${ticketId}`);
+    const response = await api.post(`/payments/refund/${ticketId}`);
     return response;
   },
 
@@ -58,7 +58,7 @@ const paymentsService = {
    * @returns {Promise} Transaction details
    */
   getTransactionStatus: async (transactionId) => {
-    const response = await api.get(`/api/payments/transaction/${transactionId}`);
+    const response = await api.get(`/payments/transaction/${transactionId}`);
     return response;
   },
 };

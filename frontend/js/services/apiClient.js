@@ -18,18 +18,59 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Enable cookies for httpOnly JWT tokens
 });
 
-// Request Interceptor - добавляет токен к каждому запросу
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
+// CSRF Token storage
+let csrfToken = null;
+let csrfTokenPromise = null; // Mutex to prevent concurrent token fetches
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+// Function to fetch CSRF token with race condition prevention
+const fetchCsrfToken = async () => {
+  // If a fetch is already in progress, return the existing promise
+  if (csrfTokenPromise) {
+    return csrfTokenPromise;
+  }
+
+  // Create new fetch promise
+  csrfTokenPromise = (async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/auth/csrf-token`, {
+        withCredentials: true,
+      });
+      csrfToken = response.data.csrfToken;
+      return csrfToken;
+    } catch (error) {
+      console.error('[API Client] Failed to fetch CSRF token:', error);
+      return null;
+    } finally {
+      // Clear promise after completion (success or failure)
+      csrfTokenPromise = null;
+    }
+  })();
+
+  return csrfTokenPromise;
+};
+
+// Request Interceptor - adds CSRF token for state-changing requests
+apiClient.interceptors.request.use(
+  async (config) => {
+    // For state-changing methods, add CSRF token
+    if (['post', 'put', 'delete', 'patch'].includes(config.method?.toLowerCase())) {
+      // Get CSRF token if not already fetched
+      if (!csrfToken) {
+        await fetchCsrfToken();
+      }
+
+      if (csrfToken) {
+        config.headers['x-csrf-token'] = csrfToken;
+      }
     }
 
-    // Логирование запросов в dev режиме
+    // No longer need to manually add Authorization header
+    // JWT is sent automatically via httpOnly cookies
+
+    // Logging requests in dev mode
     if (import.meta.env.DEV) {
       console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, config.data);
     }
@@ -65,17 +106,18 @@ apiClient.interceptors.response.use(
 
       switch (status) {
         case 401:
-          // Unauthorized - очищаем токен и перенаправляем на логин
+          // Unauthorized - session expired or token revoked
           console.error('[API Error] Unauthorized - redirecting to login');
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
+
+          // Clear CSRF token
+          csrfToken = null;
 
           toast.error('Session expired', {
             description: 'Please log in again',
             duration: 3000,
           });
 
-          // Перенаправление на страницу логина
+          // Redirect to login page
           if (window.location.pathname !== '/login' && window.location.pathname !== '/admin/login') {
             setTimeout(() => {
               window.location.href = '/login';
@@ -84,12 +126,26 @@ apiClient.interceptors.response.use(
           break;
 
         case 403:
-          // Forbidden - недостаточно прав
-          console.error('[API Error] Forbidden - insufficient permissions');
-          toast.error('Access denied', {
-            description: 'You do not have permission to perform this action',
-            duration: 4000,
-          });
+          // Check if this is a CSRF token error
+          if (errorMessage?.toLowerCase().includes('csrf') || errorMessage?.toLowerCase().includes('invalid token')) {
+            console.error('[API Error] CSRF token invalid - clearing and refetching');
+            csrfToken = null; // Clear invalid token
+
+            toast.error('Security token expired', {
+              description: 'Please try your action again',
+              duration: 4000,
+            });
+
+            // Fetch new token in background for next request
+            fetchCsrfToken().catch(console.error);
+          } else {
+            // Regular forbidden error - insufficient permissions
+            console.error('[API Error] Forbidden - insufficient permissions');
+            toast.error('Access denied', {
+              description: 'You do not have permission to perform this action',
+              duration: 4000,
+            });
+          }
           break;
 
         case 404:
@@ -262,23 +318,23 @@ export const api = {
     apiClient.defaults.baseURL = url;
   },
 
-  // Установка токена вручную
-  setAuthToken: (token) => {
-    if (token) {
-      localStorage.setItem('authToken', token);
-      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      localStorage.removeItem('authToken');
-      delete apiClient.defaults.headers.common['Authorization'];
+  // Get CSRF token (for manual use if needed)
+  getCsrfToken: async () => {
+    if (!csrfToken) {
+      await fetchCsrfToken();
     }
+    return csrfToken;
   },
 
-  // Очистка токена
-  clearAuthToken: () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    delete apiClient.defaults.headers.common['Authorization'];
+  // Clear CSRF token (e.g., on logout)
+  clearCsrfToken: () => {
+    csrfToken = null;
   },
 };
+
+// Initialize CSRF token on app load
+if (typeof window !== 'undefined') {
+  fetchCsrfToken().catch(console.error);
+}
 
 export default apiClient;

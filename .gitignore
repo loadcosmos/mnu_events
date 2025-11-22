@@ -69,3 +69,5 @@ docker-compose.override.yml
 FRONTEND_DESIGN_ANALYSIS_REPORT.md
 .kilocode/
 .kilocode/mcp.json
+
+.qoder/

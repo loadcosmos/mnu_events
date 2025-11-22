@@ -49,7 +49,7 @@ describe('EventsService', () => {
     it('should successfully create an event', async () => {
       const createEventDto = {
         title: 'Test Event',
-        description: 'Test Description',
+        description: 'This is a comprehensive test description that meets the minimum 50 character requirement for event descriptions.',
         category: Category.ACADEMIC,
         location: 'Test Location',
         startDate: '2025-12-01T10:00:00Z',
@@ -176,10 +176,14 @@ describe('EventsService', () => {
         id: '1',
         title: 'Test Event',
         category: Category.ACADEMIC,
+        capacity: 100,
         creator: {
           id: 'user-1',
           firstName: 'Test',
           lastName: 'User',
+        },
+        _count: {
+          registrations: 25,
         },
       };
 
@@ -187,7 +191,10 @@ describe('EventsService', () => {
 
       const result = await service.findOne('1');
 
-      expect(result).toEqual(mockEvent);
+      expect(result).toMatchObject({
+        ...mockEvent,
+        availableSeats: 75, // capacity (100) - registrations (25)
+      });
       expect(mockPrismaService.event.findUnique).toHaveBeenCalledWith({
         where: { id: '1' },
         include: expect.any(Object),

@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-ioredis-yet';
 import configuration from './config/configuration';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
@@ -19,6 +21,7 @@ import { AdvertisementsModule } from './advertisements/advertisements.module';
 import { PaymentVerificationModule } from './payment-verification/payment-verification.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { GamificationModule } from './gamification/gamification.module';
+import { HealthModule } from './health/health.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -29,6 +32,20 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        store: await redisStore({
+          host: configService.get('redis.host'),
+          port: configService.get('redis.port'),
+          password: configService.get('redis.password'),
+          db: configService.get('redis.db'),
+          ttl: 3600, // Default TTL: 1 hour
+        }),
+      }),
     }),
     ThrottlerModule.forRoot([
       {
@@ -52,6 +69,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     PaymentVerificationModule,
     SubscriptionsModule,
     GamificationModule,
+    HealthModule,
   ],
   providers: [
     {

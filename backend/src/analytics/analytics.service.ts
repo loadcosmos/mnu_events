@@ -352,7 +352,11 @@ export class AnalyticsService {
 
     const totalTicketRevenue = ticketRevenue._sum.price?.toNumber() || 0;
     const platformFees = platformFeesData._sum.platformFee?.toNumber() || 0;
-    const adRevenue = 0; // TODO: Implement ad revenue tracking
+    
+    // Ad revenue tracking: Phase 2 feature
+    // Will be implemented when advertisement payment integration is completed
+    // This requires tracking advertisement impressions, clicks, and conversions
+    const adRevenue = 0;
 
     // Get revenue by month (last 6 months)
     const sixMonthsAgo = new Date();

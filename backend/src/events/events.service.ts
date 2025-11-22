@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ModerationService } from '../moderation/moderation.service';
@@ -19,6 +20,8 @@ import {
 
 @Injectable()
 export class EventsService {
+  private readonly logger = new Logger(EventsService.name);
+
   constructor(
     private prisma: PrismaService,
     private moderationService: ModerationService,
@@ -80,10 +83,10 @@ export class EventsService {
     if (needsModeration) {
       // Organizers must go through moderation
       await this.moderationService.addToQueue(ModerationType.EVENT, event.id);
-      console.log(`[EventsService] Event added to moderation queue: ${event.id}`);
+      this.logger.log(`Event added to moderation queue: ${event.id}`);
     } else {
       // Admin/Moderator events are auto-approved
-      console.log(`[EventsService] Event created by ${userRole}, auto-approved`);
+      this.logger.log(`Event created by ${userRole}, auto-approved`);
     }
 
     return event;
@@ -188,7 +191,7 @@ export class EventsService {
 
       return createPaginatedResponse(events, total, validatedPage, take);
     } catch (error) {
-      console.error('[EventsService] findAll error:', error);
+      this.logger.error('findAll error:', error);
       throw error;
     }
   }
@@ -316,7 +319,7 @@ export class EventsService {
     }
 
     // Only creator or admin can view statistics
-    if (event.creatorId !== userId && userRole !== Role.ADMIN && userRole !== Role.ORGANIZER) {
+    if (event.creatorId !== userId && userRole !== Role.ADMIN) {
       throw new ForbiddenException('You do not have permission to view event statistics');
     }
 

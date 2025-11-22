@@ -5,7 +5,7 @@ class SettingsService {
    * Get current event pricing
    */
   async getPricing() {
-    const response = await api.get('/api/settings/pricing');
+    const response = await api.get('/settings/pricing');
     return response;
   }
 
@@ -13,7 +13,7 @@ class SettingsService {
    * Update event pricing (admin only)
    */
   async updatePricing(pricingData) {
-    const response = await api.put('/api/settings/pricing', pricingData);
+    const response = await api.put('/settings/pricing', pricingData);
     return response;
   }
 
@@ -21,7 +21,7 @@ class SettingsService {
    * Get pricing history (admin only)
    */
   async getPricingHistory() {
-    const response = await api.get('/api/settings/pricing/history');
+    const response = await api.get('/settings/pricing/history');
     return response;
   }
 }

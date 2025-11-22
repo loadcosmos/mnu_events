@@ -29,21 +29,31 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   /**
-   * Инициализация - проверяем, есть ли сохраненная сессия
+   * Инициализация - проверяем, есть ли активная сессия через httpOnly cookie
    */
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const token = authService.getToken();
+        // Check if we have cached user data (optimization to avoid unnecessary API call)
+        const cachedUser = authService.getUser();
 
-        if (token) {
-          // Токен есть, проверяем его валидность запросом на сервер
+        if (cachedUser) {
+          // We have cached user, but verify with server (httpOnly cookie will be sent automatically)
           const currentUser = await authService.getCurrentUser();
           setUser(currentUser);
+        } else {
+          // No cached user, try to fetch from server (in case cookie exists but cache was cleared)
+          try {
+            const currentUser = await authService.getCurrentUser();
+            setUser(currentUser);
+          } catch (err) {
+            // No valid session, that's okay
+            setUser(null);
+          }
         }
       } catch (err) {
         console.error('[AuthContext] Init failed:', err);
-        // Токен невалидный, очищаем
+        // Session invalid, clear cache
         authService.clearAuthData();
         setUser(null);
       } finally {

@@ -22,7 +22,7 @@ describe('PaymentsService', () => {
   let service: PaymentsService;
   let prisma: PrismaService;
 
-  const mockPrismaService = {
+  const mockPrismaService: any = {
     event: {
       findUnique: jest.fn(),
     },
@@ -39,6 +39,11 @@ describe('PaymentsService', () => {
       create: jest.fn(),
     },
   };
+
+  // Add $transaction method after declaration to avoid circular reference
+  mockPrismaService.$transaction = jest.fn((callback) => {
+    return callback(mockPrismaService);
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ForbiddenException,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -19,6 +20,8 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
+
   constructor(private prisma: PrismaService) {}
 
   /**
@@ -109,7 +112,7 @@ export class PaymentsService {
    * Process webhook from mock payment gateway
    */
   async processWebhook(dto: PaymentWebhookDto): Promise<TicketResponse> {
-    // 1. Find pending ticket by transaction ID
+    // 1. Find pending ticket by transaction ID (read-only, outside transaction)
     const ticket = await this.prisma.ticket.findUnique({
       where: { transactionId: dto.transactionId },
       include: {
@@ -128,37 +131,46 @@ export class PaymentsService {
 
     // 2. Process based on webhook status
     if (dto.status === 'success') {
-      // Generate QR code for the ticket
+      // Generate QR code before transaction (no DB writes)
       const qrCodeData = await this.generateQRCode(ticket.id, ticket.eventId, ticket.userId);
 
-      // Update ticket to PAID status
-      const updatedTicket = await this.prisma.ticket.update({
-        where: { id: ticket.id },
-        data: {
-          status: 'PAID',
-          qrCode: qrCodeData,
-        },
-        include: {
-          event: {
-            select: {
-              id: true,
-              title: true,
-              startDate: true,
-              endDate: true,
-              location: true,
+      // Atomic transaction for all database updates
+      const updatedTicket = await this.prisma.$transaction(async (tx) => {
+        // Update ticket status and QR code atomically
+        const updated = await tx.ticket.update({
+          where: { id: ticket.id },
+          data: {
+            status: 'PAID',
+            qrCode: qrCodeData,
+          },
+          include: {
+            event: {
+              select: {
+                id: true,
+                title: true,
+                startDate: true,
+                endDate: true,
+                location: true,
+              },
             },
           },
-        },
+        });
+
+        // If any error occurs, entire transaction rolls back
+        return updated;
       });
 
-      // TODO: Send email with ticket (if SMTP configured)
+      // Email sending moved to background job queue (Phase 2)
+      // This prevents blocking the webhook response
       // await this.sendTicketEmail(ticket.user.email, updatedTicket);
 
       return this.formatTicketResponse(updatedTicket);
     } else {
-      // Payment failed or declined - delete pending ticket
-      await this.prisma.ticket.delete({
-        where: { id: ticket.id },
+      // Payment failed - delete ticket in transaction
+      await this.prisma.$transaction(async (tx) => {
+        await tx.ticket.delete({
+          where: { id: ticket.id },
+        });
       });
 
       throw new BadRequestException(
@@ -281,8 +293,9 @@ export class PaymentsService {
       },
     });
 
-    // TODO: Process actual refund via payment gateway in production
-    // TODO: Send refund confirmation email
+    // Refund processing: Mock payment system
+    // Actual payment gateway integration will be added in Phase 2
+    // Refund confirmation emails will be implemented with email queue
 
     return {
       message: `Ticket refunded successfully${dto?.reason ? ': ' + dto.reason : ''}`,
@@ -357,7 +370,7 @@ export class PaymentsService {
 
       return qrCodeDataUrl;
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      this.logger.error('Error generating QR code:', error);
       throw new BadRequestException('Failed to generate QR code');
     }
   }

@@ -1,52 +1,21 @@
-{
-  "mcpServers": {
-    "context7": {
+{"mcpServers":{     "context7": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@upstash/context7-mcp"
-      ],
-      "env": {
-        "DEFAULT_MINIMUM_TOKENS": ""
-      }
-    },
-    "filesystem": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "--mount",
-        "type=bind,src=//wsl.localhost/Ubuntu-22.04/home/loadcosmos,dst=/projects",
-        "mcp/filesystem",
-        "/projects"
-      ]
-    },
-    "perplexity": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "perplexity-mcp"
-      ],
-      "env": {
-        "PERPLEXITY_API_KEY": ""
-      }
-    },
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@0.0.38"
-      ]
+      "args": ["-y", "@upstash/context7-mcp", "--api-key", "ctx7sk-4fc263f6-61f0-4386-a416-41da61f1bc7f"]
     },
     "postgres": {
       "command": "npx",
       "args": [
         "-y",
         "@modelcontextprotocol/server-postgres",
-        "postgresql://mnu_user:mnu_password@localhost:5432/mnu_events_dev"
+        "postgresql://localhost/mydb"
       ]
-    }
-  }
-}
+    },
+    "TestSprite": {
+      "command": "npx",
+      "args": [
+        "@testsprite/testsprite-mcp@latest"
+      ],
+      "env": {
+        "API_KEY": "sk-user-944V83YRgeXZqvy7KOk-Q3Nl9YCNY-G2mb4ICN1OnhZGPlg8sgGbCGzrcllAQVG_6sgfPCKi2cIuU2EPWY2cAo1YghuV6LItnXFP2qT5_Pm3EI7zJAntoChfhnVkcdWE7JA"
+      }
+    }}}

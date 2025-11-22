@@ -11,7 +11,7 @@ const gamificationService = {
      */
     async getUserStats() {
         try {
-            const response = await api.get('/api/gamification/stats');
+            const response = await api.get('/gamification/stats');
             return response;
         } catch (error) {
             console.error('Error fetching gamification stats:', error);
@@ -25,7 +25,7 @@ const gamificationService = {
      */
     async getUserAchievements() {
         try {
-            const response = await api.get('/api/gamification/achievements');
+            const response = await api.get('/gamification/achievements');
             return response;
         } catch (error) {
             console.error('Error fetching achievements:', error);

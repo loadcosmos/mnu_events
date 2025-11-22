@@ -10,7 +10,7 @@ const servicesService = {
    * @param {Object} filters - Filter parameters
    */
   getAll: async (filters = {}) => {
-    const response = await api.get('/api/services', { params: filters });
+    const response = await api.get('/services', { params: filters });
     return response;
   },
 
@@ -19,7 +19,7 @@ const servicesService = {
    * @param {string} id - Service ID
    */
   getById: async (id) => {
-    const response = await api.get(`/api/services/${id}`);
+    const response = await api.get(`/services/${id}`);
     return response;
   },
 
@@ -28,7 +28,7 @@ const servicesService = {
    * @param {Object} data - Service data
    */
   create: async (data) => {
-    const response = await api.post('/api/services', data);
+    const response = await api.post('/services', data);
     return response;
   },
 
@@ -38,7 +38,7 @@ const servicesService = {
    * @param {Object} data - Updated service data
    */
   update: async (id, data) => {
-    const response = await api.put(`/api/services/${id}`, data);
+    const response = await api.put(`/services/${id}`, data);
     return response;
   },
 
@@ -47,7 +47,7 @@ const servicesService = {
    * @param {string} id - Service ID
    */
   delete: async (id) => {
-    const response = await api.delete(`/api/services/${id}`);
+    const response = await api.delete(`/services/${id}`);
     return response;
   },
 
@@ -55,7 +55,7 @@ const servicesService = {
    * Get current user's services
    */
   getMyServices: async () => {
-    const response = await api.get('/api/services/my-services');
+    const response = await api.get('/services/my-services');
     return response;
   },
 
@@ -64,7 +64,7 @@ const servicesService = {
    * @param {string} providerId - Provider user ID
    */
   getByProvider: async (providerId) => {
-    const response = await api.get(`/api/services/provider/${providerId}`);
+    const response = await api.get(`/services/provider/${providerId}`);
     return response;
   },
 };

@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ForbiddenException,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GamificationService } from '../gamification/gamification.service';
@@ -26,6 +27,7 @@ import { Role } from '@prisma/client';
 
 @Injectable()
 export class CheckinService {
+  private readonly logger = new Logger(CheckinService.name);
   private readonly rateLimitMap = new Map<string, number>();
 
   constructor(
@@ -138,7 +140,7 @@ export class CheckinService {
     this.gamificationService
       .onEventCheckIn(ticket.userId, dto.eventId)
       .catch((err) =>
-        console.error('[CheckinService] Gamification error:', err),
+        this.logger.error('Gamification error:', err),
       );
 
     return {
@@ -234,11 +236,10 @@ export class CheckinService {
 
     this.rateLimitMap.set(rateLimitKey, now);
 
-    // 7. Optional: Geolocation check (if location provided)
+    // 7. Geolocation validation removed (not in MVP scope)
+    // Location data is logged for future proximity check implementation
     if (dto.location) {
-      // TODO: Implement proximity check (e.g., within 500m of event location)
-      // This would require event coordinates in the database
-      console.log('Location check:', dto.location);
+      this.logger.log('Location check:', dto.location);
     }
 
     // 8. Create check-in record
@@ -254,7 +255,7 @@ export class CheckinService {
     this.gamificationService
       .onEventCheckIn(userId, event.id)
       .catch((err) =>
-        console.error('[CheckinService] Gamification error:', err),
+        this.logger.error('Gamification error:', err),
       );
 
     // 9. Clean up old rate limit entries (older than 10 seconds)

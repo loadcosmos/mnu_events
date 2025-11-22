@@ -33,7 +33,7 @@ const eventsService = {
       if (params.creatorId) queryParams.append('creatorId', params.creatorId);
 
       const queryString = queryParams.toString();
-      const url = queryString ? `/api/events?${queryString}` : '/api/events';
+      const url = queryString ? `/events?${queryString}` : '/events';
       const response = await api.get(url);
       return response;
     } catch (error) {
@@ -49,7 +49,7 @@ const eventsService = {
    */
   async getById(id) {
     try {
-      const response = await api.get(`/api/events/${id}`);
+      const response = await api.get(`/events/${id}`);
       return response;
     } catch (error) {
       console.error('[EventsService] Get event by ID failed:', error);
@@ -64,7 +64,7 @@ const eventsService = {
    */
   async create(eventData) {
     try {
-      const response = await api.post('/api/events', eventData);
+      const response = await api.post('/events', eventData);
       return response;
     } catch (error) {
       console.error('[EventsService] Create event failed:', error);
@@ -80,7 +80,7 @@ const eventsService = {
    */
   async update(id, eventData) {
     try {
-      const response = await api.patch(`/api/events/${id}`, eventData);
+      const response = await api.patch(`/events/${id}`, eventData);
       return response;
     } catch (error) {
       console.error('[EventsService] Update event failed:', error);
@@ -95,7 +95,7 @@ const eventsService = {
    */
   async delete(id) {
     try {
-      await api.delete(`/api/events/${id}`);
+      await api.delete(`/events/${id}`);
     } catch (error) {
       console.error('[EventsService] Delete event failed:', error);
       throw error;
@@ -113,7 +113,7 @@ const eventsService = {
       if (params.page) queryParams.append('page', params.page);
       if (params.limit) queryParams.append('limit', params.limit);
 
-      const response = await api.get(`/api/events/my?${queryParams.toString()}`);
+      const response = await api.get(`/events/my?${queryParams.toString()}`);
       return response;
     } catch (error) {
       console.error('[EventsService] Get my events failed:', error);
@@ -128,7 +128,7 @@ const eventsService = {
    */
   async getStatistics(id) {
     try {
-      const response = await api.get(`/api/events/${id}/statistics`);
+      const response = await api.get(`/events/${id}/statistics`);
       return response;
     } catch (error) {
       console.error('[EventsService] Get event statistics failed:', error);

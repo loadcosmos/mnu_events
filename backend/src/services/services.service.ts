@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
@@ -20,6 +21,8 @@ import { Prisma, Role, ModerationType } from '@prisma/client';
 
 @Injectable()
 export class ServicesService {
+  private readonly logger = new Logger(ServicesService.name);
+
   constructor(
     private prisma: PrismaService,
     private subscriptionsService: SubscriptionsService,
@@ -178,10 +181,10 @@ export class ServicesService {
     if (needsModeration) {
       // Students must go through moderation
       await this.moderationService.addToQueue(ModerationType.SERVICE, service.id);
-      console.log(`[ServicesService] Service added to moderation queue: ${service.id}`);
+      this.logger.log(`Service added to moderation queue: ${service.id}`);
     } else {
       // Organizers/Admins/Moderators auto-approved
-      console.log(`[ServicesService] Service created by ${userRole}, auto-approved`);
+      this.logger.log(`Service created by ${userRole}, auto-approved`);
     }
 
     return this.formatService(service);

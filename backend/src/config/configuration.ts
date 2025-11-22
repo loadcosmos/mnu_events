@@ -5,6 +5,7 @@ export default () => {
     'REFRESH_TOKEN_SECRET',
     'EMAIL_VERIFICATION_SECRET',
     'PAYMENT_SECRET',
+    'CSRF_SECRET', // Added for CSRF protection
   ];
 
   const missingSecrets = requiredSecrets.filter(
@@ -58,6 +59,20 @@ export default () => {
     upload: {
       maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB
       uploadDir: process.env.UPLOAD_DIR || './uploads',
+    },
+    redis: {
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379', 10),
+      password: process.env.REDIS_PASSWORD || undefined,
+      db: parseInt(process.env.REDIS_DB || '0', 10),
+    },
+    csrf: {
+      secret: process.env.CSRF_SECRET,
+    },
+    logging: {
+      level: process.env.LOG_LEVEL || 'info',
+      fileEnabled: process.env.LOG_FILE_ENABLED === 'true',
+      filePath: process.env.LOG_FILE_PATH || 'logs',
     },
   };
 };

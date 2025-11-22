@@ -3,6 +3,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UnauthorizedException } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -17,6 +18,23 @@ describe('AuthController', () => {
     resendVerificationCode: jest.fn(),
     getProfile: jest.fn(),
   };
+
+  let mockReq: Partial<Request>;
+  let mockRes: Partial<Response>;
+
+  beforeEach(() => {
+    mockReq = {
+      cookies: {},
+      headers: {},
+    };
+
+    mockRes = {
+      cookie: jest.fn().mockReturnThis(),
+      clearCookie: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+      status: jest.fn().mockReturnThis(),
+    };
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,20 +63,21 @@ describe('AuthController', () => {
       const expectedResult = { message: 'Logged out successfully' };
       mockAuthService.logout.mockResolvedValue(expectedResult);
 
-      const result = await controller.logout();
+      await controller.logout(mockReq as Request, mockRes as Response);
 
-      expect(authService.logout).toHaveBeenCalled();
-      expect(result).toEqual(expectedResult);
+      expect(authService.logout).toHaveBeenCalledWith(mockReq, mockRes);
+      expect(mockRes.json).toHaveBeenCalledWith(expectedResult);
     });
 
     it('should return correct logout message format', async () => {
       const expectedResult = { message: 'Logged out successfully' };
       mockAuthService.logout.mockResolvedValue(expectedResult);
 
-      const result = await controller.logout();
+      await controller.logout(mockReq as Request, mockRes as Response);
 
-      expect(result).toHaveProperty('message');
-      expect(result.message).toBe('Logged out successfully');
+      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
+        message: 'Logged out successfully'
+      }));
     });
   });
 
@@ -69,16 +88,14 @@ describe('AuthController', () => {
         password: 'Password123!',
       };
       const expectedResult = {
-        accessToken: 'token',
-        refreshToken: 'refresh',
         user: { id: '1', email: 'test@kazguu.kz' },
       };
       mockAuthService.login.mockResolvedValue(expectedResult);
 
-      const result = await controller.login(loginDto);
+      await controller.login(loginDto, mockRes as Response);
 
-      expect(authService.login).toHaveBeenCalledWith(loginDto);
-      expect(result).toEqual(expectedResult);
+      expect(authService.login).toHaveBeenCalledWith(loginDto, mockRes);
+      expect(mockRes.json).toHaveBeenCalledWith(expectedResult);
     });
   });
 

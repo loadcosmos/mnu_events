@@ -28,6 +28,8 @@ services:
       PORT: 3001
       JWT_SECRET: dev_jwt_secret_change_in_production
       CORS_ORIGIN: http://localhost:5173
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -35,6 +37,7 @@ services:
       - mnu_events_network
     depends_on:
       - postgres
+      - redis
 
   frontend:
     build:
@@ -45,7 +48,7 @@ services:
     ports:
       - '5173:5173'
     environment:
-      VITE_API_URL: http://localhost:3001
+      VITE_API_URL: http://localhost:3001/api
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -53,6 +56,23 @@ services:
       - mnu_events_network
     depends_on:
       - backend
+
+  redis:
+    image: redis:7-alpine
+    container_name: mnu_events_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - mnu_events_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -73,6 +93,7 @@ services:
 volumes:
   postgres_data:
   pgadmin_data:
+  redis_data:
 
 networks:
   mnu_events_network:

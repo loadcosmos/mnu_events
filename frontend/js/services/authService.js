@@ -15,7 +15,7 @@ const authService = {
    */
   async register(userData) {
     try {
-      const response = await api.post('/api/auth/register', {
+      const response = await api.post('/auth/register', {
         email: userData.email,
         password: userData.password,
         firstName: userData.name?.split(' ')[0] || '',
@@ -40,14 +40,15 @@ const authService = {
    */
   async login(credentials) {
     try {
-      const response = await api.post('/api/auth/login', {
+      const response = await api.post('/auth/login', {
         email: credentials.email,
         password: credentials.password,
       });
 
-      // Сохраняем токен и данные пользователя
-      if (response.accessToken) {
-        this.saveAuthData(response.accessToken, response.user);
+      // Tokens are now stored in httpOnly cookies by the server
+      // We only cache user data for quick access
+      if (response.user) {
+        this.saveUser(response.user);
       }
 
       return response;
@@ -64,7 +65,7 @@ const authService = {
   async logout() {
     try {
       // Опционально: отправляем запрос на сервер для инвалидации токена
-      await api.post('/api/auth/logout');
+      await api.post('/auth/logout');
     } catch (error) {
       console.error('[AuthService] Logout request failed:', error);
       // Продолжаем выход даже если запрос не удался
@@ -80,7 +81,7 @@ const authService = {
    */
   async getCurrentUser() {
     try {
-      const response = await api.get('/api/auth/profile');
+      const response = await api.get('/auth/profile');
 
       // Обновляем сохраненные данные пользователя
       if (response) {
@@ -103,7 +104,7 @@ const authService = {
    */
   async updateProfile(userData) {
     try {
-      const response = await api.put('/api/auth/profile', userData);
+      const response = await api.put('/auth/profile', userData);
 
       if (response.user) {
         this.saveUser(response.user);
@@ -125,7 +126,7 @@ const authService = {
    */
   async changePassword(passwordData) {
     try {
-      const response = await api.post('/api/auth/change-password', {
+      const response = await api.post('/auth/change-password', {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       });
@@ -144,7 +145,7 @@ const authService = {
    */
   async forgotPassword(email) {
     try {
-      const response = await api.post('/api/auth/forgot-password', { email });
+      const response = await api.post('/auth/forgot-password', { email });
       return response;
     } catch (error) {
       console.error('[AuthService] Forgot password failed:', error);
@@ -161,7 +162,7 @@ const authService = {
    */
   async resetPassword(resetData) {
     try {
-      const response = await api.post('/api/auth/reset-password', {
+      const response = await api.post('/auth/reset-password', {
         token: resetData.token,
         password: resetData.password,
       });
@@ -181,13 +182,14 @@ const authService = {
   async verifyEmail(verifyData) {
     try {
       // Бэкенд ожидает { email, code }, а не { token }
-      const response = await api.post('/api/auth/verify-email', verifyData);
+      const response = await api.post('/auth/verify-email', verifyData);
       
-      // После верификации email получаем токены
-      if (response.accessToken) {
-        this.saveAuthData(response.accessToken, response.user);
+      // Tokens are now stored in httpOnly cookies by the server
+      // We only cache user data for quick access
+      if (response.user) {
+        this.saveUser(response.user);
       }
-      
+
       return response;
     } catch (error) {
       console.error('[AuthService] Email verification failed:', error);
@@ -202,7 +204,7 @@ const authService = {
    */
   async resendVerificationCode(email) {
     try {
-      const response = await api.post('/api/auth/resend-code', { email });
+      const response = await api.post('/auth/resend-code', { email });
       return response;
     } catch (error) {
       console.error('[AuthService] Resend verification code failed:', error);
@@ -211,45 +213,30 @@ const authService = {
   },
 
   // === Вспомогательные методы для работы с localStorage ===
+  // NOTE: Tokens are now stored in httpOnly cookies (server-side)
+  // We only cache user data for quick access and offline display
 
   /**
-   * Сохранение токена и данных пользователя
-   * @param {string} token - токен авторизации
-   * @param {Object} user - данные пользователя
-   */
-  saveAuthData(token, user) {
-    localStorage.setItem('authToken', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    api.setAuthToken(token);
-  },
-
-  /**
-   * Сохранение только данных пользователя
+   * Сохранение данных пользователя в localStorage (для кэширования)
    * @param {Object} user - данные пользователя
    */
   saveUser(user) {
-    localStorage.setItem('user', JSON.stringify(user));
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    }
   },
 
   /**
-   * Очистка данных авторизации
+   * Очистка кэшированных данных
    */
   clearAuthData() {
-    localStorage.removeItem('authToken');
     localStorage.removeItem('user');
-    api.clearAuthToken();
+    api.clearCsrfToken(); // Clear CSRF token on logout
   },
 
   /**
-   * Получение токена из localStorage
-   * @returns {string|null} токен или null
-   */
-  getToken() {
-    return localStorage.getItem('authToken');
-  },
-
-  /**
-   * Получение данных пользователя из localStorage
+   * Получение кэшированных данных пользователя из localStorage
+   * NOTE: This is just a cache. Always verify with server for critical operations.
    * @returns {Object|null} данные пользователя или null
    */
   getUser() {
@@ -258,11 +245,14 @@ const authService = {
   },
 
   /**
-   * Проверка, авторизован ли пользователь
+   * Проверка авторизации (проверяем наличие кэшированного пользователя)
+   * NOTE: This is just a client-side hint. Server validates httpOnly cookie.
    * @returns {boolean}
    */
   isAuthenticated() {
-    return !!this.getToken();
+    // Check if we have cached user data
+    // The actual auth is verified by server via httpOnly cookie
+    return !!this.getUser();
   },
 
   /**

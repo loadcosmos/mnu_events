@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto, VerifyEmailDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -33,8 +34,9 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
   @ApiResponse({ status: 400, description: 'Invalid or expired code' })
   @ApiResponse({ status: 429, description: 'Too many requests' })
-  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    return this.authService.verifyEmail(verifyEmailDto);
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto, @Res() res: Response) {
+    const result = await this.authService.verifyEmail(verifyEmailDto, res);
+    return res.json(result);
   }
 
   @Public()
@@ -55,8 +57,9 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials or email not verified' })
   @ApiResponse({ status: 429, description: 'Too many requests' })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
+    const result = await this.authService.login(loginDto, res);
+    return res.json(result);
   }
 
   @Public()
@@ -82,8 +85,32 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({ status: 200, description: 'Logged out successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async logout() {
-    return this.authService.logout();
+  async logout(@Req() req: Request, @Res() res: Response) {
+    const result = await this.authService.logout(req, res);
+    return res.json(result);
+  }
+
+  @Public()
+  @Get('csrf-token')
+  @ApiOperation({ summary: 'Get CSRF token for subsequent requests' })
+  @ApiResponse({ status: 200, description: 'CSRF token generated' })
+  async getCsrfToken(@Req() req: Request, @Res() res: Response) {
+    // Get the CSRF token generator from the app instance
+    const app = req.app;
+    const generateToken = (app as any).csrfTokenGenerator;
+
+    if (!generateToken) {
+      return res.status(500).json({
+        message: 'CSRF token generator not available',
+      });
+    }
+
+    const csrfToken = generateToken(req, res);
+
+    return res.json({
+      csrfToken,
+      message: 'CSRF token generated successfully',
+    });
   }
 
   @Public()

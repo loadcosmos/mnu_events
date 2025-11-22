@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ModerationStatus, ModerationType } from '@prisma/client';
 
 @Injectable()
 export class ModerationService {
+    private readonly logger = new Logger(ModerationService.name);
+
     constructor(private prisma: PrismaService) { }
 
     async addToQueue(itemType: ModerationType, itemId: string) {
@@ -59,7 +61,7 @@ export class ModerationService {
                             break;
                     }
                 } catch (error) {
-                    console.error(`Failed to fetch details for item ${item.itemId}`, error);
+                    this.logger.error(`Failed to fetch details for item ${item.itemId}`, error);
                 }
                 return { ...item, details };
             }),

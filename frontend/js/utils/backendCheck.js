@@ -8,7 +8,7 @@ export async function checkBackendAvailability() {
   try {
     // Пробуем простой GET запрос к health check или любому публичному эндпоинту
     // Используем увеличенный timeout, так как бэкенд может запускаться
-    const response = await api.get('/api/auth/email-status', {
+    const response = await api.get('/auth/email-status', {
       timeout: 10000, // Увеличено до 10 секунд
       retry: false, // Не повторяем запрос при проверке
     });

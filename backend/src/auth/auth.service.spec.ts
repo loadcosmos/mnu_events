@@ -3,8 +3,10 @@ import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtBlacklistService } from './jwt-blacklist.service';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import { Request, Response } from 'express';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -22,12 +24,19 @@ describe('AuthService', () => {
   const mockJwtService = {
     signAsync: jest.fn(),
     verify: jest.fn(),
+    decode: jest.fn(),
+  };
+
+  const mockJwtBlacklistService = {
+    addToBlacklist: jest.fn(),
+    isBlacklisted: jest.fn(),
   };
 
   const mockConfigService = {
     get: jest.fn((key: string) => {
       const config: Record<string, any> = {
         'jwt.secret': 'test-secret',
+        'nodeEnv': 'test',
         'jwt.expiresIn': '15m',
         'refreshToken.secret': 'refresh-secret',
         'refreshToken.expiresIn': '7d',
@@ -57,6 +66,10 @@ describe('AuthService', () => {
           provide: ConfigService,
           useValue: mockConfigService,
         },
+        {
+          provide: JwtBlacklistService,
+          useValue: mockJwtBlacklistService,
+        },
       ],
     }).compile();
 
@@ -71,21 +84,50 @@ describe('AuthService', () => {
 
   describe('logout', () => {
     it('should return success message', async () => {
-      const result = await service.logout();
+      const mockReq = {
+        cookies: {},
+        headers: {},
+      } as unknown as Request;
+
+      const mockRes = {
+        clearCookie: jest.fn(),
+      } as unknown as Response;
+
+      const result = await service.logout(mockReq, mockRes);
 
       expect(result).toEqual({ message: 'Logged out successfully' });
+      expect(mockRes.clearCookie).toHaveBeenCalledWith('access_token', { path: '/' });
+      expect(mockRes.clearCookie).toHaveBeenCalledWith('refresh_token', { path: '/' });
     });
 
-    it('should not require any parameters', async () => {
-      const result = await service.logout();
+    it('should blacklist token if present', async () => {
+      const mockReq = {
+        cookies: { access_token: 'valid-token' },
+        headers: {},
+      } as unknown as Request;
+
+      const mockRes = {
+        clearCookie: jest.fn(),
+      } as unknown as Response;
+
+      mockJwtService.decode.mockReturnValue({ exp: Math.floor(Date.now() / 1000) + 3600 });
+
+      const result = await service.logout(mockReq, mockRes);
 
       expect(result).toHaveProperty('message');
-      expect(mockPrismaService.user.findUnique).not.toHaveBeenCalled();
-      expect(mockJwtService.signAsync).not.toHaveBeenCalled();
+      expect(mockJwtBlacklistService.addToBlacklist).toHaveBeenCalled();
     });
   });
 
   describe('login', () => {
+    const mockRes = {
+      cookie: jest.fn(),
+    } as unknown as Response;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
     it('should throw UnauthorizedException if user not found', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
@@ -93,7 +135,7 @@ describe('AuthService', () => {
         service.login({
           email: 'notfound@kazguu.kz',
           password: 'Password123!',
-        }),
+        }, mockRes),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -109,7 +151,7 @@ describe('AuthService', () => {
         service.login({
           email: 'test@kazguu.kz',
           password: 'Password123!',
-        }),
+        }, mockRes),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -131,12 +173,12 @@ describe('AuthService', () => {
       const result = await service.login({
         email: 'test@kazguu.kz',
         password: 'Password123!',
-      });
+      }, mockRes);
 
-      expect(result).toHaveProperty('accessToken');
       expect(result).toHaveProperty('user');
       expect(result.user.email).toBe('test@kazguu.kz');
       expect(mockJwtService.signAsync).toHaveBeenCalled();
+      expect(mockRes.cookie).toHaveBeenCalledTimes(2); // access_token and refresh_token
     });
 
     it('should throw UnauthorizedException for wrong password', async () => {
@@ -154,7 +196,7 @@ describe('AuthService', () => {
         service.login({
           email: 'test@kazguu.kz',
           password: 'WrongPassword',
-        }),
+        }, mockRes),
       ).rejects.toThrow(UnauthorizedException);
     });
   });

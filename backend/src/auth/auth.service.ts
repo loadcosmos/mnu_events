@@ -3,18 +3,22 @@ import {
   BadRequestException,
   UnauthorizedException,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { JwtBlacklistService } from './jwt-blacklist.service';
 import * as bcrypt from 'bcryptjs';
 import * as nodemailer from 'nodemailer';
 import { randomBytes } from 'crypto';
+import { Response, Request } from 'express';
 import { RegisterDto, VerifyEmailDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private transporter: nodemailer.Transporter | null = null;
   private isEmailConfigured: boolean = false;
 
@@ -22,10 +26,11 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private jwtBlacklistService: JwtBlacklistService,
   ) {
     // Setup email transporter with validation (async, but don't block constructor)
     this.initializeEmailTransporter().catch((error) => {
-      console.error('[AuthService] Failed to initialize email transporter:', error);
+      this.logger.error('Failed to initialize email transporter:', error);
     });
   }
 
@@ -36,17 +41,17 @@ export class AuthService {
     const smtpPassword = this.configService.get('email.smtp.password');
     const emailFrom = this.configService.get('email.from');
 
-    console.log('[AuthService] Initializing email transporter...');
-    console.log('[AuthService] SMTP Host:', smtpHost || 'NOT SET');
-    console.log('[AuthService] SMTP Port:', smtpPort || 'NOT SET');
-    console.log('[AuthService] SMTP User:', smtpUser ? `${smtpUser.substring(0, 3)}***` : 'NOT SET');
-    console.log('[AuthService] SMTP Password:', smtpPassword ? '***SET***' : 'NOT SET');
-    console.log('[AuthService] Email From:', emailFrom || 'NOT SET');
+    this.logger.log('Initializing email transporter...');
+    this.logger.log(`SMTP Host: ${smtpHost || 'NOT SET'}`);
+    this.logger.log(`SMTP Port: ${smtpPort || 'NOT SET'}`);
+    this.logger.log(`SMTP User: ${smtpUser ? `${smtpUser.substring(0, 3)}***` : 'NOT SET'}`);
+    this.logger.log(`SMTP Password: ${smtpPassword ? '***SET***' : 'NOT SET'}`);
+    this.logger.log(`Email From: ${emailFrom || 'NOT SET'}`);
 
     // Check if SMTP is configured
     if (!smtpHost || !smtpUser || !smtpPassword) {
-      console.warn('[AuthService] ❌ SMTP not configured. Email verification will not work.');
-      console.warn('[AuthService] Required: SMTP_HOST, SMTP_USER, SMTP_PASSWORD');
+      this.logger.warn('❌ SMTP not configured. Email verification will not work.');
+      this.logger.warn('Required: SMTP_HOST, SMTP_USER, SMTP_PASSWORD');
       this.isEmailConfigured = false;
       this.transporter = null;
       return;
@@ -70,22 +75,22 @@ export class AuthService {
         },
       });
 
-      console.log('[AuthService] Transporter created, verifying connection...');
+      this.logger.log('Transporter created, verifying connection...');
 
       // Verify connection (async, but we'll wait for it)
       try {
         await new Promise<void>((resolve, reject) => {
           this.transporter!.verify((error, success) => {
             if (error) {
-              console.error('[AuthService] ❌ SMTP connection verification failed:', error);
-              console.error('[AuthService] Error code:', (error as any).code);
-              console.error('[AuthService] Error message:', error.message);
-              console.error('[AuthService] Email verification will not work until SMTP is properly configured.');
+              this.logger.error('❌ SMTP connection verification failed:', error);
+              this.logger.error(`Error code: ${(error as any).code}`);
+              this.logger.error(`Error message: ${error.message}`);
+              this.logger.error('Email verification will not work until SMTP is properly configured.');
               this.isEmailConfigured = false;
               reject(error);
             } else {
-              console.log('[AuthService] ✅ SMTP connection verified successfully');
-              console.log(`[AuthService] Email will be sent from: ${emailFrom || smtpUser}`);
+              this.logger.log('✅ SMTP connection verified successfully');
+              this.logger.log(`Email will be sent from: ${emailFrom || smtpUser}`);
               this.isEmailConfigured = true;
               resolve();
             }
@@ -94,11 +99,11 @@ export class AuthService {
       } catch (verifyError) {
         // Verification failed, but transporter is still created
         // We'll try to send anyway and catch errors during sending
-        console.warn('[AuthService] ⚠️ SMTP verification failed, but transporter created. Will attempt to send emails.');
+        this.logger.warn('⚠️ SMTP verification failed, but transporter created. Will attempt to send emails.');
         this.isEmailConfigured = false; // Set to false, but keep transporter for retry
       }
     } catch (error) {
-      console.error('[AuthService] ❌ Failed to create email transporter:', error);
+      this.logger.error('❌ Failed to create email transporter:', error);
       this.isEmailConfigured = false;
       this.transporter = null;
     }
@@ -116,8 +121,8 @@ export class AuthService {
       throw new ConflictException('User with this email already exists');
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash password with 12 rounds (increased from 10 for better security)
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // Generate cryptographically secure verification code (6 digits)
     const verificationCode = this.generateSecureVerificationCode();
@@ -148,25 +153,25 @@ export class AuthService {
     let emailSent = false;
     let emailError: string | null = null;
 
-    console.log(`[AuthService] Attempting to send verification email to ${email}...`);
-    console.log(`[AuthService] Email configured: ${this.isEmailConfigured}`);
-    console.log(`[AuthService] Transporter exists: ${!!this.transporter}`);
+    this.logger.log(`Attempting to send verification email to ${email}...`);
+    this.logger.log(`Email configured: ${this.isEmailConfigured}`);
+    this.logger.log(`Transporter exists: ${!!this.transporter}`);
 
     if (!this.isEmailConfigured || !this.transporter) {
       emailError = 'Email service is not configured. Please check SMTP settings.';
-      console.error(`[AuthService] ❌ Cannot send email: ${emailError}`);
+      this.logger.error(`❌ Cannot send email: ${emailError}`);
     } else {
       try {
         await this.sendVerificationEmail(email, verificationCode);
         emailSent = true;
-        console.log(`[AuthService] ✅ Verification email sent successfully to ${email}`);
+        this.logger.log(`✅ Verification email sent successfully to ${email}`);
       } catch (error) {
         emailError = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`[AuthService] ❌ Failed to send verification email to ${email}:`, error);
-        
+        this.logger.error(`❌ Failed to send verification email to ${email}:`, error);
+
         // Log detailed error information
         if (error instanceof Error) {
-          console.error('[AuthService] Error details:', {
+          this.logger.error('Error details:', {
             message: error.message,
             stack: error.stack,
             code: (error as any).code,
@@ -189,7 +194,7 @@ export class AuthService {
     };
   }
 
-  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+  async verifyEmail(verifyEmailDto: VerifyEmailDto, res: Response) {
     const { email, code } = verifyEmailDto;
 
     const user = await this.prisma.user.findUnique({
@@ -229,9 +234,11 @@ export class AuthService {
     // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email, user.role);
 
+    // Set httpOnly cookies
+    this.setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
+
     return {
       message: 'Email verified successfully',
-      ...tokens,
       user: {
         id: user.id,
         email: user.email,
@@ -242,7 +249,7 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, res: Response) {
     const { email, password } = loginDto;
 
     const user = await this.prisma.user.findUnique({
@@ -265,8 +272,11 @@ export class AuthService {
 
     const tokens = await this.generateTokens(user.id, user.email, user.role);
 
+    // Set httpOnly cookies
+    this.setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
+
     return {
-      ...tokens,
+      message: 'Login successful',
       user: {
         id: user.id,
         email: user.email,
@@ -335,17 +345,17 @@ export class AuthService {
     // Send verification email
     try {
       await this.sendVerificationEmail(email, verificationCode);
-      console.log(`[AuthService] Verification code resent to ${email}`);
+      this.logger.log(`Verification code resent to ${email}`);
       return {
         message: 'Verification code sent to your email',
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`[AuthService] Failed to resend verification email to ${email}:`, error);
+      this.logger.error(`Failed to resend verification email to ${email}:`, error);
 
       // Log detailed error
       if (error instanceof Error) {
-        console.error('[AuthService] Error details:', {
+        this.logger.error('Error details:', {
           message: error.message,
           code: (error as any).code,
           responseCode: (error as any).responseCode,
@@ -396,14 +406,76 @@ export class AuthService {
   }
 
   /**
-   * Выход из системы
-   * В текущей реализации JWT токены stateless, поэтому просто возвращаем успешный ответ
-   * В будущем можно добавить blacklist токенов для их инвалидации
+   * Logout user - add token to blacklist and clear cookies
+   * @param req - Express Request object (to extract token)
+   * @param res - Express Response object (to clear cookies)
    */
-  async logout() {
+  async logout(req: Request, res: Response) {
+    // Extract token from cookie or Authorization header
+    let token = null;
+    if (req.cookies && req.cookies['access_token']) {
+      token = req.cookies['access_token'];
+    } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.substring(7);
+    }
+
+    // Add token to blacklist if found
+    if (token) {
+      try {
+        // Decode token to get expiration time
+        const decoded = this.jwtService.decode(token) as any;
+        if (decoded && decoded.exp) {
+          await this.jwtBlacklistService.addToBlacklist(token, decoded.exp);
+        }
+      } catch (error) {
+        // If token is invalid/expired, no need to blacklist
+        this.logger.error('Error blacklisting token on logout:', error);
+      }
+    }
+
+    // Clear auth cookies
+    this.clearAuthCookies(res);
+
     return {
       message: 'Logged out successfully',
     };
+  }
+
+  /**
+   * Set httpOnly cookies for access and refresh tokens
+   * @param res - Express Response object
+   * @param accessToken - JWT access token
+   * @param refreshToken - JWT refresh token
+   */
+  private setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
+    const isDevelopment = this.configService.get('nodeEnv') === 'development';
+
+    // Access token cookie (httpOnly, secure in production, sameSite strict)
+    res.cookie('access_token', accessToken, {
+      httpOnly: true, // Cannot be accessed by client-side JavaScript (XSS protection)
+      secure: !isDevelopment, // HTTPS only in production
+      sameSite: 'strict', // CSRF protection
+      maxAge: 60 * 60 * 1000, // 1 hour (matches JWT expiration)
+      path: '/',
+    });
+
+    // Refresh token cookie (httpOnly, secure in production, sameSite strict)
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: !isDevelopment,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (matches refresh token expiration)
+      path: '/',
+    });
+  }
+
+  /**
+   * Clear authentication cookies
+   * @param res - Express Response object
+   */
+  private clearAuthCookies(res: Response) {
+    res.clearCookie('access_token', { path: '/' });
+    res.clearCookie('refresh_token', { path: '/' });
   }
 
   async validateUser(userId: string, email: string, role: string): Promise<any> {
@@ -479,15 +551,15 @@ export class AuthService {
     // Check if email is configured
     if (!this.isEmailConfigured || !this.transporter) {
       const error = new Error('Email service is not configured. Please check SMTP settings in .env file.');
-      console.error('[AuthService] Cannot send email:', error.message);
+      this.logger.error('Cannot send email:', error.message);
       throw error;
     }
 
     const emailFrom = this.configService.get('email.from') || this.configService.get('email.smtp.user');
-    
+
     if (!emailFrom) {
       const error = new Error('EMAIL_FROM is not configured in .env file');
-      console.error('[AuthService] Cannot send email:', error.message);
+      this.logger.error('Cannot send email:', error.message);
       throw error;
     }
 
@@ -558,7 +630,7 @@ Maqsut Narikbayev University
 
     try {
       const info = await this.transporter.sendMail(mailOptions);
-      console.log(`[AuthService] Email sent successfully:`, {
+      this.logger.log('Email sent successfully:', {
         messageId: info.messageId,
         to: email,
         from: emailFrom,
@@ -573,8 +645,8 @@ Maqsut Narikbayev University
         response: (error as any).response,
         stack: error instanceof Error ? error.stack : undefined,
       };
-      
-      console.error('[AuthService] Email sending failed:', errorDetails);
+
+      this.logger.error('Email sending failed:', errorDetails);
       
       // Provide more helpful error messages
       if ((error as any).code === 'EAUTH') {

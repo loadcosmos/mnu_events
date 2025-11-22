@@ -4,11 +4,23 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
+import { doubleCsrf } from 'csrf-csrf';
+import { createWinstonLogger } from './common/logger/winston.config';
 
 async function bootstrap() {
   try {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+      bufferLogs: true,
+    });
     const configService = app.get(ConfigService);
+
+    // Setup Winston Logger
+    const logger = createWinstonLogger(configService);
+    app.useLogger(logger);
+
+    // Cookie Parser (required for httpOnly JWT cookies)
+    app.use(cookieParser());
 
     // Security Headers - Helmet middleware
     // Защищает приложение от известных веб-уязвимостей через установку HTTP заголовков
@@ -49,18 +61,91 @@ async function bootstrap() {
       // Hide X-Powered-By header - не раскрываем технологию сервера
       hidePoweredBy: true,
     }));
-    
-    console.log(`[Bootstrap] Helmet configured for ${isDevelopment ? 'DEVELOPMENT' : 'PRODUCTION'} mode`);
 
-    // Global prefix
+    logger.log(`Helmet configured for ${isDevelopment ? 'DEVELOPMENT' : 'PRODUCTION'} mode`, 'Bootstrap');
+
+    // Global prefix (MUST be set before CSRF middleware)
     app.setGlobalPrefix('api');
+
+    // CSRF Protection (after prefix, before routes)
+    const csrfSecret = configService.get('csrf.secret');
+    const csrfUtilities = doubleCsrf({
+      getSecret: () => csrfSecret,
+      // Use simple cookie name in dev (HTTP), __Host- prefix in production (HTTPS)
+      // __Host- prefix requires secure=true, which needs HTTPS
+      cookieName: isDevelopment ? 'x-csrf-token' : '__Host-psifi.x-csrf-token',
+      cookieOptions: {
+        // Use 'lax' in dev for cross-origin localhost, 'strict' in production
+        sameSite: isDevelopment ? 'lax' : 'strict',
+        path: '/',
+        secure: !isDevelopment, // HTTPS only in production
+        httpOnly: false, // Allow JavaScript to read cookie for double-submit pattern (required by csrf-csrf)
+      },
+      size: 64,
+      ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
+      getCsrfTokenFromRequest: (req) => req.headers['x-csrf-token'] as string,
+      getSessionIdentifier: (req) => req.headers['user-agent'] || 'unknown', // Use user-agent as session identifier
+    });
+
+    const { doubleCsrfProtection, generateCsrfToken } = csrfUtilities;
+
+    // Apply CSRF protection globally, except for specific routes
+    app.use((req: any, res: any, next: any) => {
+      // Skip CSRF for OPTIONS requests (CORS preflight)
+      if (req.method === 'OPTIONS') {
+        return next();
+      }
+
+      // Exclude webhook endpoints from CSRF protection
+      // Note: Express middleware sees paths WITHOUT /api prefix (runs before NestJS routing)
+      const excludedPaths = [
+        '/payments/webhook',
+        '/auth/login',
+        '/auth/register',
+        '/auth/verify-email',
+        '/auth/resend-code',
+        '/auth/csrf-token',  // Endpoint to get CSRF token
+        '/health',           // Health check endpoints
+        '/api-docs',         // Swagger docs (actual path)
+        '/docs',             // Swagger docs (actual path)
+      ];
+
+      if (excludedPaths.some((path) => req.path.startsWith(path))) {
+        return next();
+      }
+
+      // Debug: Log CSRF-protected requests in development
+      if (isDevelopment) {
+        logger.debug?.(`CSRF check: ${req.method} ${req.path}`, 'CSRF');
+
+        // Log CSRF token details for POST/PUT/DELETE/PATCH requests
+        if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+          const cookieToken = req.cookies?.['x-csrf-token'];
+          const headerToken = req.headers['x-csrf-token'];
+          logger.debug?.(`CSRF Token - Cookie: ${cookieToken?.substring(0, 20)}..., Header: ${headerToken?.substring(0, 20)}...`, 'CSRF');
+        }
+      }
+
+      // Apply CSRF protection
+      doubleCsrfProtection(req, res, next);
+    });
+
+    // Store generateCsrfToken for use in controllers (access underlying Express instance)
+    const expressApp = app.getHttpAdapter().getInstance();
+    expressApp.csrfTokenGenerator = generateCsrfToken;
+
+    logger.log('CSRF protection configured', 'Bootstrap');
 
     // CORS
     const corsOrigin = configService.get('cors.origin');
-    console.log(`[Bootstrap] CORS Origin: ${corsOrigin}`);
+    logger.log(`CORS Origin: ${corsOrigin}`, 'Bootstrap');
     app.enableCors({
       origin: corsOrigin,
       credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token', 'X-Requested-With'],
+      exposedHeaders: ['set-cookie'],
+      maxAge: 3600, // Cache preflight requests for 1 hour
     });
 
     // Validation pipe
@@ -96,14 +181,14 @@ async function bootstrap() {
 
     const port = configService.get('port') || 3001;
     const host = '0.0.0.0'; // Слушаем на всех интерфейсах для доступности через localhost и 127.0.0.1
-    
-    console.log(`[Bootstrap] Starting server on ${host}:${port}...`);
-    console.log(`[Bootstrap] Environment: ${configService.get('nodeEnv')}`);
-    console.log(`[Bootstrap] Database URL: ${configService.get('database.url') ? 'configured' : 'NOT CONFIGURED'}`);
-    
+
+    logger.log(`Starting server on ${host}:${port}...`, 'Bootstrap');
+    logger.log(`Environment: ${configService.get('nodeEnv')}`, 'Bootstrap');
+    logger.log(`Database URL: ${configService.get('database.url') ? 'configured' : 'NOT CONFIGURED'}`, 'Bootstrap');
+
     await app.listen(port, host);
 
-    console.log(`
+    logger.log(`
   ╔══════════════════════════════════════════════════════════╗
   ║                                                          ║
   ║   🎓 MNU Events API Server                               ║
@@ -114,27 +199,32 @@ async function bootstrap() {
   ║   Environment: ${configService.get('nodeEnv')}                       ║
   ║                                                          ║
   ╚══════════════════════════════════════════════════════════╝
-  `);
-    
-    console.log(`[Bootstrap] ✅ Server successfully started and listening on ${host}:${port}`);
+  `, 'Bootstrap');
+
+    logger.log(`✅ Server successfully started and listening on ${host}:${port}`, 'Bootstrap');
   } catch (error) {
-    console.error('[Bootstrap] ❌ Failed to start server:', error);
-    
+    const standaloneLogger = require('./common/logger/winston.config').createStandaloneLogger();
+    standaloneLogger.error('❌ Failed to start server', {
+      error: error instanceof Error ? error.message : String(error),
+      context: 'Bootstrap',
+    });
+
     if (error instanceof Error) {
-      console.error('[Bootstrap] Error details:', {
+      standaloneLogger.error('Error details', {
         message: error.message,
         stack: error.stack,
         name: error.name,
+        context: 'Bootstrap',
       });
-      
+
       // Проверяем типичные ошибки
       if (error.message?.includes('EADDRINUSE')) {
-        console.error('[Bootstrap] Port is already in use. Please stop the process using port 3001 or change PORT in .env');
+        standaloneLogger.error('Port is already in use. Please stop the process using port 3001 or change PORT in .env', { context: 'Bootstrap' });
       } else if (error.message?.includes('ECONNREFUSED') || error.message?.includes('database')) {
-        console.error('[Bootstrap] Database connection failed. Make sure PostgreSQL is running: docker-compose up -d');
+        standaloneLogger.error('Database connection failed. Make sure PostgreSQL is running: docker-compose up -d', { context: 'Bootstrap' });
       }
     }
-    
+
     process.exit(1);
   }
 }
