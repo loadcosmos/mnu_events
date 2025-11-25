@@ -76,7 +76,7 @@ export default function OrganizerPage() {
         description: 'Downloading CSV file',
       });
 
-      const response = await apiClient.get(`/api/registrations/event/${eventId}/export`, {
+      const response = await apiClient.get(`/registrations/event/${eventId}/export`, {
         responseType: 'blob',
       });
 

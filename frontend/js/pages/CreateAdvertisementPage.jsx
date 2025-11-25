@@ -93,7 +93,7 @@ export default function CreateAdvertisementPage() {
                 description: 'Your ad has been submitted for review.',
             });
 
-            navigate('/services'); // Redirect to services/marketplace page
+            navigate('/'); // Redirect to home page
         } catch (err) {
             console.error('[CreateAdvertisementPage] Create ad failed:', err);
             const errorMessage = err.response?.data?.message
@@ -148,7 +148,7 @@ export default function CreateAdvertisementPage() {
 
                         {/* Image URL */}
                         <div className="space-y-2">
-                            <Label htmlFor="imageUrl" className="dark:text-white">Image URL *</Label>
+                            <Label htmlFor="imageUrl" className="dark:text-white">Advertisement Image URL *</Label>
                             <Input
                                 id="imageUrl"
                                 type="url"
@@ -158,11 +158,12 @@ export default function CreateAdvertisementPage() {
                                 required
                                 className="rounded-xl"
                             />
+                            <p className="text-sm text-gray-500 dark:text-gray-400">URL of the image to display in your advertisement</p>
                         </div>
 
                         {/* Link URL */}
                         <div className="space-y-2">
-                            <Label htmlFor="linkUrl" className="dark:text-white">Link URL (Optional)</Label>
+                            <Label htmlFor="linkUrl" className="dark:text-white">Target Link URL (Optional)</Label>
                             <Input
                                 id="linkUrl"
                                 type="url"
@@ -171,6 +172,7 @@ export default function CreateAdvertisementPage() {
                                 onChange={(e) => handleChange('linkUrl', e.target.value)}
                                 className="rounded-xl"
                             />
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Where users will be directed when clicking your advertisement</p>
                         </div>
 
                         {/* Position */}
@@ -222,7 +224,7 @@ export default function CreateAdvertisementPage() {
                                 type="button"
                                 variant="outline"
                                 size="lg"
-                                onClick={() => navigate('/services')}
+                                onClick={() => navigate('/')}
                                 disabled={loading}
                                 className="border-gray-300 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl"
                             >

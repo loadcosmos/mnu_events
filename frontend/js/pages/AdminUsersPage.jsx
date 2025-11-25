@@ -19,6 +19,7 @@ export default function AdminUsersPage() {
     { value: '', label: 'All Roles' },
     { value: 'STUDENT', label: 'Student' },
     { value: 'ORGANIZER', label: 'Organizer' },
+    { value: 'MODERATOR', label: 'Moderator' },
     { value: 'ADMIN', label: 'Admin' },
   ];
 
@@ -97,6 +98,7 @@ export default function AdminUsersPage() {
     const colors = {
       STUDENT: 'bg-blue-100 text-blue-800',
       ORGANIZER: 'bg-purple-100 text-purple-800',
+      MODERATOR: 'bg-green-100 text-green-800',
       ADMIN: 'bg-red-100 text-red-800',
     };
     return colors[role] || 'bg-gray-100 text-gray-800';

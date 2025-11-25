@@ -4,6 +4,7 @@ import { Search, Filter, SlidersHorizontal, Plus, Megaphone } from 'lucide-react
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import eventsService from '../services/eventsService';
+import servicesService from '../services/servicesService';
 import registrationsService from '../services/registrationsService';
 import adsService from '../services/adsService';
 import EventModal from '../components/EventModal';
@@ -47,59 +48,6 @@ export default function HomePage() {
   const [isAdModalOpen, setIsAdModalOpen] = useState(false);
 
   // Services/Marketplace state management
-  const mockServices = [
-    {
-      id: 1,
-      type: 'GENERAL',
-      title: 'Professional Logo Design',
-      description: 'I will create a unique logo for your business with unlimited revisions',
-      category: 'DESIGN',
-      price: 15000,
-      priceType: 'FIXED',
-      rating: 4.8,
-      reviewCount: 24,
-      imageUrl: '/images/creativity.jpg',
-      provider: {
-        firstName: 'Айдар',
-        lastName: 'Султанов',
-        faculty: 'Design',
-      },
-    },
-    {
-      id: 2,
-      type: 'GENERAL',
-      title: 'Professional Photography',
-      description: 'Event photography, portraits, product photography',
-      category: 'PHOTO_VIDEO',
-      price: 20000,
-      priceType: 'HOURLY',
-      rating: 4.9,
-      reviewCount: 42,
-      imageUrl: '/images/service.jpg',
-      provider: {
-        firstName: 'Дина',
-        lastName: 'Ахметова',
-        faculty: 'Media Arts',
-      },
-    },
-    {
-      id: 3,
-      type: 'GENERAL',
-      title: 'Web Development Services',
-      description: 'Full-stack web development: React, Node.js, PostgreSQL',
-      category: 'IT',
-      price: 25000,
-      priceType: 'FIXED',
-      rating: 4.9,
-      reviewCount: 31,
-      imageUrl: '/images/intelligence.jpg',
-      provider: {
-        firstName: 'Ерлан',
-        lastName: 'Бекназаров',
-        faculty: 'Computer Science',
-      },
-    },
-  ];
 
   const categories = [
     { value: 'all', label: 'Все категории' },
@@ -118,8 +66,8 @@ export default function HomePage() {
     { value: 'newest', label: 'Сначала новые' },
   ];
 
-  const [services, setServices] = useState(mockServices);
-  const [filteredServices, setFilteredServices] = useState(mockServices);
+  const [services, setServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSort, setSelectedSort] = useState('rating');
@@ -166,7 +114,7 @@ export default function HomePage() {
   useEffect(() => {
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, selectedCategory, selectedSort, priceRange]);
+  }, [searchQuery, selectedCategory, selectedSort, priceRange, services]);
 
   const applyFilters = () => {
     let filtered = [...services];
@@ -364,6 +312,51 @@ export default function HomePage() {
     };
   }, []);
 
+  // Load services on mount
+  useEffect(() => {
+    let isCancelled = false;
+
+    const load = async () => {
+      try {
+        // Load all services - backend will filter for approved/active ones
+        const response = await servicesService.getAll();
+
+        if (isCancelled) return;
+
+        console.log('[HomePage] Services API response:', response);
+
+        // Handle different API response formats
+        // Backend returns paginated response: { items: [...], total, page, limit }
+        let servicesData = [];
+        if (response && typeof response === 'object') {
+          if (Array.isArray(response)) {
+            servicesData = response;
+          } else if (Array.isArray(response.items)) {
+            // Paginated response from backend
+            servicesData = response.items;
+          } else if (Array.isArray(response.data)) {
+            servicesData = response.data;
+          } else if (response.services && Array.isArray(response.services)) {
+            servicesData = response.services;
+          }
+        }
+
+        console.log('[HomePage] Parsed services data:', servicesData);
+        setServices(servicesData);
+      } catch (err) {
+        console.error('[HomePage] Failed to load services:', err);
+        // Silently fail - services are not critical for the page to work
+        // Keep empty array if loading fails
+      }
+    };
+
+    load();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
   // Auto-advance slides every 5 seconds
   useEffect(() => {
     if (trendingEvents.length === 0) return;
@@ -486,8 +479,8 @@ export default function HomePage() {
                         key={idx}
                         onClick={() => setCurrentSlide(idx)}
                         className={`h-3 rounded-full transition-all ${idx === currentSlide
-                            ? 'bg-[#d62e1f] w-8'
-                            : 'liquid-glass-subtle hover:liquid-glass w-3'
+                          ? 'bg-[#d62e1f] w-8'
+                          : 'liquid-glass-subtle hover:liquid-glass w-3'
                           }`}
                         aria-label={`Go to slide ${idx + 1}`}
                       />

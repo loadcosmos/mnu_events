@@ -107,7 +107,7 @@ export default function CreateServicePage() {
                 description: 'Your service is now visible in the marketplace.',
             });
 
-            navigate('/services');
+            navigate('/');
         } catch (err) {
             console.error('[CreateServicePage] Create service failed:', err);
             const errorMessage = err.response?.data?.message
@@ -177,6 +177,10 @@ export default function CreateServicePage() {
                                 required
                                 className="rounded-xl"
                             />
+                            <p className="text-sm text-amber-600 dark:text-amber-400 flex items-start gap-1">
+                                <i className="fa-solid fa-info-circle mt-0.5"></i>
+                                <span><strong>Required:</strong> Include contact information (WhatsApp, Telegram, or phone number) in your description</span>
+                            </p>
                         </div>
 
                         {/* Category */}
@@ -263,7 +267,7 @@ export default function CreateServicePage() {
                                 type="button"
                                 variant="outline"
                                 size="lg"
-                                onClick={() => navigate('/services')}
+                                onClick={() => navigate('/')}
                                 disabled={loading}
                                 className="border-gray-300 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl"
                             >

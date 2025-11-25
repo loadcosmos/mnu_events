@@ -12,68 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
-// Mock service data - will be replaced with API
-const mockService = {
-  id: 1,
-  type: 'GENERAL',
-  title: 'Professional Logo Design',
-  description: `I will create a unique and professional logo for your business.
-
-**What you'll get:**
-- 3 initial concept designs
-- Unlimited revisions until you're satisfied
-- Source files (AI, PSD, SVG, PNG)
-- Commercial use rights
-- Fast turnaround (3-5 days)
-
-**My process:**
-1. Brief discussion to understand your vision
-2. Research and concept development
-3. Present 3 initial designs
-4. Revisions based on your feedback
-5. Final delivery with all files
-
-I have 5+ years of experience in graphic design and have worked with 50+ clients. Let's create something amazing together!`,
-  category: 'DESIGN',
-  price: 15000,
-  priceType: 'FIXED',
-  rating: 4.8,
-  reviewCount: 24,
-  imageUrl: 'https://via.placeholder.com/800x600?text=Logo+Design+Service',
-  isActive: true,
-  createdAt: '2025-01-01',
-  provider: {
-    id: 'provider-1',
-    firstName: 'Айдар',
-    lastName: 'Султанов',
-    email: 'aidar.sultanov@kazguu.kz',
-    avatar: 'https://via.placeholder.com/150?text=AS',
-    faculty: 'Design',
-  },
-  reviews: [
-    {
-      id: 1,
-      rating: 5,
-      comment: 'Отличная работа! Логотип получился именно таким, как я хотел. Быстро и профессионально!',
-      author: 'Асель М.',
-      date: '2025-01-10',
-    },
-    {
-      id: 2,
-      rating: 5,
-      comment: 'Очень доволен результатом. Айдар понял мою идею с первого раза и воплотил её идеально.',
-      author: 'Ержан К.',
-      date: '2025-01-05',
-    },
-    {
-      id: 3,
-      rating: 4,
-      comment: 'Хорошая работа, но пришлось немного подождать. В целом результат стоил ожидания.',
-      author: 'Дина А.',
-      date: '2024-12-28',
-    },
-  ],
-};
+import servicesService from '../services/servicesService';
 
 const priceTypeLabels = {
   HOURLY: 'за час',
@@ -94,14 +33,12 @@ export default function ServiceDetailsPage() {
   const loadService = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call
-      // const response = await servicesService.getById(id);
-      setTimeout(() => {
-        setService(mockService);
-        setLoading(false);
-      }, 500);
+      const response = await servicesService.getById(id);
+      setService(response);
     } catch (error) {
       console.error('Error loading service:', error);
+      // If 404 or other error, service will be null and "Service not found" will be shown
+    } finally {
       setLoading(false);
     }
   };
@@ -184,10 +121,10 @@ export default function ServiceDetailsPage() {
                   <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
                   <div>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {service.rating.toFixed(1)}
+                      {(service.rating || 0).toFixed(1)}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-500">
-                      {service.reviewCount} отзывов
+                      {service.reviewCount || 0} отзывов
                     </div>
                   </div>
                 </div>
@@ -204,51 +141,57 @@ export default function ServiceDetailsPage() {
             {/* Reviews */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Отзывы ({service.reviews.length})
+                Отзывы ({service.reviewCount || 0})
               </h2>
 
               <div className="space-y-6">
-                {service.reviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className="border-b border-gray-200 dark:border-gray-700 last:border-0 pb-6 last:pb-0"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
-                          {review.author.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-gray-900 dark:text-white">
-                            {review.author}
+                {service.reviews && service.reviews.length > 0 ? (
+                  service.reviews.map((review) => (
+                    <div
+                      key={review.id}
+                      className="border-b border-gray-200 dark:border-gray-700 last:border-0 pb-6 last:pb-0"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
+                            {review.author.charAt(0)}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-500">
-                            {new Date(review.date).toLocaleDateString('ru-RU', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })}
+                          <div>
+                            <div className="font-semibold text-gray-900 dark:text-white">
+                              {review.author}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-500">
+                              {new Date(review.date).toLocaleDateString('ru-RU', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                              })}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${
-                              i < review.rating
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${i < review.rating
                                 ? 'fill-yellow-400 text-yellow-400'
                                 : 'text-gray-300 dark:text-gray-600'
-                            }`}
-                          />
-                        ))}
+                                }`}
+                            />
+                          ))}
+                        </div>
                       </div>
-                    </div>
 
-                    <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
+                      <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>Пока нет отзывов</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>

@@ -107,6 +107,14 @@ export class EventsService {
 
     if (filterDto?.status) {
       where.status = filterDto.status;
+    } else {
+      // CRITICAL FIX: By default, exclude PENDING_MODERATION events from public view
+      // Students should only see approved/upcoming events
+      // Only when explicitly filtering by status (e.g., admins/moderators viewing queue)
+      // will PENDING_MODERATION events be shown
+      where.status = {
+        notIn: ['PENDING_MODERATION'],
+      };
     }
 
     if (filterDto?.startDateFrom || filterDto?.startDateTo) {

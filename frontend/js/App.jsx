@@ -27,7 +27,6 @@ import OrganizerScannerPage from './pages/OrganizerScannerPage.jsx';
 import OrganizerAnalyticsPage from './pages/OrganizerAnalyticsPage.jsx';
 import EventQRDisplayPage from './pages/EventQRDisplayPage.jsx';
 import StudentScannerPage from './pages/StudentScannerPage.jsx';
-import AdminLoginPage from './pages/AdminLoginPage.jsx';
 import VerifyEmailPage from './pages/VerifyEmailPage.jsx';
 import CreateEventPage from './pages/CreateEventPage.jsx';
 import EditEventPage from './pages/EditEventPage.jsx';
@@ -56,7 +55,6 @@ function App() {
           <Routes>
             {/* Публичные маршруты без Layout */}
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/mock-payment/:transactionId" element={<MockPaymentPage />} />
 

@@ -25,7 +25,7 @@ async function bootstrap() {
     // Security Headers - Helmet middleware
     // Защищает приложение от известных веб-уязвимостей через установку HTTP заголовков
     const isDevelopment = configService.get('nodeEnv') === 'development';
-    
+
     app.use(helmet({
       // Content Security Policy - защита от XSS и injection атак
       contentSecurityPolicy: isDevelopment ? false : {
@@ -108,9 +108,14 @@ async function bootstrap() {
         '/health',           // Health check endpoints
         '/api-docs',         // Swagger docs (actual path)
         '/docs',             // Swagger docs (actual path)
+        '/advertisements/impression', // Advertisement impression tracking (partial match)
       ];
 
-      if (excludedPaths.some((path) => req.path.startsWith(path))) {
+      if (
+        excludedPaths.some((path) => req.path.startsWith(path)) ||
+        // Exclude advertisement impression tracking (has dynamic ID: /advertisements/:id/impression)
+        (req.path.startsWith('/advertisements/') && req.path.endsWith('/impression'))
+      ) {
         return next();
       }
 

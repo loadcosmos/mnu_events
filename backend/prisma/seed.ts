@@ -9,10 +9,13 @@ import {
   ServiceCategory,
   PriceType,
   AdPosition,
+  PaymentStatus,
   TicketStatus,
   CheckInMode,
 } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import * as QRCode from 'qrcode';
+import * as crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -428,9 +431,50 @@ async function main() {
 
   console.log('✅ Registrations created');
 
-  // Create paid tickets
+  // Helper function to generate QR code
+  const generateTicketQRCode = async (ticketId: string, eventId: string, userId: string): Promise<string> => {
+    const qrPayload = {
+      ticketId,
+      eventId,
+      userId,
+      timestamp: Date.now(),
+    };
+
+    const secret = process.env.PAYMENT_SECRET || 'default-dev-secret-change-in-production';
+    const signature = crypto
+      .createHmac('sha256', secret)
+      .update(JSON.stringify(qrPayload))
+      .digest('hex');
+
+    const qrData = {
+      ...qrPayload,
+      signature,
+    };
+
+    try {
+      const qrCodeDataUrl = await QRCode.toDataURL(JSON.stringify(qrData), {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF',
+        },
+      });
+      return qrCodeDataUrl;
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      // Fallback to a minimal valid base64 PNG (1x1 transparent pixel)
+      return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    }
+  };
+
+  // Create paid tickets with real QR codes
+  const ticket1Id = 'ticket-seed-' + Date.now() + '-1';
+  const qrCode1 = await generateTicketQRCode(ticket1Id, paidEvent1.id, student1.id);
+  
   const ticket1 = await prisma.ticket.create({
     data: {
+      id: ticket1Id,
       eventId: paidEvent1.id,
       userId: student1.id,
       price: 5000,
@@ -438,13 +482,17 @@ async function main() {
       status: TicketStatus.PAID,
       paymentMethod: 'mock',
       transactionId: 'MOCK_TXN_' + Date.now() + '_1',
-      qrCode: 'data:image/png;base64,MOCK_QR_CODE_1',
+      qrCode: qrCode1,
       purchasedAt: new Date(),
     },
   });
 
+  const ticket2Id = 'ticket-seed-' + Date.now() + '-2';
+  const qrCode2 = await generateTicketQRCode(ticket2Id, paidEvent1.id, student2.id);
+  
   const ticket2 = await prisma.ticket.create({
     data: {
+      id: ticket2Id,
       eventId: paidEvent1.id,
       userId: student2.id,
       price: 5000,
@@ -452,13 +500,17 @@ async function main() {
       status: TicketStatus.PAID,
       paymentMethod: 'mock',
       transactionId: 'MOCK_TXN_' + Date.now() + '_2',
-      qrCode: 'data:image/png;base64,MOCK_QR_CODE_2',
+      qrCode: qrCode2,
       purchasedAt: new Date(),
     },
   });
 
+  const ticket3Id = 'ticket-seed-' + Date.now() + '-3';
+  const qrCode3 = await generateTicketQRCode(ticket3Id, paidEvent2.id, student3.id);
+  
   const ticket3 = await prisma.ticket.create({
     data: {
+      id: ticket3Id,
       eventId: paidEvent2.id,
       userId: student3.id,
       price: 3000,
@@ -466,7 +518,7 @@ async function main() {
       status: TicketStatus.PAID,
       paymentMethod: 'mock',
       transactionId: 'MOCK_TXN_' + Date.now() + '_3',
-      qrCode: 'data:image/png;base64,MOCK_QR_CODE_3',
+      qrCode: qrCode3,
       purchasedAt: new Date(),
     },
   });
@@ -599,16 +651,21 @@ async function main() {
 
   console.log('✅ Services created');
 
-  // Create advertisements
+  // Create advertisements with current dates
+  const now = new Date();
+  const adEndDate = new Date(now);
+  adEndDate.setDate(adEndDate.getDate() + 30); // Active for 30 days
+
   const ad1 = await prisma.advertisement.create({
     data: {
       title: 'Kaspi Bank Student Card',
       imageUrl: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3',
       linkUrl: 'https://kaspi.kz',
       position: AdPosition.TOP_BANNER,
+      paymentStatus: PaymentStatus.PAID,
       isActive: true,
-      startDate: new Date(`${eventYear}-12-01T00:00:00`),
-      endDate: new Date(`${eventYear}-12-31T23:59:59`),
+      startDate: now,
+      endDate: adEndDate,
       impressions: 1250,
       clicks: 85,
     },
@@ -620,9 +677,10 @@ async function main() {
       imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c',
       linkUrl: null,
       position: AdPosition.HERO_SLIDE,
+      paymentStatus: PaymentStatus.PAID,
       isActive: true,
-      startDate: new Date(`${eventYear}-12-01T00:00:00`),
-      endDate: new Date(`${eventYear}-12-31T23:59:59`),
+      startDate: now,
+      endDate: adEndDate,
       impressions: 3200,
       clicks: 240,
     },
@@ -634,9 +692,10 @@ async function main() {
       imageUrl: 'https://images.unsplash.com/photo-1511920170033-f8396924c348',
       linkUrl: null,
       position: AdPosition.NATIVE_FEED,
+      paymentStatus: PaymentStatus.PAID,
       isActive: true,
-      startDate: new Date(`${eventYear}-12-01T00:00:00`),
-      endDate: new Date(`${eventYear}-12-31T23:59:59`),
+      startDate: now,
+      endDate: adEndDate,
       impressions: 950,
       clicks: 67,
     },
@@ -648,9 +707,10 @@ async function main() {
       imageUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d',
       linkUrl: null,
       position: AdPosition.BOTTOM_BANNER,
+      paymentStatus: PaymentStatus.PAID,
       isActive: true,
-      startDate: new Date(`${eventYear}-12-01T00:00:00`),
-      endDate: new Date(`${eventYear}-12-31T23:59:59`),
+      startDate: now,
+      endDate: adEndDate,
       impressions: 820,
       clicks: 45,
     },

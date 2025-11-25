@@ -41,9 +41,90 @@ export default function TicketView({ ticket }) {
     return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
   };
 
-  const handleDownload = () => {
-    // TODO: Implement PDF download
-    console.log('[TicketView] Download ticket:', ticket.id);
+  const handleDownload = async () => {
+    try {
+      // Create a canvas element for the ticket
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Set canvas dimensions (standard ticket size)
+      canvas.width = 800;
+      canvas.height = 400;
+
+      // Background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Border
+      ctx.strokeStyle = '#d62e1f';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+      // Header background
+      ctx.fillStyle = '#d62e1f';
+      ctx.fillRect(0, 0, canvas.width, 80);
+
+      // Title
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 28px Arial';
+      ctx.fillText('MNU Events - Your Ticket', 30, 50);
+
+      // Event details
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 24px Arial';
+      ctx.fillText(event.title || 'Event', 30, 130);
+
+      ctx.font = '18px Arial';
+      ctx.fillText(`Date: ${formatDate(event.startDate)}`, 30, 170);
+      ctx.fillText(`Time: ${formatTime(event.startDate)}`, 30, 200);
+      ctx.fillText(`Location: ${event.location || 'TBA'}`, 30, 230);
+      ctx.fillText(`Ticket ID: ${ticket.id.slice(0, 8).toUpperCase()}`, 30, 260);
+
+      if (ticket.price) {
+        ctx.fillText(`Price: ${ticket.price}₸`, 30, 290);
+      }
+
+      // Add QR code if available
+      if (ticket.qrCode) {
+        const qrImg = new Image();
+        qrImg.crossOrigin = 'anonymous';
+        qrImg.src = ticket.qrCode;
+
+        await new Promise((resolve, reject) => {
+          qrImg.onload = () => {
+            // Draw QR code on the right side
+            ctx.drawImage(qrImg, 550, 120, 200, 200);
+            resolve();
+          };
+          qrImg.onerror = reject;
+        });
+      }
+
+      // Footer
+      ctx.font = '14px Arial';
+      ctx.fillStyle = '#666666';
+      ctx.fillText('Please present this ticket at the entrance', 30, 360);
+
+      // Convert canvas to blob and download
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ticket-${event.title.replace(/\s+/g, '-').toLowerCase()}-${ticket.id.slice(0, 8)}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      });
+
+      console.log('[TicketView] Ticket downloaded successfully');
+    } catch (error) {
+      console.error('[TicketView] Download failed:', error);
+      // Fallback: open QR code in new tab if available
+      if (ticket.qrCode) {
+        window.open(ticket.qrCode, '_blank');
+      }
+    }
   };
 
   const handleShare = async () => {

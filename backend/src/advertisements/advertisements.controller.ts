@@ -26,9 +26,9 @@ import { Public } from '../auth/decorators/public.decorator';
 import { AdPosition } from '@prisma/client';
 
 @ApiTags('advertisements')
-@Controller('ads')
+@Controller('advertisements')
 export class AdvertisementsController {
-  constructor(private readonly adsService: AdvertisementsService) {}
+  constructor(private readonly adsService: AdvertisementsService) { }
 
   @Get('pricing')
   @Public()
@@ -38,7 +38,7 @@ export class AdvertisementsController {
     return this.adsService.getPricing();
   }
 
-  @Post('create')
+  @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new advertisement (goes to moderation)' })
@@ -91,7 +91,7 @@ export class AdvertisementsController {
     return this.adsService.updatePaymentStatus(id, updateStatusDto);
   }
 
-  @Post(':id/track-impression')
+  @Post(':id/impression')
   @Public()
   @ApiOperation({ summary: 'Track advertisement impression' })
   @ApiResponse({ status: 200, description: 'Impression tracked' })
@@ -100,7 +100,7 @@ export class AdvertisementsController {
     return { success: true };
   }
 
-  @Post(':id/track-click')
+  @Post(':id/click')
   @Public()
   @ApiOperation({ summary: 'Track advertisement click' })
   @ApiResponse({ status: 200, description: 'Click tracked' })

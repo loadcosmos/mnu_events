@@ -10,7 +10,6 @@ import { cn } from '../lib/utils';
 
 export default function LoginPage() {
   const [showSignup, setShowSignup] = useState(false);
-  const [loginType, setLoginType] = useState('student'); // 'student' or 'admin'
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -47,46 +46,36 @@ export default function LoginPage() {
         email: formData.email,
         password: formData.password,
       });
-      
-      // Редирект в зависимости от роли пользователя
-      // Всегда редиректим по роли, игнорируя сохраненный путь
+
+      // Role-based routing - redirect based on user role
       const userRole = response?.user?.role;
-      
-      // Проверяем соответствие выбранного типа входа и роли пользователя
-      if (loginType === 'admin' && userRole !== 'ADMIN' && userRole !== 'ORGANIZER' && userRole !== 'MODERATOR') {
-        setError('Access denied. Admin, Organizer, or Moderator privileges required.');
-        setLoading(false);
-        return;
-      }
 
-      if (loginType === 'student' && (userRole === 'ADMIN' || userRole === 'ORGANIZER' || userRole === 'MODERATOR')) {
-        setError('Please use Admin login for admin/organizer/moderator accounts.');
-        setLoading(false);
-        return;
-      }
-
-      // Редирект в зависимости от роли
-      if (userRole === 'ORGANIZER') {
-        navigate('/organizer', { replace: true });
-        toast.success('Welcome back!', {
-          description: `Logged in as Organizer: ${response?.user?.firstName || response?.user?.email}`,
-        });
-      } else if (userRole === 'ADMIN') {
-        navigate('/admin', { replace: true });
-        toast.success('Welcome back!', {
-          description: `Logged in as Admin: ${response?.user?.firstName || response?.user?.email}`,
-        });
-      } else if (userRole === 'MODERATOR') {
-        navigate('/moderator', { replace: true });
-        toast.success('Welcome back!', {
-          description: `Logged in as Moderator: ${response?.user?.firstName || response?.user?.email}`,
-        });
-      } else {
-        // Студенты идут на главную страницу
-        navigate('/', { replace: true });
-        toast.success('Welcome back!', {
-          description: `Logged in as ${response?.user?.firstName || response?.user?.email}`,
-        });
+      switch (userRole) {
+        case 'ADMIN':
+          navigate('/admin', { replace: true });
+          toast.success('Welcome back!', {
+            description: `Logged in as Admin: ${response?.user?.firstName || response?.user?.email}`,
+          });
+          break;
+        case 'ORGANIZER':
+          navigate('/organizer', { replace: true });
+          toast.success('Welcome back!', {
+            description: `Logged in as Organizer: ${response?.user?.firstName || response?.user?.email}`,
+          });
+          break;
+        case 'MODERATOR':
+          navigate('/moderator', { replace: true });
+          toast.success('Welcome back!', {
+            description: `Logged in as Moderator: ${response?.user?.firstName || response?.user?.email}`,
+          });
+          break;
+        case 'STUDENT':
+        default:
+          navigate('/', { replace: true });
+          toast.success('Welcome back!', {
+            description: `Logged in as ${response?.user?.firstName || response?.user?.email}`,
+          });
+          break;
       }
     } catch (err) {
       setError(err.message || 'Login failed. Please try again.');
@@ -123,7 +112,7 @@ export default function LoginPage() {
         name: formData.name,
       });
       // После регистрации редиректим на страницу верификации email
-      navigate('/verify-email', { 
+      navigate('/verify-email', {
         replace: true,
         state: { email: formData.email }
       });
@@ -144,20 +133,7 @@ export default function LoginPage() {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Кнопка переключения Student/Admin в правом верхнем углу */}
-      {!showSignup && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            setLoginType(loginType === 'student' ? 'admin' : 'student');
-            setError('');
-          }}
-          className="fixed top-4 right-4 z-50 liquid-glass-button border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white hover:bg-white dark:hover:bg-[#2a2a2a] transition-all duration-300 shadow-lg"
-        >
-          {loginType === 'student' ? 'Admin' : 'Student'}
-        </Button>
-      )}
+      {/* Removed Student/Admin toggle - unified login for all users */}
 
       <Card className="w-full max-w-md shadow-2xl liquid-glass-strong border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <CardHeader className="space-y-1 text-center">

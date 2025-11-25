@@ -156,7 +156,7 @@ export default function EventsPage() {
               <p className="text-xl text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">Find your next adventure</p>
             </div>
             <button
-              onClick={() => navigate('/my-registrations')}
+              onClick={() => navigate('/registrations')}
               className="liquid-glass-red-button text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-lg"
             >
               My Registrations
