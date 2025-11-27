@@ -40,12 +40,12 @@ export class AuthController {
   }
 
   @Public()
-  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 попыток за 60 секунд (дополнительно к 5-минутной защите в сервисе)
+  @Throttle({ default: { limit: 2, ttl: 300000 } }) // SECURITY FIX: 2 attempts per 5 minutes (was 5/minute)
   @Post('resend-code')
   @ApiOperation({ summary: 'Resend verification code (5 min cooldown between sends)' })
   @ApiResponse({ status: 200, description: 'Verification code sent' })
   @ApiResponse({ status: 400, description: 'Bad request or cooldown active' })
-  @ApiResponse({ status: 429, description: 'Too many requests' })
+  @ApiResponse({ status: 429, description: 'Too many requests - max 2 per 5 minutes' })
   async resendCode(@Body() body: { email: string }) {
     return this.authService.resendVerificationCode(body.email);
   }

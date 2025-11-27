@@ -5,7 +5,10 @@ import {
   ForbiddenException,
   ConflictException,
   Logger,
+  Inject,
 } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { GamificationService } from '../gamification/gamification.service';
 import {
@@ -28,11 +31,13 @@ import { Role } from '@prisma/client';
 @Injectable()
 export class CheckinService {
   private readonly logger = new Logger(CheckinService.name);
-  private readonly rateLimitMap = new Map<string, number>();
+  // SECURITY FIX: Removed in-memory rate limiting - now using Redis
+  // This prevents bypass in multi-instance deployments
 
   constructor(
     private prisma: PrismaService,
     private gamificationService: GamificationService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) { }
 
   /**
@@ -225,16 +230,31 @@ export class CheckinService {
       throw new ConflictException('You have already checked in to this event');
     }
 
-    // 6. Rate limiting: max 1 scan per 5 seconds per user
-    const rateLimitKey = `${userId}:${event.id}`;
-    const lastScanTime = this.rateLimitMap.get(rateLimitKey);
+    // 6. SECURITY FIX: Redis-based rate limiting (works across multiple instances)
+    // Max 1 scan per 5 seconds per user per event
+    const rateLimitKey = `checkin:ratelimit:${userId}:${event.id}`;
+    const RATE_LIMIT_WINDOW = 5; // 5 seconds
+    
+    // Check if rate limit key exists in Redis
+    const lastScanTime = await this.cacheManager.get<number>(rateLimitKey);
     const now = Date.now();
 
-    if (lastScanTime && now - lastScanTime < 5000) {
-      throw new BadRequestException('Please wait before scanning again');
+    if (lastScanTime) {
+      const timeElapsed = now - lastScanTime;
+      if (timeElapsed < RATE_LIMIT_WINDOW * 1000) {
+        const remainingSeconds = Math.ceil((RATE_LIMIT_WINDOW * 1000 - timeElapsed) / 1000);
+        throw new BadRequestException(
+          `Please wait ${remainingSeconds} second(s) before scanning again`
+        );
+      }
     }
 
-    this.rateLimitMap.set(rateLimitKey, now);
+    // Set rate limit in Redis with TTL
+    await this.cacheManager.set(
+      rateLimitKey,
+      now,
+      RATE_LIMIT_WINDOW * 1000, // TTL in milliseconds
+    );
 
     // 7. Geolocation validation removed (not in MVP scope)
     // Location data is logged for future proximity check implementation
@@ -258,15 +278,7 @@ export class CheckinService {
         this.logger.error('Gamification error:', err),
       );
 
-    // 9. Clean up old rate limit entries (older than 10 seconds)
-    setTimeout(() => {
-      const entries = Array.from(this.rateLimitMap.entries());
-      entries.forEach(([key, timestamp]) => {
-        if (Date.now() - timestamp > 10000) {
-          this.rateLimitMap.delete(key);
-        }
-      });
-    }, 10000);
+    // SECURITY FIX: No manual cleanup needed - Redis TTL handles expiration
 
     return {
       success: true,

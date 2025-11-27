@@ -42,6 +42,8 @@ model User {
   moderatedItems   ModerationQueue[]
   subscriptions    Subscription[]
   achievements     Achievement[]
+  advertisements   Advertisement[] @relation("AdvertiserAds")
+  externalPartner  ExternalPartner?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -59,6 +61,7 @@ enum Role {
   ORGANIZER
   MODERATOR
   ADMIN
+  EXTERNAL_PARTNER
 }
 
 model Event {
@@ -78,6 +81,11 @@ model Event {
   isPaid      Boolean  @default(false)
   price       Decimal? @db.Decimal(10, 2)
   platformFee Decimal? @db.Decimal(10, 2)
+
+  // External partner fields
+  isExternalEvent   Boolean @default(false)
+  externalPartnerId String?
+  externalPartner   ExternalPartner? @relation(fields: [externalPartnerId], references: [id], onDelete: SetNull)
 
   // QR Check-in fields
   checkInMode  CheckInMode @default(ORGANIZER_SCANS)
@@ -103,6 +111,8 @@ model Event {
   @@index([endDate]) // For filtering past events
   @@index([category, status]) // Composite index for common filter combinations
   @@index([isPaid]) // For filtering paid events
+  @@index([externalPartnerId]) // For filtering partner events
+  @@index([isExternalEvent]) // For separating external vs internal events
   @@map("events")
 }
 
@@ -160,19 +170,20 @@ enum RegistrationStatus {
 }
 
 model Club {
-  id          String   @id @default(uuid())
-  name        String
-  description String   @db.Text
-  category    ClubCategory
-  imageUrl    String?
-  
+  id            String   @id @default(uuid())
+  name          String
+  description   String   @db.Text
+  category      ClubCategory
+  csiCategories String[] @default([])
+  imageUrl      String?
+
   // Organizer relation
   organizerId String
   organizer   User     @relation("ClubOrganizer", fields: [organizerId], references: [id], onDelete: Cascade)
-  
+
   // Members
   members     ClubMembership[]
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -225,6 +236,17 @@ model Ticket {
   userId        String
   price         Decimal       @db.Decimal(10, 2)
   platformFee   Decimal       @db.Decimal(10, 2)
+
+  // Commission tracking (for external partners)
+  commissionRate   Decimal? @db.Decimal(5, 4) // e.g., 0.10 = 10%
+  commissionAmount Decimal? @db.Decimal(10, 2) // Calculated commission
+  partnerAmount    Decimal? @db.Decimal(10, 2) // Amount partner receives
+  ticketCode       String?  @unique // TICKET-XXXXX for Kaspi comment
+
+  // Commission payment by partner
+  commissionPaidByPartner Boolean @default(false)
+  commissionPaidAt        DateTime?
+
   status        TicketStatus  @default(PENDING)
   paymentMethod String?       // 'mock', 'kaspi', 'card'
   transactionId String?       @unique
@@ -241,6 +263,8 @@ model Ticket {
   @@index([userId])
   @@index([status])
   @@index([transactionId])
+  @@index([ticketCode])
+  @@index([commissionPaidByPartner])
   @@map("tickets")
 }
 
@@ -347,12 +371,23 @@ model Advertisement {
   endDate       DateTime
   impressions   Int           @default(0)
   clicks        Int           @default(0)
+
+  // External partner fields
+  advertiserId      String? // User ID with EXTERNAL_PARTNER role
+  advertiser        User?   @relation("AdvertiserAds", fields: [advertiserId], references: [id], onDelete: SetNull)
+  commissionRate    Decimal? @db.Decimal(5, 4) // Commission rate if partner ad
+  commissionAmount  Decimal? @db.Decimal(10, 2) // Commission amount
+  commissionPaid    Boolean  @default(false)
+  commissionPaidAt  DateTime?
+
   createdAt     DateTime      @default(now())
 
   @@index([position])
   @@index([isActive])
   @@index([paymentStatus])
   @@index([startDate, endDate])
+  @@index([advertiserId])
+  @@index([commissionPaid])
   @@map("advertisements")
 }
 
@@ -456,6 +491,82 @@ model Subscription {
 
 enum SubscriptionType {
   PREMIUM  // 500 тг/месяц - 10 service listings
+}
+
+model ExternalPartner {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Company information
+  companyName   String
+  bin           String   // БИН (Business Identification Number)
+  contactPerson String
+  phone         String
+  email         String
+  whatsapp      String
+
+  // Kaspi payment details (for receiving payments from students)
+  kaspiPhone String
+  kaspiName  String
+
+  // Subscription & limits
+  hasPremiumSubscription Boolean   @default(false)
+  subscriptionExpiresAt  DateTime?
+  paidEventSlots         Int       @default(0) // Number of additional paid event slots (3,000₸ each)
+
+  // Commission
+  commissionRate Decimal @db.Decimal(5, 4) @default(0.10) // 0.10 = 10% (can be overridden by admin)
+  commissionDebt Decimal @db.Decimal(10, 2) @default(0.00) // Accumulated unpaid commission
+
+  // Statistics
+  totalEventsCreated  Int     @default(0)
+  totalTicketsSold    Int     @default(0)
+  totalRevenue        Decimal @db.Decimal(10, 2) @default(0.00)
+  totalCommissionPaid Decimal @db.Decimal(10, 2) @default(0.00)
+
+  // Verification
+  isVerified Boolean   @default(true) // Set to true when admin creates partner
+  verifiedAt DateTime?
+
+  // Relations
+  events Event[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isVerified])
+  @@index([hasPremiumSubscription])
+  @@map("external_partners")
+}
+
+model PlatformSettings {
+  id String @id @default(uuid())
+
+  // Commission rates (changeable by admin)
+  defaultCommissionRate Decimal @db.Decimal(5, 4) @default(0.10) // 10%
+  premiumCommissionRate Decimal @db.Decimal(5, 4) @default(0.07) // 7%
+
+  // Pricing
+  additionalEventPrice       Decimal @db.Decimal(10, 2) @default(3000.00)  // 3,000₸ per additional event
+  premiumSubscriptionPrice   Decimal @db.Decimal(10, 2) @default(15000.00) // 15,000₸/month
+
+  // Advertisement pricing (per week)
+  topBannerPricePerWeek   Decimal @db.Decimal(10, 2) @default(15000.00) // 15,000₸
+  nativeFeedPricePerWeek  Decimal @db.Decimal(10, 2) @default(8000.00)  // 8,000₸
+  sidebarPricePerWeek     Decimal @db.Decimal(10, 2) @default(5000.00)  // 5,000₸
+
+  // Platform Kaspi details (for receiving payments)
+  platformKaspiPhone String? // Kaspi number for platform payments
+  platformKaspiName  String? // Full name for Kaspi transfers
+
+  // Audit
+  updatedBy String? // Admin user ID who last updated settings
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("platform_settings")
 }
 
 // ============================================

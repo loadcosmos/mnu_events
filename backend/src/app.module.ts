@@ -17,6 +17,8 @@ import { ServicesModule } from './services/services.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ModerationModule } from './moderation/moderation.module';
 import { SettingsModule } from './settings/settings.module';
+import { PlatformSettingsModule } from './platform-settings/platform-settings.module';
+import { PartnersModule } from './partners/partners.module';
 import { AdvertisementsModule } from './advertisements/advertisements.module';
 import { PaymentVerificationModule } from './payment-verification/payment-verification.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
@@ -65,6 +67,8 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     AnalyticsModule,
     ModerationModule,
     SettingsModule,
+    PlatformSettingsModule,
+    PartnersModule,
     AdvertisementsModule,
     PaymentVerificationModule,
     SubscriptionsModule,

@@ -48,6 +48,18 @@ export class PaymentsController {
     return this.paymentsService.createPayment(dto, req.user.sub);
   }
 
+  @Post('mock-confirm/:transactionId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Confirm a mock payment (dev only)' })
+  @ApiResponse({ status: 200, description: 'Payment confirmed' })
+  async confirmMockPayment(
+    @Param('transactionId') transactionId: string,
+    @Request() req: RequestWithUser,
+  ) {
+    return this.paymentsService.confirmMockPayment(transactionId);
+  }
+
   @Post('webhook')
   @Public()
   @ApiOperation({ summary: 'Webhook for payment confirmation (mock gateway)' })
@@ -135,8 +147,13 @@ export class PaymentsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get transaction status by ID' })
   @ApiResponse({ status: 200, description: 'Transaction status' })
+  @ApiResponse({ status: 403, description: 'Access denied - not your transaction' })
   @ApiResponse({ status: 404, description: 'Transaction not found' })
-  async getTransactionStatus(@Param('id') id: string) {
-    return this.paymentsService.getTransactionStatus(id);
+  async getTransactionStatus(
+    @Param('id') id: string,
+    @Request() req: RequestWithUser,
+  ) {
+    // SECURITY FIX: Pass user info for authorization check
+    return this.paymentsService.getTransactionStatus(id, req.user.sub, req.user.role);
   }
 }

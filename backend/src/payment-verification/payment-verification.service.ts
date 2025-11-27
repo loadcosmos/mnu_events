@@ -3,13 +3,18 @@ import {
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UploadReceiptDto } from './dto/upload-receipt.dto';
 import { VerifyPaymentDto } from './dto/verify-payment.dto';
+import * as QRCode from 'qrcode';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class PaymentVerificationService {
+  private readonly logger = new Logger(PaymentVerificationService.name);
+
   constructor(private prisma: PrismaService) {}
 
   /**
@@ -63,14 +68,21 @@ export class PaymentVerificationService {
   }
 
   /**
-   * Get pending verifications for organizer's events
+   * Get pending verifications for organizer's/partner's events
    */
-  async getPendingVerifications(organizerId: string, eventId?: string) {
+  async getPendingVerifications(userId: string, eventId?: string) {
     const where: any = {
       status: 'PENDING',
       ticket: {
         event: {
-          creatorId: organizerId,
+          OR: [
+            { creatorId: userId }, // Organizer's events
+            {
+              externalPartner: {
+                userId: userId, // Partner's events
+              },
+            },
+          ],
         },
       },
     };
@@ -107,20 +119,31 @@ export class PaymentVerificationService {
   }
 
   /**
-   * Get all verifications for a specific event (organizer only)
+   * Get all verifications for a specific event (organizer/partner only)
    */
-  async getEventVerifications(eventId: string, organizerId: string) {
-    // Verify organizer owns the event
+  async getEventVerifications(eventId: string, userId: string) {
+    // Verify user owns the event (organizer or partner)
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
+      include: {
+        externalPartner: {
+          select: {
+            userId: true,
+          },
+        },
+      },
     });
 
     if (!event) {
       throw new NotFoundException('Event not found');
     }
 
-    if (event.creatorId !== organizerId) {
-      throw new ForbiddenException('You are not the organizer of this event');
+    // Check if user is organizer or partner
+    const isOrganizer = event.creatorId === userId;
+    const isPartner = event.externalPartner?.userId === userId;
+
+    if (!isOrganizer && !isPartner) {
+      throw new ForbiddenException('You are not the organizer/partner of this event');
     }
 
     return this.prisma.paymentVerification.findMany({
@@ -149,11 +172,11 @@ export class PaymentVerificationService {
 
   /**
    * Approve or reject payment verification
-   * Organizer verifies the receipt and approves/rejects payment
+   * Organizer/Partner verifies the receipt and approves/rejects payment
    */
   async verifyPayment(
     verificationId: string,
-    organizerId: string,
+    userId: string,
     verifyDto: VerifyPaymentDto,
   ) {
     const verification = await this.prisma.paymentVerification.findUnique({
@@ -161,7 +184,15 @@ export class PaymentVerificationService {
       include: {
         ticket: {
           include: {
-            event: true,
+            event: {
+              include: {
+                externalPartner: {
+                  select: {
+                    userId: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -171,10 +202,13 @@ export class PaymentVerificationService {
       throw new NotFoundException('Payment verification not found');
     }
 
-    // Verify organizer owns the event
-    if (verification.ticket.event.creatorId !== organizerId) {
+    // Verify user owns the event (organizer or partner)
+    const isOrganizer = verification.ticket.event.creatorId === userId;
+    const isPartner = verification.ticket.event.externalPartner?.userId === userId;
+
+    if (!isOrganizer && !isPartner) {
       throw new ForbiddenException(
-        'You are not the organizer of this event',
+        'You are not the organizer/partner of this event',
       );
     }
 
@@ -195,20 +229,79 @@ export class PaymentVerificationService {
       },
     });
 
-    // If approved, update ticket status to PAID
+    // If approved, update ticket status to PAID and generate QR code
     if (verifyDto.status === 'APPROVED') {
+      // Generate QR code for the ticket
+      const qrCodeData = await this.generateQRCode(
+        verification.ticketId,
+        verification.ticket.eventId,
+        verification.ticket.userId,
+      );
+
       await this.prisma.ticket.update({
         where: { id: verification.ticketId },
         data: {
           status: 'PAID',
+          qrCode: qrCodeData,
         },
       });
+
+      this.logger.log(`Payment verified and QR code generated for ticket ${verification.ticketId}`);
     }
 
-    // If rejected, you might want to allow student to re-upload
+    // If rejected, student can re-upload receipt
     // Ticket stays as PENDING
 
     return updated;
+  }
+
+  /**
+   * Generate QR code for ticket
+   * Format: JSON with signature for security
+   */
+  private async generateQRCode(
+    ticketId: string,
+    eventId: string,
+    userId: string,
+  ): Promise<string> {
+    const qrPayload = {
+      ticketId,
+      eventId,
+      userId,
+      timestamp: Date.now(),
+    };
+
+    // Sign the payload for security validation
+    if (!process.env.PAYMENT_SECRET) {
+      throw new BadRequestException('Payment secret not configured');
+    }
+
+    const signature = crypto
+      .createHmac('sha256', process.env.PAYMENT_SECRET)
+      .update(JSON.stringify(qrPayload))
+      .digest('hex');
+
+    const qrData = {
+      ...qrPayload,
+      signature,
+    };
+
+    // Generate QR code as base64 data URL
+    try {
+      const qrCodeDataUrl = await QRCode.toDataURL(JSON.stringify(qrData), {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF',
+        },
+      });
+
+      return qrCodeDataUrl;
+    } catch (error) {
+      this.logger.error('Error generating QR code:', error);
+      throw new BadRequestException('Failed to generate QR code');
+    }
   }
 
   /**

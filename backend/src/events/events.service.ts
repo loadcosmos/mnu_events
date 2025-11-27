@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ModerationService } from '../moderation/moderation.service';
+import { PartnersService } from '../partners/partners.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { FilterEventsDto } from './dto/filter-events.dto';
@@ -16,6 +17,7 @@ import {
   createPaginatedResponse,
   requireCreatorOrAdmin,
   validateEventListing,
+  sanitizeSearchQuery,
 } from '../common/utils';
 
 @Injectable()
@@ -25,6 +27,7 @@ export class EventsService {
   constructor(
     private prisma: PrismaService,
     private moderationService: ModerationService,
+    private partnersService: PartnersService,
   ) { }
 
   async create(createEventDto: CreateEventDto, userId: string, userRole: Role) {
@@ -38,6 +41,28 @@ export class EventsService {
 
     if (startDate < new Date()) {
       throw new BadRequestException('Start date cannot be in the past');
+    }
+
+    // Check partner event limits (for EXTERNAL_PARTNER role)
+    let externalPartnerId: string | null = null;
+    if (userRole === Role.EXTERNAL_PARTNER) {
+      const limitCheck = await this.partnersService.canCreateEvent(userId);
+
+      if (!limitCheck.allowed) {
+        throw new ForbiddenException({
+          code: 'EVENT_LIMIT_REACHED',
+          message: 'Достигнут лимит мероприятий',
+          currentEvents: limitCheck.currentEvents,
+          limit: limitCheck.limit,
+          additionalSlotPrice: 3000,
+        });
+      }
+
+      // Get partner ID to link event
+      const partner = await this.partnersService.findByUserId(userId);
+      externalPartnerId = partner.id;
+
+      this.logger.log(`External partner ${partner.companyName} creating event (${limitCheck.currentEvents}/${limitCheck.limit})`);
     }
 
     // Moderation logic:
@@ -62,6 +87,8 @@ export class EventsService {
         endDate,
         creatorId: userId,
         status: needsModeration ? 'PENDING_MODERATION' : 'UPCOMING',
+        isExternalEvent: externalPartnerId !== null,
+        externalPartnerId: externalPartnerId,
       },
       include: {
         creator: {
@@ -72,6 +99,14 @@ export class EventsService {
             email: true,
           },
         },
+        externalPartner: externalPartnerId ? {
+          select: {
+            id: true,
+            companyName: true,
+            kaspiPhone: true,
+            kaspiName: true,
+          },
+        } : undefined,
         _count: {
           select: {
             registrations: true,
@@ -128,33 +163,37 @@ export class EventsService {
     }
 
     if (filterDto?.search) {
-      // Note: mode: 'insensitive' only works with String fields, not Text fields
-      // description is @db.Text, so we can't use mode: 'insensitive' for it
-      where.OR = [
-        { title: { contains: filterDto.search, mode: 'insensitive' } },
-        { location: { contains: filterDto.search, mode: 'insensitive' } },
-        // description is Text field, so we search it case-sensitively
-        // If case-insensitive search is needed for description, we'd need to use raw SQL
-        { description: { contains: filterDto.search } },
-        // Search by organizer's first name
-        {
-          creator: {
-            firstName: { contains: filterDto.search, mode: 'insensitive' }
-          }
-        },
-        // Search by organizer's last name
-        {
-          creator: {
-            lastName: { contains: filterDto.search, mode: 'insensitive' }
-          }
-        },
-        // Search by organizer's email
-        {
-          creator: {
-            email: { contains: filterDto.search, mode: 'insensitive' }
-          }
-        },
-      ];
+      // SECURITY FIX: Sanitize search input to prevent ReDoS and resource exhaustion
+      const sanitizedSearch = sanitizeSearchQuery(filterDto.search);
+      
+      if (sanitizedSearch) {
+        // Note: mode: 'insensitive' only works with String fields, not Text fields
+        // description is @db.Text, so we can't use mode: 'insensitive' for it
+        where.OR = [
+          { title: { contains: sanitizedSearch, mode: 'insensitive' } },
+          { location: { contains: sanitizedSearch, mode: 'insensitive' } },
+          // description is Text field, so we search it case-sensitively
+          { description: { contains: sanitizedSearch } },
+          // Search by organizer's first name
+          {
+            creator: {
+              firstName: { contains: sanitizedSearch, mode: 'insensitive' }
+            }
+          },
+          // Search by organizer's last name
+          {
+            creator: {
+              lastName: { contains: sanitizedSearch, mode: 'insensitive' }
+            }
+          },
+          // Search by organizer's email
+          {
+            creator: {
+              email: { contains: sanitizedSearch, mode: 'insensitive' }
+            }
+          },
+        ];
+      }
     }
 
     if (filterDto?.creatorId) {
@@ -326,8 +365,15 @@ export class EventsService {
       throw new NotFoundException('Event not found');
     }
 
-    // Only creator or admin can view statistics
-    if (event.creatorId !== userId && userRole !== Role.ADMIN) {
+    // SECURITY FIX: Explicit authorization check
+    // Only event creator or ADMIN role can view statistics
+    // ORGANIZER role alone is not sufficient - must be the event creator
+    if (userRole === Role.ADMIN) {
+      // Admin can view any event statistics
+    } else if (event.creatorId === userId) {
+      // Event creator can view their own event statistics
+    } else {
+      // All other cases denied (including ORGANIZER who didn't create this event)
       throw new ForbiddenException('You do not have permission to view event statistics');
     }
 

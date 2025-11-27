@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
+import paymentsService from '../services/paymentsService';
 
 export default function MockPaymentPage() {
   const { transactionId } = useParams();
@@ -31,20 +32,24 @@ export default function MockPaymentPage() {
   const handleSuccess = async () => {
     setProcessing(true);
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // Call backend to confirm payment
+      await paymentsService.confirmMockPayment(transactionId);
 
-    toast.success('Payment successful!', {
-      description: 'Your ticket has been purchased successfully.',
-    });
+      toast.success('Payment successful!', {
+        description: 'Your ticket has been purchased successfully.',
+      });
 
-    // TODO Phase 4: Call backend webhook to confirm payment
-    // await paymentsService.confirmPayment(transactionId);
-
-    setProcessing(false);
-
-    // Redirect to my registrations page
-    navigate('/registrations', { replace: true });
+      // Redirect to my registrations page
+      navigate('/registrations', { replace: true });
+    } catch (err) {
+      console.error('Payment confirmation failed:', err);
+      toast.error('Payment failed', {
+        description: err.response?.data?.message || 'Failed to confirm payment. Please try again.',
+      });
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const handleDecline = async () => {

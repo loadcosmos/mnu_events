@@ -29,7 +29,7 @@ const CATEGORIES = [
 
 export default function CreateEventPage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -156,14 +156,18 @@ export default function CreateEventPage() {
       if (eventId) {
         navigate(`/events/${eventId}`);
       } else {
-        navigate('/organizer');
+        if (user?.role === 'EXTERNAL_PARTNER') {
+          navigate('/partner');
+        } else {
+          navigate('/organizer');
+        }
       }
     } catch (err) {
       console.error('[CreateEventPage] Create event failed:', err);
       const errorMessage = err.response?.data?.message
         ? (Array.isArray(err.response.data.message)
-            ? err.response.data.message.join(', ')
-            : err.response.data.message)
+          ? err.response.data.message.join(', ')
+          : err.response.data.message)
         : err.message || 'Failed to create event';
       setError(errorMessage);
       // Toast уже показывается в apiClient interceptor
@@ -391,7 +395,13 @@ export default function CreateEventPage() {
                 type="button"
                 variant="outline"
                 size="lg"
-                onClick={() => navigate('/organizer')}
+                onClick={() => {
+                  if (user?.role === 'EXTERNAL_PARTNER') {
+                    navigate('/partner');
+                  } else {
+                    navigate('/organizer');
+                  }
+                }}
                 disabled={loading}
                 className="border-gray-300 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl"
               >

@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PlatformSettingsService } from '../platform-settings/platform-settings.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentWebhookDto } from './dto/payment-webhook.dto';
 import { RefundTicketDto } from './dto/refund-ticket.dto';
@@ -17,12 +18,16 @@ import {
 } from './interfaces/payment-response.interface';
 import * as QRCode from 'qrcode';
 import * as crypto from 'crypto';
+import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PaymentsService {
   private readonly logger = new Logger(PaymentsService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private platformSettingsService: PlatformSettingsService,
+  ) { }
 
   /**
    * Create a mock payment and return redirect URL
@@ -34,6 +39,9 @@ export class PaymentsService {
     // 1. Verify event exists and is paid
     const event = await this.prisma.event.findUnique({
       where: { id: dto.eventId },
+      include: {
+        externalPartner: true, // Include partner info for commission calculation
+      },
     });
 
     if (!event) {
@@ -70,34 +78,65 @@ export class PaymentsService {
     }
 
     // 4. Verify payment amount matches event price
-    if (!event.price || !event.platformFee) {
+    if (!event.price) {
       throw new BadRequestException('Event price not configured');
     }
 
-    const expectedTotal = Number(event.price) + Number(event.platformFee);
+    // 5. Calculate commission for external partner events
+    let commissionRate: Decimal | null = null;
+    let commissionAmount: Decimal | null = null;
+    let partnerAmount: Decimal | null = null;
+    let ticketCode: string | null = null;
+
+    if (event.isExternalEvent && event.externalPartner) {
+      // Get platform settings for commission rate
+      const settings = await this.platformSettingsService.getSettings();
+
+      // Use partner-specific commission rate if set, otherwise default
+      commissionRate = event.externalPartner.commissionRate;
+
+      // Calculate commission
+      const price = Number(event.price);
+      commissionAmount = new Decimal(price * Number(commissionRate));
+      partnerAmount = new Decimal(price - Number(commissionAmount));
+
+      // Generate unique ticket code for Kaspi comment
+      ticketCode = `TICKET-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+
+      this.logger.log(`Commission calculated for partner event: rate=${commissionRate}, amount=${commissionAmount}`);
+    }
+
+    // Verify payment amount
+    const platformFee = event.platformFee || new Decimal(0);
+    const expectedTotal = Number(event.price) + Number(platformFee);
+
     if (dto.amount !== expectedTotal) {
       throw new BadRequestException(
         `Invalid payment amount. Expected ${expectedTotal}`,
       );
     }
 
-    // 5. Generate unique transaction ID
+    // 6. Generate unique transaction ID
     const transactionId = `txn_${Date.now()}_${crypto.randomBytes(8).toString('hex')}`;
 
-    // 6. Create pending ticket
+    // 7. Create pending ticket
     await this.prisma.ticket.create({
       data: {
         eventId: dto.eventId,
         userId: userId,
         price: event.price,
-        platformFee: event.platformFee,
+        platformFee: platformFee,
+        commissionRate: commissionRate,
+        commissionAmount: commissionAmount,
+        partnerAmount: partnerAmount,
+        ticketCode: ticketCode,
         status: 'PENDING',
-        paymentMethod: 'mock',
+        paymentMethod: event.isExternalEvent ? 'kaspi' : 'mock',
         transactionId: transactionId,
       },
     });
 
-    // 7. Return mock payment redirect URL
+    // 8. Return mock payment redirect URL
     const redirectUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/mock-payment/${transactionId}`;
 
     return {
@@ -106,6 +145,48 @@ export class PaymentsService {
       redirectUrl,
       message: 'Redirecting to mock payment gateway',
     };
+  }
+
+  /**
+   * Confirm mock payment (Dev/Test only)
+   */
+  async confirmMockPayment(transactionId: string): Promise<TicketResponse> {
+    // 1. Find pending ticket
+    const ticket = await this.prisma.ticket.findUnique({
+      where: { transactionId },
+      include: {
+        event: true,
+        user: true,
+      },
+    });
+
+    if (!ticket) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    if (ticket.status !== 'PENDING') {
+      throw new BadRequestException(`Transaction already processed (Status: ${ticket.status})`);
+    }
+
+    // 2. Generate QR code
+    const qrCodeData = await this.generateQRCode(ticket.id, ticket.eventId, ticket.userId);
+
+    // 3. Update ticket to PAID
+    const updatedTicket = await this.prisma.$transaction(async (tx) => {
+      return tx.ticket.update({
+        where: { id: ticket.id },
+        data: {
+          status: 'PAID',
+          qrCode: qrCodeData,
+          purchasedAt: new Date(),
+        },
+        include: {
+          event: true,
+        },
+      });
+    });
+
+    return this.formatTicketResponse(updatedTicket);
   }
 
   /**
@@ -304,9 +385,12 @@ export class PaymentsService {
 
   /**
    * Get transaction status
+   * SECURITY FIX: Added authorization - only ticket owner or admin can view
    */
   async getTransactionStatus(
     transactionId: string,
+    userId: string,
+    userRole: string,
   ): Promise<TransactionStatus> {
     const ticket = await this.prisma.ticket.findUnique({
       where: { transactionId },
@@ -314,6 +398,12 @@ export class PaymentsService {
 
     if (!ticket || !ticket.transactionId) {
       throw new NotFoundException('Transaction not found');
+    }
+
+    // SECURITY FIX: Authorization check - prevent IDOR
+    // Only the ticket owner or admin can view transaction status
+    if (ticket.userId !== userId && userRole !== 'ADMIN') {
+      throw new ForbiddenException('You do not have access to this transaction');
     }
 
     return {
@@ -346,7 +436,7 @@ export class PaymentsService {
     if (!process.env.PAYMENT_SECRET) {
       throw new BadRequestException('Payment secret not configured');
     }
-    
+
     const signature = crypto
       .createHmac('sha256', process.env.PAYMENT_SECRET)
       .update(JSON.stringify(qrPayload))

@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Filter, SlidersHorizontal, Plus, Megaphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import eventsService from '../services/eventsService';
-import servicesService from '../services/servicesService';
 import registrationsService from '../services/registrationsService';
 import adsService from '../services/adsService';
 import EventModal from '../components/EventModal';
 import AdBanner from '../components/AdBanner';
 import AdModal from '../components/AdModal';
-import ServiceCard from '../components/ServiceCard';
 import { formatDate } from '../utils/dateFormatters';
 import { getCsiIcon, getCsiColors } from '../utils/categoryMappers';
 
@@ -18,13 +15,15 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
 
-  // Redirect organizers and admins to their pages
+  // Redirect organizers, admins, and partners to their pages
   useEffect(() => {
     if (isAuthenticated() && user) {
       if (user.role === 'ORGANIZER') {
         navigate('/organizer', { replace: true });
       } else if (user.role === 'ADMIN') {
         navigate('/admin', { replace: true });
+      } else if (user.role === 'EXTERNAL_PARTNER') {
+        navigate('/partner', { replace: true });
       }
     }
   }, [isAuthenticated, user, navigate]);
@@ -43,36 +42,10 @@ export default function HomePage() {
     topBanner: null,
     nativeFeed: null,
     bottomBanner: null,
+    heroSlide: [], // Array of HERO_SLIDE ads
   });
   const [selectedAd, setSelectedAd] = useState(null);
   const [isAdModalOpen, setIsAdModalOpen] = useState(false);
-
-  // Services/Marketplace state management
-
-  const categories = [
-    { value: 'all', label: 'Все категории' },
-    { value: 'DESIGN', label: 'Дизайн' },
-    { value: 'PHOTO_VIDEO', label: 'Фото/Видео' },
-    { value: 'IT', label: 'IT' },
-    { value: 'COPYWRITING', label: 'Копирайтинг' },
-    { value: 'CONSULTING', label: 'Консультации' },
-    { value: 'OTHER', label: 'Другое' },
-  ];
-
-  const sortOptions = [
-    { value: 'rating', label: 'По рейтингу' },
-    { value: 'price-asc', label: 'Цена: возрастание' },
-    { value: 'price-desc', label: 'Цена: убывание' },
-    { value: 'newest', label: 'Сначала новые' },
-  ];
-
-  const [services, setServices] = useState([]);
-  const [filteredServices, setFilteredServices] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedSort, setSelectedSort] = useState('rating');
-  const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });
 
   const openEventModal = (eventId) => {
     setModalEventId(eventId);
@@ -108,53 +81,6 @@ export default function HomePage() {
     } catch (err) {
       console.error('[HomePage] Failed to track ad click:', err);
     }
-  };
-
-  // Services filtering logic
-  useEffect(() => {
-    applyFilters();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, selectedCategory, selectedSort, priceRange, services]);
-
-  const applyFilters = () => {
-    let filtered = [...services];
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (service) =>
-          service.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          service.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Category filter
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter((service) => service.category === selectedCategory);
-    }
-
-    // Price range filter
-    filtered = filtered.filter(
-      (service) => service.price >= priceRange.min && service.price <= priceRange.max
-    );
-
-    // Sort
-    switch (selectedSort) {
-      case 'rating':
-        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-        break;
-      case 'price-asc':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'newest':
-        // Would sort by createdAt if available
-        break;
-    }
-
-    setFilteredServices(filtered);
   };
 
   // Load events on mount
@@ -286,10 +212,11 @@ export default function HomePage() {
       try {
         // Load ads for different positions
         // adsService.getActive handles 404 errors gracefully and returns []
-        const [topBannerAds, nativeFeedAds, bottomBannerAds] = await Promise.all([
+        const [topBannerAds, nativeFeedAds, bottomBannerAds, heroSlideAds] = await Promise.all([
           adsService.getActive('TOP_BANNER'),
           adsService.getActive('NATIVE_FEED'),
           adsService.getActive('BOTTOM_BANNER'),
+          adsService.getActive('HERO_SLIDE'),
         ]);
 
         if (isCancelled) return;
@@ -298,6 +225,7 @@ export default function HomePage() {
           topBanner: topBannerAds?.[0] || null,
           nativeFeed: nativeFeedAds?.[0] || null,
           bottomBanner: bottomBannerAds?.[0] || null,
+          heroSlide: heroSlideAds || [], // Store all HERO_SLIDE ads
         });
       } catch (err) {
         // Silently handle errors - ads are non-critical feature
@@ -312,61 +240,42 @@ export default function HomePage() {
     };
   }, []);
 
-  // Load services on mount
-  useEffect(() => {
-    let isCancelled = false;
+  /**
+   * Mix trending events with HERO_SLIDE advertisements
+   * Ratio: 3 events : 1 ad
+   * Returns array of slides with type indicator
+   */
+  const getMixedHeroSlides = () => {
+    const mixed = [];
+    const heroAds = ads.heroSlide || [];
+    let adIndex = 0;
 
-    const load = async () => {
-      try {
-        // Load all services - backend will filter for approved/active ones
-        const response = await servicesService.getAll();
+    trendingEvents.forEach((event, index) => {
+      // Add event slide
+      mixed.push({ type: 'event', data: event });
 
-        if (isCancelled) return;
-
-        console.log('[HomePage] Services API response:', response);
-
-        // Handle different API response formats
-        // Backend returns paginated response: { items: [...], total, page, limit }
-        let servicesData = [];
-        if (response && typeof response === 'object') {
-          if (Array.isArray(response)) {
-            servicesData = response;
-          } else if (Array.isArray(response.items)) {
-            // Paginated response from backend
-            servicesData = response.items;
-          } else if (Array.isArray(response.data)) {
-            servicesData = response.data;
-          } else if (response.services && Array.isArray(response.services)) {
-            servicesData = response.services;
-          }
-        }
-
-        console.log('[HomePage] Parsed services data:', servicesData);
-        setServices(servicesData);
-      } catch (err) {
-        console.error('[HomePage] Failed to load services:', err);
-        // Silently fail - services are not critical for the page to work
-        // Keep empty array if loading fails
+      // After every 3 events, insert an ad (if available)
+      if ((index + 1) % 3 === 0 && adIndex < heroAds.length) {
+        mixed.push({ type: 'ad', data: heroAds[adIndex] });
+        adIndex++;
       }
-    };
+    });
 
-    load();
+    return mixed;
+  };
 
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
+  const mixedHeroSlides = getMixedHeroSlides();
 
   // Auto-advance slides every 5 seconds
   useEffect(() => {
-    if (trendingEvents.length === 0) return;
+    if (mixedHeroSlides.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % trendingEvents.length);
+      setCurrentSlide((prev) => (prev + 1) % mixedHeroSlides.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [trendingEvents.length]);
+  }, [mixedHeroSlides.length]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
@@ -380,7 +289,7 @@ export default function HomePage() {
               <p className="text-xl">Loading events...</p>
             </div>
           </div>
-        ) : trendingEvents.length === 0 ? (
+        ) : mixedHeroSlides.length === 0 ? (
           // Fallback when no events
           <>
             <div className="absolute inset-0 bg-[url('/images/backg.jpg')] bg-cover bg-center opacity-20 dark:opacity-20" />
@@ -411,15 +320,22 @@ export default function HomePage() {
             </div>
           </>
         ) : (
-          // Event Slider
+          // Mixed Event and Ad Slider
           <>
-            {trendingEvents.map((event, index) => {
+            {mixedHeroSlides.map((slide, index) => {
               const isActive = index === currentSlide;
-              const imageUrl = event.imageUrl || '/images/backg.jpg';
+              const isAdSlide = slide.type === 'ad';
+              const content = slide.data;
+              const imageUrl = content.imageUrl || '/images/backg.jpg';
+
+              // Track ad impression when slide becomes active
+              if (isActive && isAdSlide && content.id) {
+                handleAdImpression(content.id);
+              }
 
               return (
                 <div
-                  key={event.id}
+                  key={`${slide.type}-${content.id}`}
                   className={`absolute inset-0 transition-opacity duration-1000 ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
                     }`}
                 >
@@ -431,55 +347,84 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-black/50" />
                   </div>
 
-                  {/* Content */}
-                  <div className="relative z-10 flex flex-col items-center justify-center h-full px-4">
-                    <div className="max-w-4xl text-center space-y-6">
-                      <span className="inline-block bg-[#d62e1f] text-white px-4 py-2 rounded-full text-sm font-bold uppercase">
-                        {event.category}
-                      </span>
-                      <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight">
-                        {event.title}
-                      </h1>
-                      <p className="text-lg md:text-xl text-[#a0a0a0] max-w-2xl mx-auto line-clamp-2">
-                        {event.description || 'Join us for an amazing event!'}
-                      </p>
-                      <div className="flex flex-wrap justify-center gap-6 text-sm md:text-base text-white">
-                        <div className="flex items-center gap-2">
-                          <i className="fa-regular fa-calendar text-xl" />
-                          <span>{formatDate(event.startDate)}</span>
+                  {isAdSlide ? (
+                    /* Advertisement Slide */
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full px-4">
+                      <div className="max-w-4xl text-center space-y-6">
+                        {/* Ad Badge */}
+                        <div className="inline-block bg-yellow-500 text-black px-4 py-2 rounded-full text-sm font-bold uppercase">
+                          Реклама
                         </div>
-                        <div className="flex items-center gap-2">
-                          <i className="fa-solid fa-location-dot text-xl" />
-                          <span>{event.location}</span>
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight">
+                          {content.title}
+                        </h1>
+                        <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleAdClick(content.id);
+                              openAdModal(content);
+                            }}
+                            className="liquid-glass-red-button px-8 h-12 flex items-center justify-center text-white rounded-2xl font-bold text-base"
+                          >
+                            Узнать больше
+                          </button>
                         </div>
-                      </div>
-                      <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                        <button
-                          type="button"
-                          onClick={() => openEventModal(event.id)}
-                          className="liquid-glass-red-button px-8 py-4 text-white rounded-2xl font-bold text-base"
-                        >
-                          Learn More
-                        </button>
-                        <Button
-                          size="lg"
-                          className="liquid-glass-red-button text-white rounded-2xl px-8 py-4"
-                          asChild
-                        >
-                          <Link to="/events">View All Events</Link>
-                        </Button>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    /* Event Slide */
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full px-4">
+                      <div className="max-w-4xl text-center space-y-6">
+                        <span className="inline-block bg-[#d62e1f] text-white px-4 py-2 rounded-full text-sm font-bold uppercase">
+                          {content.category}
+                        </span>
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight">
+                          {content.title}
+                        </h1>
+                        <p className="text-lg md:text-xl text-[#a0a0a0] max-w-2xl mx-auto line-clamp-2">
+                          {content.description || 'Join us for an amazing event!'}
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-6 text-sm md:text-base text-white">
+                          <div className="flex items-center gap-2">
+                            <i className="fa-regular fa-calendar text-xl" />
+                            <span>{formatDate(content.startDate)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <i className="fa-solid fa-location-dot text-xl" />
+                            <span>{content.location}</span>
+                          </div>
+                        </div>
+                        <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                          <button
+                            type="button"
+                            onClick={() => openEventModal(content.id)}
+                            className="liquid-glass-red-button px-8 h-12 flex items-center justify-center text-white rounded-2xl font-bold text-base"
+                          >
+                            Learn More
+                          </button>
+                          <Button
+                            size="lg"
+                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-2xl px-8 h-12 font-bold text-base border-none"
+                            asChild
+                          >
+                            <Link to="/events">View All Events</Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Slide Indicators */}
                   <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
-                    {trendingEvents.map((_, idx) => (
+                    {mixedHeroSlides.map((s, idx) => (
                       <button
                         key={idx}
                         onClick={() => setCurrentSlide(idx)}
                         className={`h-3 rounded-full transition-all ${idx === currentSlide
-                          ? 'bg-[#d62e1f] w-8'
+                          ? s.type === 'ad'
+                            ? 'bg-yellow-500 w-8'
+                            : 'bg-[#d62e1f] w-8'
                           : 'liquid-glass-subtle hover:liquid-glass w-3'
                           }`}
                         aria-label={`Go to slide ${idx + 1}`}
@@ -493,7 +438,7 @@ export default function HomePage() {
                       e.preventDefault();
                       e.stopPropagation();
                       setCurrentSlide(
-                        (prev) => (prev - 1 + trendingEvents.length) % trendingEvents.length
+                        (prev) => (prev - 1 + mixedHeroSlides.length) % mixedHeroSlides.length
                       );
                     }}
                     className="hidden md:flex absolute left-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all items-center justify-center"
@@ -505,7 +450,7 @@ export default function HomePage() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      setCurrentSlide((prev) => (prev + 1) % trendingEvents.length);
+                      setCurrentSlide((prev) => (prev + 1) % mixedHeroSlides.length);
                     }}
                     className="hidden md:flex absolute right-4 top-1/2 transform -translate-y-1/2 z-20 liquid-glass-button text-white p-4 rounded-2xl transition-all items-center justify-center"
                     aria-label="Next slide"
@@ -528,182 +473,6 @@ export default function HomePage() {
           onClick={openAdModal}
         />
       )}
-
-      {/* Services/Marketplace Section */}
-      <section className="py-16 px-4 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
-                Marketplace <span className="text-[#d62e1f]">услуг</span>
-              </h2>
-              <p className="text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
-                Найдите профессионалов для вашего проекта
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                onClick={() => navigate('/services/create')}
-                className="rounded-xl bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Service
-              </Button>
-              <Button
-                onClick={() => navigate('/advertisements/create')}
-                variant="outline"
-                className="rounded-xl border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
-              >
-                <Megaphone className="w-4 h-4 mr-2" />
-                Post Ad
-              </Button>
-            </div>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="mb-6 space-y-4">
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Поиск услуг..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="
-                  w-full pl-12 pr-4 py-3 rounded-lg
-                  bg-white dark:bg-[#0a0a0a]
-                  border border-gray-200 dark:border-[#2a2a2a]
-                  focus:border-purple-500 dark:focus:border-purple-500
-                  focus:ring-2 focus:ring-purple-500/20
-                  text-gray-900 dark:text-white
-                  outline-none transition-all
-                "
-              />
-            </div>
-
-            {/* Filters Row */}
-            <div className="flex flex-wrap gap-3">
-              {/* Category Filter */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="
-                  px-4 py-2 rounded-lg
-                  bg-white dark:bg-[#0a0a0a]
-                  border border-gray-200 dark:border-[#2a2a2a]
-                  focus:border-purple-500 dark:focus:border-purple-500
-                  focus:ring-2 focus:ring-purple-500/20
-                  text-gray-900 dark:text-white
-                  outline-none
-                "
-              >
-                {categories.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
-
-              {/* Sort Filter */}
-              <select
-                value={selectedSort}
-                onChange={(e) => setSelectedSort(e.target.value)}
-                className="
-                  px-4 py-2 rounded-lg
-                  bg-white dark:bg-[#0a0a0a]
-                  border border-gray-200 dark:border-[#2a2a2a]
-                  focus:border-purple-500 dark:focus:border-purple-500
-                  focus:ring-2 focus:ring-purple-500/20
-                  text-gray-900 dark:text-white
-                  outline-none
-                "
-              >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-
-              {/* Advanced Filters Button */}
-              <Button
-                onClick={() => setShowFilters(!showFilters)}
-                variant="outline"
-                className="flex items-center gap-2 border-gray-300 dark:border-[#2a2a2a] text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
-              >
-                <SlidersHorizontal className="w-4 h-4" />
-                Фильтры
-              </Button>
-            </div>
-
-            {/* Advanced Filters Panel */}
-            {showFilters && (
-              <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-[#2a2a2a] p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Дополнительные фильтры
-                </h3>
-
-                <div className="space-y-4">
-                  {/* Price Range */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Диапазон цен
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="number"
-                        placeholder="Мин"
-                        value={priceRange.min}
-                        onChange={(e) =>
-                          setPriceRange({ ...priceRange, min: parseInt(e.target.value) || 0 })
-                        }
-                        className="flex-1 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] text-gray-900 dark:text-white"
-                      />
-                      <span className="text-gray-500">—</span>
-                      <input
-                        type="number"
-                        placeholder="Макс"
-                        value={priceRange.max}
-                        onChange={(e) =>
-                          setPriceRange({ ...priceRange, max: parseInt(e.target.value) || 100000 })
-                        }
-                        className="flex-1 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] text-gray-900 dark:text-white"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Results Count */}
-          <div className="mb-6 text-sm text-gray-600 dark:text-[#a0a0a0]">
-            Найдено услуг: {filteredServices.length}
-          </div>
-
-          {/* Services Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredServices.map((service) => (
-              <ServiceCard key={service.id} service={service} />
-            ))}
-          </div>
-
-          {/* Empty State */}
-          {filteredServices.length === 0 && (
-            <div className="text-center py-12">
-              <Filter className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Услуги не найдены
-              </h3>
-              <p className="text-gray-600 dark:text-[#a0a0a0]">
-                Попробуйте изменить параметры фильтрации
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* My Upcoming Events - Horizontal Scroll (Only for authenticated users) */}
       {isAuthenticated() && myUpcomingEvents.length > 0 && (

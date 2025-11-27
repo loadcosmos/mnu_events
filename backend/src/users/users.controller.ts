@@ -52,17 +52,32 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update user profile (own profile only)' })
+  @Patch('me')
+  @ApiOperation({ summary: 'Update current user profile' })
   @ApiResponse({ status: 200, description: 'User updated' })
-  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  updateMe(
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() user: any,
+  ) {
+    // SECURITY FIX: Use authenticated user ID from JWT, not route parameter
+    // This prevents IDOR vulnerability where users could update others' profiles
+    return this.usersService.update(user.id, updateUserDto, user.id);
+  }
+
+  @Patch(':id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Update any user profile (Admin only)' })
+  @ApiResponse({ status: 200, description: 'User updated' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'User not found' })
   update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() user: any,
   ) {
-    return this.usersService.update(id, updateUserDto, user.id);
+    // Admin can update any user profile
+    return this.usersService.updateAsAdmin(id, updateUserDto);
   }
 
   @Patch(':id/role')

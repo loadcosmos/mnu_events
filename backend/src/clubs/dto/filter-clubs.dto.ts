@@ -14,6 +14,14 @@ export class FilterClubsDto {
   @IsOptional()
   search?: string;
 
+  @ApiPropertyOptional({
+    example: 'CREATIVITY,SERVICE',
+    description: 'Comma-separated CSI categories to filter by'
+  })
+  @IsString()
+  @IsOptional()
+  csiCategories?: string;
+
   @ApiPropertyOptional({ example: 1, default: 1 })
   @Type(() => Number)
   @IsOptional()

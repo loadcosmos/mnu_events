@@ -4,6 +4,7 @@ import { Input } from '../components/ui/input';
 import clubsService from '../services/clubsService';
 import FilterSheet from '../components/FilterSheet';
 import { CLUB_CATEGORIES, CSI_CATEGORIES } from '../utils/constants';
+import { getCsiIcon, getCsiGradientClass, getAllCsiCategories } from '../utils/categoryMappers';
 
 export default function ClubsPage() {
   const navigate = useNavigate();
@@ -12,13 +13,27 @@ export default function ClubsPage() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [selectedCsiTags, setSelectedCsiTags] = useState([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   // Collapsible filter sections
   const [categoryExpanded, setCategoryExpanded] = useState(false);
+  const [csiExpanded, setCsiExpanded] = useState(false);
+  const [dateExpanded, setDateExpanded] = useState(false);
 
-  const categories = ['ALL', ...new Set([...Object.values(CLUB_CATEGORIES), ...Object.values(CSI_CATEGORIES)])];
+  const categories = ['ALL', ...Object.values(CLUB_CATEGORIES)];
+  const csiCategories = getAllCsiCategories();
+
+  const toggleCsiTag = (csiValue) => {
+    setSelectedCsiTags((prev) =>
+      prev.includes(csiValue)
+        ? prev.filter((tag) => tag !== csiValue)
+        : [...prev, csiValue]
+    );
+  };
 
   useEffect(() => {
     const debounceTime = searchQuery ? 500 : 0;
@@ -28,12 +43,7 @@ export default function ClubsPage() {
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery]);
-
-  useEffect(() => {
-    loadClubs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory]);
+  }, [selectedCategory, selectedCsiTags, searchQuery, startDate, endDate]);
 
   const loadClubs = useCallback(async () => {
     try {
@@ -53,15 +63,16 @@ export default function ClubsPage() {
         params.search = searchQuery;
       }
 
-      // Check if selected category is a CSI category
-      const isCsiCategory = Object.values(CSI_CATEGORIES).includes(selectedCategory);
+      if (selectedCsiTags.length > 0) {
+        params.csiCategories = selectedCsiTags.join(',');
+      }
 
-      if (selectedCategory !== 'ALL') {
-        if (isCsiCategory) {
-          params.csiTags = selectedCategory;
-        } else {
-          params.category = selectedCategory;
-        }
+      if (startDate) {
+        params.createdFrom = startDate;
+      }
+
+      if (endDate) {
+        params.createdTo = endDate;
       }
 
       const response = await clubsService.getAll(params);
@@ -91,7 +102,7 @@ export default function ClubsPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, selectedCsiTags, startDate, endDate]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
@@ -122,20 +133,120 @@ export default function ClubsPage() {
           </div>
         </div>
         {/* Category Filters */}
-        <div className="max-w-7xl mx-auto px-4 pb-4">
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
+        <div className="max-w-7xl mx-auto px-4 pb-4 relative">
+          {/* Filter Status Bar - Fixed Right */}
+          {(selectedCategory !== 'ALL' || selectedCsiTags.length > 0 || startDate || endDate) && (
+            <div className="hidden md:block fixed right-6 top-32 z-20 w-64 p-4 rounded-2xl liquid-glass-strong shadow-xl animate-in slide-in-from-right">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-gray-700 dark:text-[#a0a0a0]">
+                  Active Filters
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-[#d62e1f] text-white text-xs font-bold">
+                  {(selectedCategory !== 'ALL' ? 1 : 0) + selectedCsiTags.length + (startDate || endDate ? 1 : 0)}
+                </span>
+              </div>
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full font-semibold transition-colors ${selectedCategory === cat
-                  ? 'liquid-glass-red-button text-white'
-                  : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
-                  }`}
+                onClick={() => {
+                  setSelectedCategory('ALL');
+                  setSelectedCsiTags([]);
+                  setStartDate('');
+                  setEndDate('');
+                }}
+                className="w-full text-sm font-semibold text-white bg-[#d62e1f] hover:bg-[#ff4433] transition-colors px-4 py-2 rounded-xl flex items-center justify-center gap-2"
               >
-                {cat}
+                <i className="fa-solid fa-xmark"></i>
+                Clear All Filters
               </button>
-            ))}
+            </div>
+          )}
+
+          {/* Section: Categories */}
+          <div className="mb-4">
+            <h3 className="text-xs font-medium text-gray-500 dark:text-[#666666] mb-2">
+              Категории
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300 ${
+                    selectedCategory === cat
+                      ? 'liquid-glass-red-button text-white'
+                      : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Section: CSI Tags */}
+          <div className="mb-4">
+            <h3 className="text-xs font-medium text-gray-500 dark:text-[#666666] mb-2">
+              CSI
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {csiCategories.map((csi) => {
+                const isSelected = selectedCsiTags.includes(csi.value);
+                const gradientClass = getCsiGradientClass(csi.value);
+                return (
+                  <button
+                    key={csi.value}
+                    onClick={() => toggleCsiTag(csi.value)}
+                    className={`px-4 py-2 rounded-full font-semibold transition-all duration-300 ${
+                      isSelected
+                        ? `bg-gradient-to-r ${gradientClass} text-white shadow-lg`
+                        : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <span className="mr-1.5">{getCsiIcon(csi.value)}</span>
+                    {csi.label.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section: Date Range */}
+          <div>
+            <h3 className="text-xs font-medium text-gray-500 dark:text-[#666666] mb-2">
+              Дата создания
+            </h3>
+            <div className="flex gap-3 items-center flex-wrap">
+              <div className="flex-1 min-w-[200px]">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  placeholder="От"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none transition-colors duration-300"
+                />
+              </div>
+              <span className="text-gray-500 dark:text-[#666666] font-medium">—</span>
+              <div className="flex-1 min-w-[200px]">
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  placeholder="До"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none transition-colors duration-300"
+                />
+              </div>
+              {(startDate || endDate) && (
+                <button
+                  onClick={() => {
+                    setStartDate('');
+                    setEndDate('');
+                  }}
+                  className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white transition-colors font-semibold text-sm"
+                >
+                  <i className="fa-solid fa-xmark mr-2"></i>
+                  Очистить
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -326,6 +437,95 @@ export default function ClubsPage() {
                     {category}
                   </label>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* CSI Filter - Collapsible */}
+          <div className="border border-gray-200 dark:border-[#2a2a2a] rounded-lg overflow-hidden transition-colors duration-300">
+            <button
+              onClick={() => setCsiExpanded(!csiExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition-colors"
+            >
+              <span>CSI</span>
+              <i
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${csiExpanded ? 'rotate-180' : ''
+                  }`}
+              />
+            </button>
+            {csiExpanded && (
+              <div className="p-3 space-y-2 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
+                {csiCategories.map((csi) => {
+                  const isSelected = selectedCsiTags.includes(csi.value);
+                  const gradientClass = getCsiGradientClass(csi.value);
+                  return (
+                    <label
+                      key={csi.value}
+                      className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-all ${
+                        isSelected
+                          ? `bg-gradient-to-r ${gradientClass} text-white shadow-lg`
+                          : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleCsiTag(csi.value)}
+                        className="mr-3 accent-[#d62e1f]"
+                      />
+                      <span className="mr-2">{getCsiIcon(csi.value)}</span>
+                      {csi.label.toUpperCase()}
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Date Range Filter - Collapsible */}
+          <div className="border border-gray-200 dark:border-[#2a2a2a] rounded-lg overflow-hidden transition-colors duration-300">
+            <button
+              onClick={() => setDateExpanded(!dateExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition-colors"
+            >
+              <span>Date Range</span>
+              <i
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${
+                  dateExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {dateExpanded && (
+              <div className="p-4 space-y-4 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
+                <div>
+                  <label className="block text-gray-600 dark:text-[#a0a0a0] text-sm mb-2 transition-colors duration-300">From Date</label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none transition-colors duration-300"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-600 dark:text-[#a0a0a0] text-sm mb-2 transition-colors duration-300">To Date</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none transition-colors duration-300"
+                  />
+                </div>
+                {(startDate || endDate) && (
+                  <button
+                    onClick={() => {
+                      setStartDate('');
+                      setEndDate('');
+                    }}
+                    className="w-full px-4 py-2 rounded-lg bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
+                  >
+                    Clear Dates
+                  </button>
+                )}
               </div>
             )}
           </div>

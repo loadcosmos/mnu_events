@@ -7,7 +7,7 @@ import FilterSheet from '../components/FilterSheet';
 import NativeAd from '../components/NativeAd';
 import { formatDate } from '../utils/dateFormatters';
 import { EVENT_CATEGORIES, CSI_CATEGORIES } from '../utils/constants';
-import { getCsiIcon, getCsiColors, getAllCsiCategories } from '../utils/categoryMappers';
+import { getCsiIcon, getCsiColors, getCsiGradientClass, getAllCsiCategories } from '../utils/categoryMappers';
 
 // Mock ads data (will be loaded from API later)
 const mockAds = [
@@ -36,6 +36,7 @@ export default function EventsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Collapsible filter sections
   const [categoryExpanded, setCategoryExpanded] = useState(false);
@@ -169,7 +170,7 @@ export default function EventsPage() {
       <div className="hidden md:block sticky top-20 z-30 liquid-glass-strong border-b border-gray-200 dark:border-[#2a2a2a] transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-2xl">
+            <div className="relative flex-1">
               <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#a0a0a0] text-lg transition-colors duration-300" />
               <Input
                 type="search"
@@ -179,50 +180,121 @@ export default function EventsPage() {
                 className="pl-12 pr-6 py-3 rounded-lg border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-[#666666] focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 transition-colors duration-300"
               />
             </div>
-          </div>
-        </div>
-        {/* Category Filters */}
-        <div className="max-w-7xl mx-auto px-4 pb-4">
-          <div className="flex flex-wrap gap-2 mb-3">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300 ${
-                  selectedCategory === cat
-                    ? 'liquid-glass-red-button text-white'
-                    : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${showFilters || (selectedCategory !== 'ALL' || selectedCsiTags.length > 0 || selectedStatus !== 'ALL' || startDate || endDate)
+                ? 'bg-[#d62e1f] text-white shadow-lg'
+                : 'bg-white dark:bg-[#1a1a1a] text-gray-700 dark:text-[#a0a0a0] border border-gray-300 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
                 }`}
-              >
-                {cat}
-              </button>
-            ))}
+            >
+              <i className="fa-solid fa-filter" />
+              <span>Filters</span>
+              {(selectedCategory !== 'ALL' || selectedCsiTags.length > 0 || selectedStatus !== 'ALL' || startDate || endDate) && (
+                <span className="ml-1 bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                  {(selectedCategory !== 'ALL' ? 1 : 0) + selectedCsiTags.length + (selectedStatus !== 'ALL' ? 1 : 0) + (startDate || endDate ? 1 : 0)}
+                </span>
+              )}
+              <i className={`fa-solid fa-chevron-down ml-2 transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`} />
+            </button>
           </div>
 
-          {/* CSI Filters */}
-          <div>
-            <p className="text-xs font-semibold text-gray-500 dark:text-[#666666] mb-2 transition-colors duration-300">
-              CSI Tags (Multi-select)
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {csiCategories.map((csi) => {
-                const isSelected = selectedCsiTags.includes(csi.value);
-                const colors = getCsiColors(csi.value);
-                return (
+          {/* Collapsible Filters Section */}
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showFilters ? 'max-h-[800px] opacity-100 mt-6' : 'max-h-0 opacity-0'}`}>
+            <div className="pb-2">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Filter Options</h3>
+                {(selectedCategory !== 'ALL' || selectedCsiTags.length > 0 || selectedStatus !== 'ALL' || startDate || endDate) && (
                   <button
-                    key={csi.value}
-                    onClick={() => toggleCsiTag(csi.value)}
-                    className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all border-2 ${
-                      isSelected
-                        ? `${colors.bg} ${colors.text} ${colors.border} scale-105`
-                        : 'bg-gray-100 dark:bg-[#1a1a1a] border-gray-300 dark:border-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:scale-105'
-                    }`}
+                    onClick={() => {
+                      setSelectedCategory('ALL');
+                      setSelectedCsiTags([]);
+                      setSelectedStatus('ALL');
+                      setStartDate('');
+                      setEndDate('');
+                    }}
+                    className="text-sm text-[#d62e1f] hover:text-[#ff4433] font-semibold flex items-center gap-1"
                   >
-                    <span className="mr-1">{getCsiIcon(csi.value)}</span>
-                    {csi.label}
+                    <i className="fa-solid fa-xmark" />
+                    Clear All
                   </button>
-                );
-              })}
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                {/* Section: Categories */}
+                <div>
+                  <h3 className="text-xs font-medium text-gray-500 dark:text-[#666666] mb-3 uppercase tracking-wider">
+                    Categories
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${selectedCategory === cat
+                          ? 'liquid-glass-red-button text-white'
+                          : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                          }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Section: CSI Tags */}
+                <div>
+                  <h3 className="text-xs font-medium text-gray-500 dark:text-[#666666] mb-3 uppercase tracking-wider">
+                    CSI Attributes
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {csiCategories.map((csi) => {
+                      const isSelected = selectedCsiTags.includes(csi.value);
+                      const gradientClass = getCsiGradientClass(csi.value);
+                      return (
+                        <button
+                          key={csi.value}
+                          onClick={() => toggleCsiTag(csi.value)}
+                          className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${isSelected
+                            ? `bg-gradient-to-r ${gradientClass} text-white shadow-lg`
+                            : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                            }`}
+                        >
+                          <span className="mr-1.5">{getCsiIcon(csi.value)}</span>
+                          {csi.label.toUpperCase()}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Section: Date Range */}
+                <div>
+                  <h3 className="text-xs font-medium text-gray-500 dark:text-[#666666] mb-3 uppercase tracking-wider">
+                    Date Range
+                  </h3>
+                  <div className="flex gap-3 items-center flex-wrap">
+                    <div className="flex-1 min-w-[200px] max-w-xs">
+                      <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none transition-colors duration-300"
+                      />
+                    </div>
+                    <span className="text-gray-500 dark:text-[#666666] font-medium">—</span>
+                    <div className="flex-1 min-w-[200px] max-w-xs">
+                      <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white focus:border-[#d62e1f] focus:ring-2 focus:ring-[#d62e1f]/20 outline-none transition-colors duration-300"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -310,94 +382,94 @@ export default function EventsPage() {
                 {(() => {
                   const contentWithAds = [];
                   const nativeAd = mockAds.find((ad) => ad.position === 'NATIVE_FEED');
-                  
+
                   sortedEvents.forEach((event, index) => {
                     const imageUrl = event.imageUrl || '/images/backg.jpg';
-                    
+
                     contentWithAds.push(
                       <div
                         key={event.id}
                         className="bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all cursor-pointer group shadow-lg hover:shadow-2xl flex flex-col"
                         onClick={() => openEventModal(event.id)}
                       >
-                      {/* Image Section - Fixed Height, No Scroll */}
-                      <div className="relative h-48 md:h-52 flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
-                        <img
-                          src={imageUrl}
-                          alt={event.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          onError={(e) => {
-                            e.target.src = '/images/event-placeholder.jpg';
-                          }}
-                        />
-                        {/* Subtle gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                      </div>
-
-                      {/* Content Section - Strict Vertical Layout with Proper Padding */}
-                      <div className="flex-1 flex flex-col px-5 py-5 md:px-6 md:py-6 space-y-4">
-                        {/* Category Badge and CSI Tags */}
-                        <div className="flex-shrink-0 flex items-center gap-2 flex-wrap">
-                          <span className="inline-block bg-[#d62e1f] text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide">
-                            {event.category}
-                          </span>
-                          {/* CSI Tags */}
-                          {event.csiTags && event.csiTags.length > 0 && (
-                            event.csiTags.map((csiTag) => {
-                              const colors = getCsiColors(csiTag);
-                              return (
-                                <span
-                                  key={csiTag}
-                                  className={`inline-flex items-center gap-1 ${colors.bg} ${colors.text} ${colors.border} px-2.5 py-1 rounded-lg text-xs font-semibold border`}
-                                >
-                                  {getCsiIcon(csiTag)}
-                                </span>
-                              );
-                            })
-                          )}
+                        {/* Image Section - Fixed Height, No Scroll */}
+                        <div className="relative h-48 md:h-52 flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+                          <img
+                            src={imageUrl}
+                            alt={event.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              e.target.src = '/images/event-placeholder.jpg';
+                            }}
+                          />
+                          {/* Subtle gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                         </div>
 
-                        {/* Date/Time - MNU Red + Bold */}
-                        <div className="flex items-center gap-2.5 flex-shrink-0">
-                          <i className="fa-regular fa-calendar text-[#d62e1f] text-base" />
-                          <span className="text-base font-bold text-[#d62e1f]">{formatDate(event.startDate)}</span>
-                        </div>
-
-                        {/* Event Title - Large + Bold */}
-                        <h3 className="text-2xl md:text-2xl font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight flex-shrink-0 transition-colors duration-300">
-                          {event.title}
-                        </h3>
-
-                        {/* Description - Controlled Height */}
-                        <p className="text-gray-600 dark:text-[#a0a0a0] text-sm leading-relaxed line-clamp-2 flex-shrink-0 transition-colors duration-300">
-                          {event.description}
-                        </p>
-
-                        {/* Meta Info - Vertical Stack */}
-                        <div className="flex flex-col gap-2.5 pt-4 border-t border-gray-200 dark:border-[#2a2a2a] flex-shrink-0 transition-colors duration-300">
-                          {/* Location */}
-                          <div className="flex items-center gap-2.5">
-                            <i className="fa-solid fa-location-dot text-[#d62e1f] text-base flex-shrink-0" />
-                            <span className="text-sm font-medium text-gray-600 dark:text-[#a0a0a0] truncate transition-colors duration-300">{event.location}</span>
-                          </div>
-                          {/* Capacity */}
-                          <div className="flex items-center gap-2.5">
-                            <i className="fa-solid fa-users text-[#d62e1f] text-base flex-shrink-0" />
-                            <span className="text-sm font-semibold text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
-                              {event._count?.registrations || 0} / {event.capacity}
+                        {/* Content Section - Strict Vertical Layout with Proper Padding */}
+                        <div className="flex-1 flex flex-col px-5 py-5 md:px-6 md:py-6 space-y-4">
+                          {/* Category Badge and CSI Tags */}
+                          <div className="flex-shrink-0 flex items-center gap-2 flex-wrap">
+                            <span className="inline-block bg-[#d62e1f] text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide">
+                              {event.category}
                             </span>
+                            {/* CSI Tags */}
+                            {event.csiTags && event.csiTags.length > 0 && (
+                              event.csiTags.map((csiTag) => {
+                                const colors = getCsiColors(csiTag);
+                                return (
+                                  <span
+                                    key={csiTag}
+                                    className={`inline-flex items-center gap-1 ${colors.bg} ${colors.text} ${colors.border} px-2.5 py-1 rounded-lg text-xs font-semibold border`}
+                                  >
+                                    {getCsiIcon(csiTag)}
+                                  </span>
+                                );
+                              })
+                            )}
+                          </div>
+
+                          {/* Date/Time - MNU Red + Bold */}
+                          <div className="flex items-center gap-2.5 flex-shrink-0">
+                            <i className="fa-regular fa-calendar text-[#d62e1f] text-base" />
+                            <span className="text-base font-bold text-[#d62e1f]">{formatDate(event.startDate)}</span>
+                          </div>
+
+                          {/* Event Title - Large + Bold */}
+                          <h3 className="text-2xl md:text-2xl font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight flex-shrink-0 transition-colors duration-300">
+                            {event.title}
+                          </h3>
+
+                          {/* Description - Controlled Height */}
+                          <p className="text-gray-600 dark:text-[#a0a0a0] text-sm leading-relaxed line-clamp-2 flex-shrink-0 transition-colors duration-300">
+                            {event.description}
+                          </p>
+
+                          {/* Meta Info - Vertical Stack */}
+                          <div className="flex flex-col gap-2.5 pt-4 border-t border-gray-200 dark:border-[#2a2a2a] flex-shrink-0 transition-colors duration-300">
+                            {/* Location */}
+                            <div className="flex items-center gap-2.5">
+                              <i className="fa-solid fa-location-dot text-[#d62e1f] text-base flex-shrink-0" />
+                              <span className="text-sm font-medium text-gray-600 dark:text-[#a0a0a0] truncate transition-colors duration-300">{event.location}</span>
+                            </div>
+                            {/* Capacity */}
+                            <div className="flex items-center gap-2.5">
+                              <i className="fa-solid fa-users text-[#d62e1f] text-base flex-shrink-0" />
+                              <span className="text-sm font-semibold text-gray-600 dark:text-[#a0a0a0] transition-colors duration-300">
+                                {event._count?.registrations || 0} / {event.capacity}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
                     );
-                    
+
                     // Insert native ad after every 3 events
                     if ((index + 1) % 3 === 0 && nativeAd) {
                       contentWithAds.push(<NativeAd key={`ad-${index}`} ad={nativeAd} />);
                     }
                   });
-                  
+
                   return contentWithAds;
                 })()}
               </div>
@@ -421,9 +493,8 @@ export default function EventsPage() {
             >
               <span>Category</span>
               <i
-                className={`fa-solid fa-chevron-down text-sm transition-transform ${
-                  categoryExpanded ? 'rotate-180' : ''
-                }`}
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${categoryExpanded ? 'rotate-180' : ''
+                  }`}
               />
             </button>
             {categoryExpanded && (
@@ -431,11 +502,10 @@ export default function EventsPage() {
                 {categories.map((category) => (
                   <label
                     key={category}
-                    className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-colors ${
-                      selectedCategory === category
-                        ? 'liquid-glass-red-button text-white'
-                        : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-colors ${selectedCategory === category
+                      ? 'liquid-glass-red-button text-white'
+                      : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     <input
                       type="radio"
@@ -459,9 +529,8 @@ export default function EventsPage() {
             >
               <span>Status</span>
               <i
-                className={`fa-solid fa-chevron-down text-sm transition-transform ${
-                  statusExpanded ? 'rotate-180' : ''
-                }`}
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${statusExpanded ? 'rotate-180' : ''
+                  }`}
               />
             </button>
             {statusExpanded && (
@@ -469,11 +538,10 @@ export default function EventsPage() {
                 {statuses.map((status) => (
                   <label
                     key={status}
-                    className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-colors ${
-                      selectedStatus === status
-                        ? 'liquid-glass-red-button text-white'
-                        : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-colors ${selectedStatus === status
+                      ? 'liquid-glass-red-button text-white'
+                      : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     <input
                       type="radio"
@@ -495,29 +563,24 @@ export default function EventsPage() {
               onClick={() => setCsiExpanded(!csiExpanded)}
               className="w-full flex items-center justify-between px-4 py-3 bg-gray-200 dark:bg-[#2a2a2a] text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition-colors"
             >
-              <span>CSI Tags</span>
+              <span>CSI</span>
               <i
-                className={`fa-solid fa-chevron-down text-sm transition-transform ${
-                  csiExpanded ? 'rotate-180' : ''
-                }`}
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${csiExpanded ? 'rotate-180' : ''
+                  }`}
               />
             </button>
             {csiExpanded && (
               <div className="p-3 space-y-2 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
-                <p className="text-xs text-gray-500 dark:text-[#666666] mb-2 transition-colors duration-300">
-                  Select multiple tags
-                </p>
                 {csiCategories.map((csi) => {
                   const isSelected = selectedCsiTags.includes(csi.value);
-                  const colors = getCsiColors(csi.value);
+                  const gradientClass = getCsiGradientClass(csi.value);
                   return (
                     <label
                       key={csi.value}
-                      className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-all border-2 ${
-                        isSelected
-                          ? `${colors.bg} ${colors.text} ${colors.border}`
-                          : 'bg-gray-100 dark:bg-[#2a2a2a] border-gray-200 dark:border-[#3a3a3a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
-                      }`}
+                      className={`flex items-center px-4 py-3 rounded-xl cursor-pointer transition-all ${isSelected
+                        ? `bg-gradient-to-r ${gradientClass} text-white shadow-lg`
+                        : 'bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-[#a0a0a0] hover:bg-gray-300 dark:hover:bg-[#3a3a3a] hover:text-gray-900 dark:hover:text-white'
+                        }`}
                     >
                       <input
                         type="checkbox"
@@ -526,7 +589,7 @@ export default function EventsPage() {
                         className="mr-3 accent-[#d62e1f]"
                       />
                       <span className="mr-2">{getCsiIcon(csi.value)}</span>
-                      {csi.label}
+                      {csi.label.toUpperCase()}
                     </label>
                   );
                 })}
@@ -542,9 +605,8 @@ export default function EventsPage() {
             >
               <span>Date Range</span>
               <i
-                className={`fa-solid fa-chevron-down text-sm transition-transform ${
-                  dateExpanded ? 'rotate-180' : ''
-                }`}
+                className={`fa-solid fa-chevron-down text-sm transition-transform ${dateExpanded ? 'rotate-180' : ''
+                  }`}
               />
             </button>
             {dateExpanded && (

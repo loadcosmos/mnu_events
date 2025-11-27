@@ -265,37 +265,39 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* My Stats Section */}
-      <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
-            My <span className="text-[#d62e1f]">Stats</span>
-          </h2>
+      {/* My Stats Section - Students Only */}
+      {currentUser?.role === 'STUDENT' && (
+        <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
+              My <span className="text-[#d62e1f]">Stats</span>
+            </h2>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white dark:bg-[#1a1a1a] rounded-lg p-6 text-center border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all shadow-lg hover:shadow-2xl">
-              <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
-                {stats.eventsAttended}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-white dark:bg-[#1a1a1a] rounded-lg p-6 text-center border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all shadow-lg hover:shadow-2xl">
+                <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
+                  {stats.eventsAttended}
+                </div>
+                <div className="text-xs md:text-sm text-gray-600 dark:text-[#a0a0a0] font-semibold transition-colors duration-300">Events Attended</div>
               </div>
-              <div className="text-xs md:text-sm text-gray-600 dark:text-[#a0a0a0] font-semibold transition-colors duration-300">Events Attended</div>
-            </div>
 
-            <div className="bg-white dark:bg-[#1a1a1a] rounded-lg p-6 text-center border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all shadow-lg hover:shadow-2xl">
-              <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
-                {stats.upcomingEvents}
+              <div className="bg-white dark:bg-[#1a1a1a] rounded-lg p-6 text-center border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all shadow-lg hover:shadow-2xl">
+                <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
+                  {stats.upcomingEvents}
+                </div>
+                <div className="text-xs md:text-sm text-gray-600 dark:text-[#a0a0a0] font-semibold transition-colors duration-300">Upcoming Events</div>
               </div>
-              <div className="text-xs md:text-sm text-gray-600 dark:text-[#a0a0a0] font-semibold transition-colors duration-300">Upcoming Events</div>
-            </div>
 
-            <div className="bg-white dark:bg-[#1a1a1a] rounded-lg p-6 text-center border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all shadow-lg hover:shadow-2xl">
-              <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
-                {stats.clubsJoined}
+              <div className="bg-white dark:bg-[#1a1a1a] rounded-lg p-6 text-center border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all shadow-lg hover:shadow-2xl">
+                <div className="text-3xl md:text-4xl font-extrabold text-[#d62e1f] mb-2">
+                  {stats.clubsJoined}
+                </div>
+                <div className="text-xs md:text-sm text-gray-600 dark:text-[#a0a0a0] font-semibold transition-colors duration-300">Clubs Joined</div>
               </div>
-              <div className="text-xs md:text-sm text-gray-600 dark:text-[#a0a0a0] font-semibold transition-colors duration-300">Clubs Joined</div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Gamification Section (Students only) */}
       {currentUser?.role === 'STUDENT' && (
@@ -310,32 +312,34 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Quick Links Section */}
-      <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
-            Quick <span className="text-[#d62e1f]">Access</span>
-          </h2>
+      {/* Quick Links Section - Students Only */}
+      {currentUser?.role === 'STUDENT' && (
+        <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
+              Quick <span className="text-[#d62e1f]">Access</span>
+            </h2>
 
-          <Link
-            to="/registrations"
-            className="flex items-center justify-between p-6 bg-white dark:bg-[#1a1a1a] rounded-lg border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all group shadow-lg hover:shadow-2xl"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#d62e1f] rounded-full flex items-center justify-center">
-                <i className="fa-solid fa-calendar-check text-white text-xl" />
+            <Link
+              to="/registrations"
+              className="flex items-center justify-between p-6 bg-white dark:bg-[#1a1a1a] rounded-lg border border-gray-200 dark:border-[#2a2a2a] hover:border-[#d62e1f] transition-all group shadow-lg hover:shadow-2xl"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#d62e1f] rounded-full flex items-center justify-center">
+                  <i className="fa-solid fa-calendar-check text-white text-xl" />
+                </div>
+                <div>
+                  <h3 className="text-gray-900 dark:text-white font-bold text-lg group-hover:text-[#d62e1f] transition-colors">
+                    My Registrations
+                  </h3>
+                  <p className="text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">View and manage your event registrations</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-gray-900 dark:text-white font-bold text-lg group-hover:text-[#d62e1f] transition-colors">
-                  My Registrations
-                </h3>
-                <p className="text-gray-600 dark:text-[#a0a0a0] text-sm transition-colors duration-300">View and manage your event registrations</p>
-              </div>
-            </div>
-            <i className="fa-solid fa-chevron-right text-gray-600 dark:text-[#a0a0a0] group-hover:text-[#d62e1f] transition-colors" />
-          </Link>
+              <i className="fa-solid fa-chevron-right text-gray-600 dark:text-[#a0a0a0] group-hover:text-[#d62e1f] transition-colors" />
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Settings Section */}
       <div className="py-8 px-4 bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300">

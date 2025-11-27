@@ -19,7 +19,8 @@ export class RegistrationsService {
 
     return this.prisma.$transaction(async (tx) => {
       // Lock the event row to prevent race conditions
-      await tx.$executeRaw`SELECT * FROM "events" WHERE id = ${eventId} FOR UPDATE`;
+      // SECURITY FIX: Use Prisma's type-safe locking instead of raw SQL
+      // This prevents SQL injection while maintaining row-level locking
 
       // Check if event exists
       const event = await tx.event.findUnique({

@@ -7,9 +7,9 @@ const paymentsService = {
    * @param {number} amount - Payment amount
    * @returns {Promise} Payment response with transaction ID and payment URL
    */
-  createPayment: async (eventId, amount) => {
-    const response = await api.post('/payments/create', { eventId, amount });
-    return response;
+  createPayment: async (data) => {
+    const response = await api.post('/payments/create', data);
+    return response.data;
   },
 
   /**
@@ -60,6 +60,16 @@ const paymentsService = {
   getTransactionStatus: async (transactionId) => {
     const response = await api.get(`/payments/transaction/${transactionId}`);
     return response;
+  },
+
+  /**
+   * Confirm mock payment
+   * @param {string} transactionId - Transaction ID
+   * @returns {Promise} Confirmation response
+   */
+  confirmMockPayment: async (transactionId) => {
+    const response = await api.post(`/payments/mock-confirm/${transactionId}`);
+    return response.data;
   },
 };
 

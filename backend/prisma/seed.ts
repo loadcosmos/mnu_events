@@ -112,6 +112,84 @@ async function main() {
 
   console.log('✅ Users created');
 
+  // Create external partners
+  const partner1User = await prisma.user.create({
+    data: {
+      email: 'partner1@itacademy.kz',
+      password: hashedPassword,
+      firstName: 'Ivan',
+      lastName: 'Petrov',
+      role: Role.EXTERNAL_PARTNER,
+      emailVerified: true,
+      faculty: null,
+    },
+  });
+
+  const partner2User = await prisma.user.create({
+    data: {
+      email: 'partner2@coffeehouse.kz',
+      password: hashedPassword,
+      firstName: 'Elena',
+      lastName: 'Sidorova',
+      role: Role.EXTERNAL_PARTNER,
+      emailVerified: true,
+      faculty: null,
+    },
+  });
+
+  // Create platform settings
+  await prisma.platformSettings.create({
+    data: {
+      defaultCommissionRate: 0.10, // 10%
+      premiumCommissionRate: 0.07, // 7%
+      additionalEventPrice: 3000,
+      premiumSubscriptionPrice: 15000,
+      topBannerPricePerWeek: 15000,
+      nativeFeedPricePerWeek: 8000,
+      sidebarPricePerWeek: 5000,
+      platformKaspiPhone: '+7 777 999 88 77',
+      platformKaspiName: 'MNU Events Platform',
+    },
+  });
+
+  const partner1 = await prisma.externalPartner.create({
+    data: {
+      userId: partner1User.id,
+      companyName: 'IT Academy Kazakhstan',
+      bin: '123456789012',
+      contactPerson: 'Ivan Petrov',
+      phone: '+7 777 123 45 67',
+      email: 'info@itacademy.kz',
+      whatsapp: '+7 777 123 45 67',
+      kaspiPhone: '+7 777 123 45 67',
+      kaspiName: 'Ivan Petrov',
+      commissionRate: 0.10,
+      paidEventSlots: 2, // Has 2 additional paid slots
+      isVerified: true,
+      verifiedAt: new Date(),
+    },
+  });
+
+  const partner2 = await prisma.externalPartner.create({
+    data: {
+      userId: partner2User.id,
+      companyName: 'Coffee House Central',
+      bin: '987654321098',
+      contactPerson: 'Elena Sidorova',
+      phone: '+7 701 987 65 43',
+      email: 'info@coffeehouse.kz',
+      whatsapp: '+7 701 987 65 43',
+      kaspiPhone: '+7 701 987 65 43',
+      kaspiName: 'Elena Sidorova',
+      commissionRate: 0.08, // Custom 8% commission
+      paidEventSlots: 0,
+      isVerified: true,
+      verifiedAt: new Date(),
+    },
+  });
+
+  console.log('✅ External partners created');
+
   // Create events
   const events = [];
 
@@ -299,6 +377,55 @@ async function main() {
   });
   events.push(event10);
 
+  // Create external partner events (paid, with commission tracking)
+  const partnerEvent1 = await prisma.event.create({
+    data: {
+      title: 'Full-Stack Web Development Bootcamp',
+      description:
+        'Intensive 2-day coding bootcamp by IT Academy Kazakhstan. Learn React, Node.js, and deploy your first web app. Certificate included.',
+      category: Category.TECH,
+      csiTags: [CsiCategory.CREATIVITY, CsiCategory.INTELLIGENCE],
+      location: 'IT Academy, Dostyk Avenue 123',
+      startDate: new Date(`${eventYear}-12-21T10:00:00`),
+      endDate: new Date(`${eventYear}-12-22T18:00:00`),
+      capacity: 25,
+      status: EventStatus.UPCOMING,
+      imageUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085',
+      creatorId: partner1User.id,
+      isPaid: true,
+      price: 15000,
+      isExternalEvent: true,
+      externalPartnerId: partner1.id,
+      checkInMode: CheckInMode.ORGANIZER_SCANS,
+    },
+  });
+  events.push(partnerEvent1);
+
+  const partnerEvent2 = await prisma.event.create({
+    data: {
+      title: 'Coffee & Networking: Startup Founders Meetup',
+      description:
+        'Exclusive networking event for aspiring entrepreneurs and startup founders. Connect over coffee, share ideas, and find potential co-founders. Drinks and snacks included.',
+      category: Category.CAREER,
+      csiTags: [CsiCategory.SERVICE],
+      location: 'Coffee House Central, Abay Street 45',
+      startDate: new Date(`${eventYear}-12-17T18:00:00`),
+      endDate: new Date(`${eventYear}-12-17T21:00:00`),
+      capacity: 30,
+      status: EventStatus.UPCOMING,
+      imageUrl: 'https://images.unsplash.com/photo-1511920170033-f8396924c348',
+      creatorId: partner2User.id,
+      isPaid: true,
+      price: 2500,
+      isExternalEvent: true,
+      externalPartnerId: partner2.id,
+      checkInMode: CheckInMode.ORGANIZER_SCANS,
+    },
+  });
+  events.push(partnerEvent2);
+
+  console.log('✅ External partner events created (testing commission system)');
+
   // Create paid events
   const paidEvent1 = await prisma.event.create({
     data: {
@@ -440,7 +567,16 @@ async function main() {
       timestamp: Date.now(),
     };
 
-    const secret = process.env.PAYMENT_SECRET || 'default-dev-secret-change-in-production';
+    // SECURITY FIX: Never use default secrets - require PAYMENT_SECRET to be set
+    // This prevents QR code forgery attacks
+    if (!process.env.PAYMENT_SECRET) {
+      throw new Error(
+        'PAYMENT_SECRET environment variable is required for seed data. ' +
+        'This secret is used to sign QR codes and must be set in your .env file.'
+      );
+    }
+
+    const secret = process.env.PAYMENT_SECRET;
     const signature = crypto
       .createHmac('sha256', secret)
       .update(JSON.stringify(qrPayload))
@@ -471,7 +607,7 @@ async function main() {
   // Create paid tickets with real QR codes
   const ticket1Id = 'ticket-seed-' + Date.now() + '-1';
   const qrCode1 = await generateTicketQRCode(ticket1Id, paidEvent1.id, student1.id);
-  
+
   const ticket1 = await prisma.ticket.create({
     data: {
       id: ticket1Id,
@@ -489,7 +625,7 @@ async function main() {
 
   const ticket2Id = 'ticket-seed-' + Date.now() + '-2';
   const qrCode2 = await generateTicketQRCode(ticket2Id, paidEvent1.id, student2.id);
-  
+
   const ticket2 = await prisma.ticket.create({
     data: {
       id: ticket2Id,
@@ -507,7 +643,7 @@ async function main() {
 
   const ticket3Id = 'ticket-seed-' + Date.now() + '-3';
   const qrCode3 = await generateTicketQRCode(ticket3Id, paidEvent2.id, student3.id);
-  
+
   const ticket3 = await prisma.ticket.create({
     data: {
       id: ticket3Id,
@@ -523,7 +659,84 @@ async function main() {
     },
   });
 
-  console.log('✅ Tickets created');
+  // Create partner event tickets with commission tracking
+  // Partner 1 (IT Academy): 15,000₸ event, 10% commission = 1,500₸ commission, 13,500₸ to partner
+  const partnerTicket1Id = 'ticket-seed-' + Date.now() + '-partner1';
+  const partnerQrCode1 = await generateTicketQRCode(partnerTicket1Id, partnerEvent1.id, student1.id);
+
+  const partnerTicket1 = await prisma.ticket.create({
+    data: {
+      id: partnerTicket1Id,
+      eventId: partnerEvent1.id,
+      userId: student1.id,
+      price: 15000,
+      platformFee: 0, // No platform fee for external events
+      status: TicketStatus.PAID,
+      paymentMethod: 'kaspi',
+      transactionId: 'KASPI_TXN_' + Date.now() + '_P1',
+      qrCode: partnerQrCode1,
+      purchasedAt: new Date(),
+      // Commission fields
+      commissionRate: 0.10, // 10%
+      commissionAmount: 1500, // 15,000 * 0.10
+      partnerAmount: 13500, // 15,000 - 1,500
+      ticketCode: 'TICKET-SEED001',
+      commissionPaidByPartner: false,
+    },
+  });
+
+  // Partner 2 (Coffee House): 2,500₸ event, 8% custom commission = 200₸ commission, 2,300₸ to partner
+  const partnerTicket2Id = 'ticket-seed-' + Date.now() + '-partner2';
+  const partnerQrCode2 = await generateTicketQRCode(partnerTicket2Id, partnerEvent2.id, student2.id);
+
+  const partnerTicket2 = await prisma.ticket.create({
+    data: {
+      id: partnerTicket2Id,
+      eventId: partnerEvent2.id,
+      userId: student2.id,
+      price: 2500,
+      platformFee: 0,
+      status: TicketStatus.PAID,
+      paymentMethod: 'kaspi',
+      transactionId: 'KASPI_TXN_' + Date.now() + '_P2',
+      qrCode: partnerQrCode2,
+      purchasedAt: new Date(),
+      // Commission fields
+      commissionRate: 0.08, // 8% custom rate
+      commissionAmount: 200, // 2,500 * 0.08
+      partnerAmount: 2300, // 2,500 - 200
+      ticketCode: 'TICKET-SEED002',
+      commissionPaidByPartner: false,
+    },
+  });
+
+  // One more ticket for partner event 1
+  const partnerTicket3Id = 'ticket-seed-' + Date.now() + '-partner3';
+  const partnerQrCode3 = await generateTicketQRCode(partnerTicket3Id, partnerEvent1.id, student3.id);
+
+  const partnerTicket3 = await prisma.ticket.create({
+    data: {
+      id: partnerTicket3Id,
+      eventId: partnerEvent1.id,
+      userId: student3.id,
+      price: 15000,
+      platformFee: 0,
+      status: TicketStatus.PAID,
+      paymentMethod: 'kaspi',
+      transactionId: 'KASPI_TXN_' + Date.now() + '_P3',
+      qrCode: partnerQrCode3,
+      purchasedAt: new Date(),
+      // Commission fields
+      commissionRate: 0.10,
+      commissionAmount: 1500,
+      partnerAmount: 13500,
+      ticketCode: 'TICKET-SEED003',
+      commissionPaidByPartner: true, // This one is already paid
+      commissionPaidAt: new Date(),
+    },
+  });
+
+  console.log('✅ Tickets created (including 3 partner event tickets with commission tracking)');
 
   // Create check-ins
   await prisma.checkIn.create({
@@ -701,22 +914,53 @@ async function main() {
     },
   });
 
-  const ad4 = await prisma.advertisement.create({
+  // Add more HERO_SLIDE ads for testing carousel
+  const ad5 = await prisma.advertisement.create({
     data: {
-      title: 'Language Center - 20% Off',
-      imageUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d',
-      linkUrl: null,
-      position: AdPosition.BOTTOM_BANNER,
+      title: 'Kaspi Bank - Кредит наличными до 10 млн ₸! Получите деньги за 1 день',
+      imageUrl: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3',
+      linkUrl: 'https://kaspi.kz/shop/kredit',
+      position: AdPosition.HERO_SLIDE,
       paymentStatus: PaymentStatus.PAID,
       isActive: true,
       startDate: now,
       endDate: adEndDate,
-      impressions: 820,
-      clicks: 45,
+      impressions: 2500,
+      clicks: 180,
     },
   });
 
-  console.log('✅ Advertisements created');
+  const ad6 = await prisma.advertisement.create({
+    data: {
+      title: 'IT Academy - Стань программистом за 6 месяцев! Гарантия трудоустройства',
+      imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97',
+      linkUrl: 'https://itacademy.kz',
+      position: AdPosition.HERO_SLIDE,
+      paymentStatus: PaymentStatus.PAID,
+      isActive: true,
+      startDate: now,
+      endDate: adEndDate,
+      impressions: 1800,
+      clicks: 120,
+    },
+  });
+
+  const ad7 = await prisma.advertisement.create({
+    data: {
+      title: `Coffee House - Скидка 30% для студентов! Покажите студенческий и получите скидку на все меню`,
+      imageUrl: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31',
+      linkUrl: 'https://www.instagram.com/coffeehouse.almaty',
+      position: AdPosition.HERO_SLIDE,
+      paymentStatus: PaymentStatus.PAID,
+      isActive: true,
+      startDate: now,
+      endDate: adEndDate,
+      impressions: 1600,
+      clicks: 95,
+    },
+  });
+
+  console.log('✅ Advertisements created (including 4 HERO_SLIDE ads)')
 
   // Create clubs
   const club1 = await prisma.club.create({
@@ -851,22 +1095,36 @@ async function main() {
   ║   Student 1:  student1@kazguu.kz                             ║
   ║   Student 2:  student2@kazguu.kz                             ║
   ║   Student 3:  student3@kazguu.kz                             ║
+  ║   Partner 1:  partner1@itacademy.kz (IT Academy)             ║
+  ║   Partner 2:  partner2@coffeehouse.kz (Coffee House)         ║
   ║                                                              ║
   ║   Password for all: Password123!                             ║
   ║                                                              ║
   ║   Created:                                                   ║
-  ║   - 6 Users (1 Admin, 1 Organizer, 1 Moderator, 3 Students) ║
-  ║   - 13 Events (10 free + 2 paid + 1 lecture)                 ║
+  ║   - 8 Users (1 Admin, 1 Organizer, 1 Moderator,             ║
+  ║              3 Students, 2 External Partners)                ║
+  ║   - 15 Events (10 free + 2 paid + 2 partner + 1 lecture)     ║
   ║   - 7 Free Registrations                                     ║
-  ║   - 3 Paid Tickets (with QR codes)                           ║
+  ║   - 6 Paid Tickets (3 platform + 3 partner events)           ║
   ║   - 2 Check-ins (student scan mode)                          ║
   ║   - 6 Services (3 general + 3 tutoring)                      ║
   ║   - 4 Advertisements (various positions)                     ║
   ║   - 6 Clubs (various categories)                             ║
   ║   - 7 Club Memberships                                       ║
   ║                                                              ║
+  ║   🤝 External Partners System Ready:                         ║
+  ║   - 2 External partners with different commission rates      ║
+  ║   - Partner 1: IT Academy (10% commission, 2 paid slots)     ║
+  ║   - Partner 2: Coffee House (8% custom rate, 0 paid slots)   ║
+  ║   - 2 Partner events created and linked                      ║
+  ║   - 3 Tickets with commission tracking:                      ║
+  ║     • IT Academy event: 15,000₸ (1,500₸ commission)          ║
+  ║     • Coffee House event: 2,500₸ (200₸ commission)           ║
+  ║   - Platform settings configured                             ║
+  ║                                                              ║
   ║   💰 Monetization Features Ready:                            ║
   ║   - Paid events with tickets                                 ║
+  ║   - Commission system for external partners                  ║
   ║   - QR check-in (2 modes)                                    ║
   ║   - Services marketplace                                     ║
   ║   - Advertisement system                                     ║

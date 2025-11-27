@@ -46,8 +46,8 @@ export class PaymentVerificationController {
   }
 
   @Get('pending')
-  @Roles('ORGANIZER')
-  @ApiOperation({ summary: 'Get pending payment verifications (organizer)' })
+  @Roles('ORGANIZER', 'EXTERNAL_PARTNER', 'MODERATOR', 'ADMIN')
+  @ApiOperation({ summary: 'Get pending payment verifications (organizer/partner/moderator)' })
   @ApiQuery({ name: 'eventId', required: false })
   @ApiResponse({
     status: 200,
@@ -64,15 +64,15 @@ export class PaymentVerificationController {
   }
 
   @Get('event/:eventId')
-  @Roles('ORGANIZER')
+  @Roles('ORGANIZER', 'EXTERNAL_PARTNER', 'MODERATOR', 'ADMIN')
   @ApiOperation({
-    summary: 'Get all verifications for an event (organizer)',
+    summary: 'Get all verifications for an event (organizer/partner/moderator)',
   })
   @ApiResponse({
     status: 200,
     description: 'Returns all verifications for the event',
   })
-  @ApiResponse({ status: 403, description: 'Forbidden - Not event organizer' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Not event organizer/partner' })
   async getEventVerifications(@Request() req: RequestWithUser, @Param('eventId') eventId: string) {
     return this.paymentVerificationService.getEventVerifications(
       eventId,
@@ -81,13 +81,13 @@ export class PaymentVerificationController {
   }
 
   @Post(':id/verify')
-  @Roles('ORGANIZER')
-  @ApiOperation({ summary: 'Approve or reject payment (organizer)' })
+  @Roles('ORGANIZER', 'EXTERNAL_PARTNER', 'MODERATOR', 'ADMIN')
+  @ApiOperation({ summary: 'Approve or reject payment (organizer/partner/moderator)' })
   @ApiResponse({
     status: 200,
     description: 'Payment verification updated',
   })
-  @ApiResponse({ status: 403, description: 'Forbidden - Not event organizer' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Not event organizer/partner' })
   @ApiResponse({ status: 404, description: 'Verification not found' })
   async verifyPayment(
     @Request() req: RequestWithUser,

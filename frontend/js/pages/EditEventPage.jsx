@@ -29,7 +29,7 @@ const CATEGORIES = [
 export default function EditEventPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -72,7 +72,11 @@ export default function EditEventPage() {
         toast.error('Event not found', {
           description: 'The event you are trying to edit does not exist.',
         });
-        navigate('/organizer');
+        if (user?.role === 'EXTERNAL_PARTNER') {
+          navigate('/partner');
+        } else {
+          navigate('/organizer');
+        }
         return;
       }
 
@@ -111,14 +115,18 @@ export default function EditEventPage() {
       console.error('[EditEventPage] Load event failed:', err);
       const errorMessage = err.response?.data?.message
         ? (Array.isArray(err.response.data.message)
-            ? err.response.data.message.join(', ')
-            : err.response.data.message)
+          ? err.response.data.message.join(', ')
+          : err.response.data.message)
         : err.message || 'Failed to load event';
       setError(errorMessage);
       toast.error('Failed to load event', {
         description: errorMessage,
       });
-      navigate('/organizer');
+      if (user?.role === 'EXTERNAL_PARTNER') {
+        navigate('/partner');
+      } else {
+        navigate('/organizer');
+      }
     } finally {
       setLoading(false);
     }
@@ -210,8 +218,8 @@ export default function EditEventPage() {
       console.error('[EditEventPage] Update event failed:', err);
       const errorMessage = err.response?.data?.message
         ? (Array.isArray(err.response.data.message)
-            ? err.response.data.message.join(', ')
-            : err.response.data.message)
+          ? err.response.data.message.join(', ')
+          : err.response.data.message)
         : err.message || 'Failed to update event';
       setError(errorMessage);
       // Toast уже показывается в apiClient interceptor
@@ -420,7 +428,13 @@ export default function EditEventPage() {
                 type="button"
                 variant="outline"
                 size="lg"
-                onClick={() => navigate(`/events/${id}`)}
+                onClick={() => {
+                  if (user?.role === 'EXTERNAL_PARTNER') {
+                    navigate('/partner');
+                  } else {
+                    navigate('/organizer');
+                  }
+                }}
                 disabled={saving}
                 className="border-gray-300 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl"
               >

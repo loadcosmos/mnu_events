@@ -129,3 +129,12 @@ export const getAllCsiCategories = () => {
     colors: CSI_COLORS[key],
   }));
 };
+
+/**
+ * Get CSI category gradient class for backgrounds
+ * Returns the gradient Tailwind classes (e.g., "from-purple-500 to-pink-500")
+ */
+export const getCsiGradientClass = (csiCategory) => {
+  const colors = getCsiColors(csiCategory);
+  return colors.gradient;
+};

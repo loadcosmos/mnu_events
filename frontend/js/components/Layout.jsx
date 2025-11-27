@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 import OrganizerLayout from './OrganizerLayout.jsx';
 import AdminLayout from './AdminLayout.jsx';
+import PartnerLayout from './PartnerLayout.jsx';
 import BottomNavigation from './BottomNavigation';
 import GamificationBadge from './Gamification/GamificationBadge';
 import gamificationService from '../services/gamificationService';
@@ -124,6 +125,11 @@ export default function Layout({ children }) {
   // Если пользователь - админ, используем AdminLayout
   if (isAuthenticated() && user?.role === 'ADMIN') {
     return <AdminLayout>{children}</AdminLayout>;
+  }
+
+  // Если пользователь - внешний партнер, используем PartnerLayout
+  if (isAuthenticated() && user?.role === 'EXTERNAL_PARTNER') {
+    return <PartnerLayout>{children}</PartnerLayout>;
   }
 
   const handleLogout = async () => {
@@ -259,6 +265,14 @@ export default function Layout({ children }) {
                 asChild
                 className={`rounded-xl ${textColorClass} ${hoverClass} text-base transition-all`}
               >
+                <Link to="/marketplace">Marketplace</Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="default"
+                asChild
+                className={`rounded-xl ${textColorClass} ${hoverClass} text-base transition-all`}
+              >
                 <Link to="/clubs">Clubs</Link>
               </Button>
             </nav>
@@ -360,6 +374,86 @@ export default function Layout({ children }) {
       </header>
 
       <main className="pt-20">{children}</main>
+
+      {/* Footer */}
+      <footer className="hidden md:block mt-16 border-t border-gray-200 dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-lg">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid gap-8 md:grid-cols-3">
+            {/* About */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">MNU Events</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                University events management platform for students, organizers, and partners.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">Quick Links</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/events" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#d62e1f] dark:hover:text-[#d62e1f] transition-colors">
+                    Events
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/clubs" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#d62e1f] dark:hover:text-[#d62e1f] transition-colors">
+                    Clubs
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/marketplace" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#d62e1f] dark:hover:text-[#d62e1f] transition-colors">
+                    Marketplace
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/premium" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#d62e1f] dark:hover:text-[#d62e1f] transition-colors">
+                    Premium
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">Contact & Support</h3>
+              <div className="space-y-3">
+                <a
+                  href="https://wa.me/77779998877"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                >
+                  <i className="fa-brands fa-whatsapp text-lg"></i>
+                  <span>+7 777 999 88 77</span>
+                </a>
+                <p className="text-xs text-gray-500 dark:text-gray-500">
+                  For partner inquiries and event slot purchases
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                © {new Date().getFullYear()} MNU Events Platform. All rights reserved.
+              </p>
+              <div className="flex items-center gap-6">
+                <a
+                  href="https://wa.me/77779998877"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-600 dark:text-gray-400 hover:text-[#d62e1f] dark:hover:text-[#d62e1f] transition-colors"
+                >
+                  <i className="fa-brands fa-whatsapp text-xl"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
 
       {/* Bottom Navigation for mobile */}
       <BottomNavigation />

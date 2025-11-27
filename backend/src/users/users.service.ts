@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto, UpdateRoleDto } from './dto/update-user.dto';
 import { Role } from '@prisma/client';
+import { sanitizeSearchQuery } from '../common/utils';
 
 @Injectable()
 export class UsersService {
@@ -15,12 +16,15 @@ export class UsersService {
   async findAll(page: number = 1, limit: number = 10, search?: string) {
     const skip = (page - 1) * limit;
 
-    const where = search
+    // SECURITY FIX: Sanitize search input to prevent ReDoS and resource exhaustion
+    const sanitizedSearch = sanitizeSearchQuery(search);
+
+    const where = sanitizedSearch
       ? {
           OR: [
-            { email: { contains: search, mode: 'insensitive' as any } },
-            { firstName: { contains: search, mode: 'insensitive' as any } },
-            { lastName: { contains: search, mode: 'insensitive' as any } },
+            { email: { contains: sanitizedSearch, mode: 'insensitive' as any } },
+            { firstName: { contains: sanitizedSearch, mode: 'insensitive' as any } },
+            { lastName: { contains: sanitizedSearch, mode: 'insensitive' as any } },
           ],
         }
       : {};
@@ -88,11 +92,41 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, currentUserId: string) {
-    // Users can only update their own profile
+    // SECURITY FIX: Simplified - only used for user updating their own profile
+    // Admin updates go through updateAsAdmin method
     if (id !== currentUserId) {
       throw new ForbiddenException('You can only update your own profile');
     }
 
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        avatar: true,
+        faculty: true,
+        role: true,
+        emailVerified: true,
+      },
+    });
+
+    return updatedUser;
+  }
+
+  async updateAsAdmin(id: string, updateUserDto: UpdateUserDto) {
+    // SECURITY FIX: Separate method for admin updates
+    // This method should only be called from admin-protected endpoints
     const user = await this.prisma.user.findUnique({
       where: { id },
     });

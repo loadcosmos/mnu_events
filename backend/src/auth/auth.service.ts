@@ -11,7 +11,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtBlacklistService } from './jwt-blacklist.service';
 import * as bcrypt from 'bcryptjs';
 import * as nodemailer from 'nodemailer';
-import { randomBytes } from 'crypto';
+import * as crypto from 'crypto'; // SECURITY FIX: Import full crypto module for timingSafeEqual
 import { Response, Request } from 'express';
 import { RegisterDto, VerifyEmailDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -153,7 +153,8 @@ export class AuthService {
     let emailSent = false;
     let emailError: string | null = null;
 
-    this.logger.log(`Attempting to send verification email to ${email}...`);
+    // SECURITY FIX: Don't log email addresses (PII) - use user ID instead
+    this.logger.log(`Attempting to send verification email for user: ${user.id}`);
     this.logger.log(`Email configured: ${this.isEmailConfigured}`);
     this.logger.log(`Transporter exists: ${!!this.transporter}`);
 
@@ -164,10 +165,10 @@ export class AuthService {
       try {
         await this.sendVerificationEmail(email, verificationCode);
         emailSent = true;
-        this.logger.log(`✅ Verification email sent successfully to ${email}`);
+        this.logger.log(`✅ Verification email sent successfully for user: ${user.id}`);
       } catch (error) {
         emailError = error instanceof Error ? error.message : 'Unknown error';
-        this.logger.error(`❌ Failed to send verification email to ${email}:`, error);
+        this.logger.error(`❌ Failed to send verification email for user: ${user.id}`, error);
 
         // Log detailed error information
         if (error instanceof Error) {
@@ -217,7 +218,11 @@ export class AuthService {
       throw new BadRequestException('Verification code expired. Please request a new one.');
     }
 
-    if (user.verificationCode !== code) {
+    // SECURITY FIX: Use constant-time comparison to prevent timing attacks
+    // This prevents attackers from determining correct digits via timing analysis
+    const isCodeValid = this.constantTimeCompare(user.verificationCode, code);
+    
+    if (!isCodeValid) {
       throw new BadRequestException('Invalid verification code');
     }
 
@@ -345,13 +350,15 @@ export class AuthService {
     // Send verification email
     try {
       await this.sendVerificationEmail(email, verificationCode);
-      this.logger.log(`Verification code resent to ${email}`);
+      // SECURITY FIX: Don't log email addresses (PII) - use user ID instead
+      this.logger.log(`Verification code resent for user: ${user.id}`);
       return {
         message: 'Verification code sent to your email',
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(`Failed to resend verification email to ${email}:`, error);
+      // SECURITY FIX: Don't log email addresses (PII) - use user ID instead
+      this.logger.error(`Failed to resend verification email for user: ${user.id}`, error);
 
       // Log detailed error
       if (error instanceof Error) {
@@ -495,13 +502,39 @@ export class AuthService {
   private generateSecureVerificationCode(): string {
     // Generate random bytes and convert to a 6-digit number
     // We need 3 bytes (24 bits) to get numbers up to 16,777,215
-    const randomBuffer = randomBytes(3);
+    const randomBuffer = crypto.randomBytes(3);
     const randomNumber = randomBuffer.readUIntBE(0, 3);
 
     // Ensure it's a 6-digit number (100000-999999)
     const code = (randomNumber % 900000) + 100000;
 
     return code.toString();
+  }
+
+  /**
+   * SECURITY FIX: Constant-time string comparison
+   * Prevents timing attacks that could leak information about correct values
+   * Uses crypto.timingSafeEqual for cryptographically secure comparison
+   */
+  private constantTimeCompare(a: string, b: string): boolean {
+    // Handle null/undefined cases
+    if (!a || !b) {
+      return false;
+    }
+
+    // Normalize lengths - if different, comparison will fail but still take constant time
+    // Pad shorter string with zeros to match length
+    const maxLength = Math.max(a.length, b.length);
+    const bufferA = Buffer.from(a.padEnd(maxLength, '\0'));
+    const bufferB = Buffer.from(b.padEnd(maxLength, '\0'));
+
+    try {
+      // timingSafeEqual requires buffers of same length
+      return crypto.timingSafeEqual(bufferA, bufferB) && a.length === b.length;
+    } catch {
+      // If any error occurs, return false
+      return false;
+    }
   }
 
   /**
@@ -630,9 +663,9 @@ Maqsut Narikbayev University
 
     try {
       const info = await this.transporter.sendMail(mailOptions);
+      // SECURITY FIX: Don't log recipient email address (PII)
       this.logger.log('Email sent successfully:', {
         messageId: info.messageId,
-        to: email,
         from: emailFrom,
       });
     } catch (error) {

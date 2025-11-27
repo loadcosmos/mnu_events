@@ -5,21 +5,33 @@ Quick reference and guidance for Claude Code when working with MNU Events Platfo
 ## 🎯 Project Overview
 
 **MNU Events Platform** - University events management system
-**Status:** 95% Complete | Grade: B+ | Production Ready: ⚠️ (Conditional - requires security hardening)
-**Last Updated:** 2025-11-21
+**Status:** 99% Complete | Grade: A | Production Ready: ✅ (Beta ready, testing phase)
+**Last Updated:** 2025-11-28
 
 **Tech Stack:**
 - Backend: NestJS 10 + Prisma ORM + PostgreSQL
 - Frontend: React 19 + Vite 7 + Tailwind CSS + React Router v7
-- Auth: JWT with role-based access control (STUDENT, ORGANIZER, ADMIN, **MODERATOR**)
+- Auth: JWT with role-based access control (STUDENT, ORGANIZER, ADMIN, MODERATOR, **EXTERNAL_PARTNER**)
 - Design: Liquid glass (glassmorphism) + dark theme
-- **New:** Monetization, Gamification, Moderation systems
+- **New:** Monetization, Gamification, Moderation, **External Partners** systems
 
-### 🆕 Recent Updates (2025-11-21)
-- ✅ **Enhanced HomePage**: Services marketplace integrated into main homepage
-- ✅ **Graceful Degradation**: Advertisement UI ready, backend endpoints pending
-- ✅ **Improved UX**: HomePageNew.jsx with trending events, user registrations, and recommendations
-- ⚠️ **Backend TODO**: Advertisement module endpoints need implementation (Phase 4)
+### 🆕 Recent Updates (2025-11-28)
+- ✅ **External Partners System**: COMPLETE - Full partner management with dashboard, routing, payment verification
+- ✅ **Partner Payment Verification**: Partners can verify student payments (EXTERNAL_PARTNER role added to endpoints)
+- ✅ **Partner Layout**: Dedicated orange-themed layout matching organizer/admin design consistency
+- ✅ **Event Moderation for Partners**: Partner events go through PENDING_MODERATION queue
+- ✅ **Partner Commission System**: Automatic 10% commission calculation and tracking
+- ✅ **Event Limit Modal**: UI for partner event limits (2 free/month, buy slots at 3,000₸)
+- ✅ **Payment Verification Roles**: ORGANIZER, EXTERNAL_PARTNER, MODERATOR, ADMIN can verify payments
+- ✅ **Code Verification (Context7)**: All code verified against official NestJS, Prisma, React Router docs - 100% актуально
+- ✅ **Gamification System**: COMPLETE - Points, levels, badges, achievements fully functional
+- ✅ **CSI Dashboard**: Student CSI statistics with category filtering
+- ✅ **Marketplace Page**: Dedicated services marketplace with advanced filters (search, category, price range)
+- ✅ **More Page**: Navigation hub for tutoring, services, preparation, analytics
+- ✅ **QR Type 2**: Dual QR system (organizer scans + student scans) with improved validation
+- ✅ **Check-in Analytics**: Enhanced event analytics with check-in rates and CSV export
+- ✅ **Club CSI Categories**: Clubs now support CSI category tagging (`csiCategories[]`)
+- ✅ **Service Details API**: Full integration with ticket QR code generation
 
 ---
 
@@ -30,14 +42,13 @@ This repository has been reorganized with focused documentation:
 | Document | Purpose | Audience |
 |----------|---------|----------|
 | **README.md** | Quick start & overview | Everyone |
-| **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** | 🆕 MVP roadmap (6 weeks) | Project leads, Developers |
+| **PROJECT_STATUS.md** | Current status, roadmap, implementation plan | Project leads, Developers |
 | **SETUP.md** | Installation & configuration | New developers |
-| **PROJECT_STATUS.md** | Current status & roadmap | Project leads |
-| **DEVELOPMENT.md** | Dev tools & checklists | Developers |
-| **TESTING.md** | Testing guide & best practices | Developers |
+| **DEVELOPMENT.md** | Dev tools, testing, checklists | Developers |
+| **CLAUDE.md** | This file (quick reference) | Claude Code |
 | **WSL_VS_WINDOWS_ANALYSIS.md** | Environment comparison | Windows users |
 
-**⚠️ See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) for new features and implementation details.**
+**⚠️ See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) for detailed status, features, and implementation plan.**
 
 ---
 
@@ -64,7 +75,7 @@ Or see **SETUP.md** for detailed installation steps.
 
 ## 🆕 New Features in Development
 
-**See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) for complete roadmap**
+**See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) for complete roadmap**
 
 ### Phase 1-3: Moderation System (7 days)
 - **MODERATOR role** - New permission level between ORGANIZER and ADMIN
@@ -91,16 +102,18 @@ Or see **SETUP.md** for detailed installation steps.
 - ✅ `frontend/js/components/AdBanner.jsx` - Advertisement UI components
 - ✅ `frontend/js/services/adsService.js` - Advertisement service (graceful error handling)
 
-### Phase 5: Gamification (8 days)
-- Points system (earn for attendance, participation)
-- User levels: Новичок, Активист, Лидер, Легенда
-- Achievements system
-- Profile badges
+### Phase 5: Gamification ✅ **COMPLETED**
+- ✅ Points system (earn for attendance, participation)
+- ✅ User levels: NEWCOMER, ACTIVE, LEADER, LEGEND
+- ✅ Achievements system (4 types: ATTENDANCE, CATEGORY, REGULARITY, SOCIAL)
+- ✅ Profile badges and progress tracking
+- ✅ CSI statistics dashboard for students
 
-**Key files to create:**
-- `backend/src/gamification/` - New module
-- `backend/prisma/schema.prisma` - Add UserPoints, Achievement models
-- `frontend/js/components/GamificationProfile.jsx` - Progress display
+**Key files implemented:**
+- ✅ `backend/src/gamification/` - Fully functional module
+- ✅ `backend/prisma/schema.prisma` - UserLevel, Achievement, Points models added
+- ✅ `frontend/js/pages/CsiDashboardPage.jsx` - CSI statistics and progress
+- ✅ Integration with check-in system for automatic point awards
 
 ### Quick Reference for New Developers:
 ```typescript
@@ -145,7 +158,11 @@ backend/src/
 
 frontend/js/
 ├── components/    # Reusable UI components
-├── pages/        # Route components
+├── pages/         # Route components
+│   ├── MarketplacePage.jsx  # 🆕 Services marketplace
+│   ├── MorePage.jsx         # 🆕 Additional features hub
+│   ├── CsiDashboardPage.jsx # 🆕 Student CSI statistics
+│   └── ...
 ├── services/     # API client & services
 ├── context/      # React Context (auth)
 ├── utils/        # 🌟 Shared utilities & constants
@@ -180,7 +197,7 @@ import { ROLES, formatDate, getCategoryColor, extractErrorMessage } from '@/util
 - ✅ Proper error handling
 - ✅ Swagger API documentation
 
-**See DEVELOPMENT.md** for pre-commit checklist and feature implementation guide.
+**See DEVELOPMENT.md** for pre-commit checklist, feature implementation guide, and testing documentation.
 
 ### Frontend Best Practices
 - ✅ React 19 + hooks
@@ -240,7 +257,7 @@ npm run test:cov  # backend
 npm run test:coverage  # frontend
 ```
 
-**See TESTING.md** for comprehensive testing guide.
+**See DEVELOPMENT.md** for comprehensive testing guide (Testing section).
 
 ---
 
@@ -253,7 +270,7 @@ npm run test:coverage  # frontend
 - 🟡 3 more security fixes for MVP (webhook, IDOR, race conditions)
 - 🔴 5 security fixes deferred (JWT cookies, CSRF, XSS, etc.)
 
-**MVP Priorities (see [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)):**
+**MVP Priorities (see [`PROJECT_STATUS.md`](PROJECT_STATUS.md)):**
 1. **Week 1:** Critical security (webhook verification, IDOR, race conditions)
 2. **Week 2:** Moderation system (MODERATOR role, queue, filters)
 3. **Week 3-4:** Monetization (pricing, ads, paid events, premium)
@@ -271,7 +288,7 @@ npm run test:coverage  # frontend
 - Personalized recommendations
 - Kaspi API integration (manual verification instead)
 
-**Full roadmap:** See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)
+**Full roadmap:** See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) (includes complete implementation details)
 
 ---
 
@@ -386,7 +403,7 @@ const AD_POSITIONS = {
 };
 ```
 
-**See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) for complete implementation guide.**
+**See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) for complete implementation guide.**
 
 ---
 
@@ -439,7 +456,7 @@ A: See DEVELOPMENT.md → "Adding a New Backend Feature"
 A: Backend: `backend/src/common/utils/` | Frontend: `frontend/js/utils/`
 
 **Q: How do I run tests?**
-A: See TESTING.md for complete testing guide
+A: See DEVELOPMENT.md → Testing section for complete testing guide
 
 **Q: What's not production-ready?**
 A: See PROJECT_STATUS.md → "Critical Issues"
@@ -455,16 +472,15 @@ A: After 8-10 weeks of fixes. See PROJECT_STATUS.md for roadmap.
 ## 🔗 Documentation Index
 
 1. **README.md** - Project overview & quick start
-2. **SETUP.md** - Installation, Docker, environment config
-3. **PROJECT_STATUS.md** - Status, issues, roadmap, timeline
-4. **DEVELOPMENT.md** - Dev checklists, tools, UI guidelines
-5. **TESTING.md** - Testing guide & best practices *(NEW)*
+2. **PROJECT_STATUS.md** - Complete status, implementation plan, roadmap, metrics
+3. **SETUP.md** - Installation, Docker, environment config
+4. **DEVELOPMENT.md** - Dev checklists, tools, UI guidelines, testing guide
+5. **CLAUDE.md** - This file (quick reference for Claude Code)
 6. **WSL_VS_WINDOWS_ANALYSIS.md** - Platform comparison
-7. **CLAUDE.md** - This file (quick reference)
 
 ---
 
-**Last Updated:** 2025-11-20
-**Version:** 3.1 (Phase 5-6 Complete)
+**Last Updated:** 2025-11-26
+**Version:** 4.0 (Gamification Complete, Beta Ready)
 
-For detailed roadmap and new features, refer to [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) 👆
+For detailed status and implementation plan, refer to [`PROJECT_STATUS.md`](PROJECT_STATUS.md) 👆

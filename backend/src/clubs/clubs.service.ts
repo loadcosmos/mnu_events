@@ -62,6 +62,14 @@ export class ClubsService {
       ];
     }
 
+    // CSI categories filter (multi-select)
+    if (filterDto?.csiCategories) {
+      const csiTags = filterDto.csiCategories.split(',').map(tag => tag.trim());
+      where.csiCategories = {
+        hasSome: csiTags,
+      };
+    }
+
     const [clubs, total] = await Promise.all([
       this.prisma.club.findMany({
         where,
